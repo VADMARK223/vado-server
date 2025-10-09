@@ -1,0 +1,12 @@
+services:
+  vado-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vado-server
+    ports:
+      - "5556:5556" # порт хоста: порт контейнера
+    restart: unless-stopped
+    environment:
+      - ENV=dev
+      - PORT=5556
