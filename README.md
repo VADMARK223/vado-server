@@ -34,3 +34,9 @@ go get -u go.uber.org/zap
 ```shell
 go run ./cmd/server/main.go
 ```
+
+# Stack
+- Postgres
+- Zap
+- Gin
+- Golang
