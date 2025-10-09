@@ -39,4 +39,4 @@ go run ./cmd/server/main.go
 - Postgres
 - Zap
 - Gin
-- Golang
+- Gorm

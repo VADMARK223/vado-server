@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"vado_server/internal/db"
 	"vado_server/internal/handlers"
 	"vado_server/internal/util"
@@ -11,6 +10,7 @@ import (
 	"vado_server/internal/logger"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
@@ -22,11 +22,10 @@ func main() {
 	appCtx.Log.Infow("Start vado-server.", "time", time.Now().Format("2006-01-02 15:04:05"))
 	database := initDB(appCtx)
 	appCtx.DB = database
-	defer func(database *sql.DB) {
-		_ = database.Close()
-	}(database)
+	//defer func(database *gorm.DB) {
+	//	_ = database.Close()
+	//}(database)
 
-	//handlers.RegisterTaskRoutes(appCtx)
 	startServer(appCtx, util.GetEnv("PORT"))
 }
 
@@ -40,7 +39,7 @@ func initLogger() *zap.SugaredLogger {
 	return zapLogger
 }
 
-func initDB(appCtx *appcontext.AppContext) *sql.DB {
+func initDB(appCtx *appcontext.AppContext) *gorm.DB {
 	dsn := util.GetEnv("POSTGRES_DSN")
 	database, err := db.Connect(dsn)
 	if err != nil {
