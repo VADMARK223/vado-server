@@ -8,10 +8,12 @@ import (
 	"vado_server/internal/handler"
 	"vado_server/internal/logger"
 
+	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
 
 func main() {
+	_ = godotenv.Load(".env")
 	appCtx := appcontext.NewAppContext(initLogger())
 	initLogger()
 

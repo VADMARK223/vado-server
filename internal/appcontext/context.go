@@ -31,6 +31,5 @@ func NewAppContext(log *zap.SugaredLogger) *AppContext {
 	app.DB = db
 	log.Infow("Database connected")
 
-	//"host=localhost port=5432 user=postgres password= dbname=vado sslmode=disable"
 	return app
 }
