@@ -34,6 +34,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy # app ждет healthcheck БД
+    volumes:
+      - ./templates:/app/templates   # монтируем шаблоны внутрь контейнера
 
 volumes:
   postgres-data:

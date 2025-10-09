@@ -40,3 +40,5 @@ go run ./cmd/server/main.go
 - Zap
 - Gin
 - Gorm
+
+На будущее: golang-migrate
