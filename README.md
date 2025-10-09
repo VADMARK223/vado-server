@@ -1,3 +1,25 @@
+# Docker
+## Postgres
+
+Зайти в контейнер
+```shell
+docker exec -it vado_postgres bash
+```
+
+### psql
+Зайти в `psql`
+```shell
+psql -U vadmark -d vadodb
+```
+Список таблиц
+```shell
+\dt
+```
+Структура таблицы
+```shell
+\d tasks
+```
+
 # Golang
 
 Инициализация проекта

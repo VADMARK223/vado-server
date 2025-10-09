@@ -1,13 +1,36 @@
 package appcontext
 
-import "go.uber.org/zap"
+import (
+	"database/sql"
+	"os"
+
+	_ "github.com/lib/pq"
+	"go.uber.org/zap"
+)
 
 type AppContext struct {
 	Log *zap.SugaredLogger
+	DB  *sql.DB
 }
 
 func NewAppContext(log *zap.SugaredLogger) *AppContext {
-	return &AppContext{
-		Log: log,
+	app := &AppContext{Log: log}
+	dsn := os.Getenv("POSTGRES_DSN")
+	if dsn == "" {
+		log.Fatal("POSTGRES_DSN is not set")
 	}
+
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		log.Fatalw("failed to connect to database", "error", err)
+	}
+	if err = db.Ping(); err != nil {
+		log.Fatalw("cannot ping database", "error", err)
+	}
+
+	app.DB = db
+	log.Infow("Database connected")
+
+	//"host=localhost port=5432 user=postgres password= dbname=vado sslmode=disable"
+	return app
 }

@@ -1,4 +1,24 @@
 services:
+  postgres:
+    image: postgres:15
+    container_name: vado-postgres
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U vadmark -d vadodb" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: vadmark
+      POSTGRES_PASSWORD: 5125341
+      POSTGRES_DB: vadodb
+#    ports:
+#      - "5432:5432" # Не пробрасываем порт, потому что локально уже запущен Postgres на этом порту
+    volumes:
+      - postgres-data:/var/lib/postgresql/data # том для сохранения БД
+      - ./data:/app/data   # монтируем локальную папку внутрь контейнера
+      - ./db:/docker-entrypoint-initdb.d # SQL-скрипты при старте
+
   vado-server:
     build:
       context: .
@@ -8,5 +28,11 @@ services:
       - "5556:5556" # порт хоста: порт контейнера
     restart: unless-stopped
     environment:
-      - ENV=dev
-      - PORT=5556
+      PORT: 5556
+      POSTGRES_DSN: postgres://vadmark:5125341@postgres:5432/vadodb?sslmode=disable
+    depends_on:
+      postgres:
+        condition: service_healthy # app ждет healthcheck БД
+
+volumes:
+  postgres-data:

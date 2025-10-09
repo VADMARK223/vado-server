@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 	"vado_server/internal/appcontext"
+	"vado_server/internal/handler"
 	"vado_server/internal/logger"
 
 	"go.uber.org/zap"
@@ -12,8 +13,12 @@ import (
 
 func main() {
 	appCtx := appcontext.NewAppContext(initLogger())
-
 	initLogger()
+
+	handler.RegisterTaskRoutes(appCtx)
+
+	// POSTGRES_URL is not set
+
 	startServer(appCtx, getPort())
 }
 
