@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админка</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<header>
+    <h1>Пользователи</h1>
+</header>
+
+<main>
+    <div class="container">
+        <form class="add-form" action="/admin" method="POST">
+            <label>
+                <input type="text" name="username" placeholder="Имя пользователя" required>
+            </label>
+            <label>
+                <input type="text" name="password" placeholder="Пароль пользователя" required>
+            </label>
+            <button type="submit" class="btn">Добавить пользователя</button>
+        </form>
+
+        <ul class="task-list">
+            {{range .Users}}
+            <li class="task-item">
+                <div class="task-info">
+                    <h3>{{.Username}}</h3>
+                </div>
+
+                <form action="/tasks/{{.ID}}/toggle" method="POST">
+                    <button class="btn-small" type="submit">
+                        Удалить
+                    </button>
+                </form>
+            </li>
+            {{else}}
+            <p class="empty">Пока нет пользователей</p>
+            {{end}}
+        </ul>
+    </div>
+</main>
+
+<footer>
+    <a href="/" class="link">На главную</a>
+</footer>
+</body>
+</html>

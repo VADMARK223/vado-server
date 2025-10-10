@@ -60,9 +60,14 @@ func startServer(cxt *appcontext.AppContext, port string) {
 	r.LoadHTMLGlob("internal/templates/*")
 
 	r.GET("/", handlers.ShowIndex)
-	//r.GET("/tasks", handlers.GetTasks(cxt))
+
 	r.GET("/tasks", handlers.ShowTasks(cxt))
 	r.POST("/tasks", handlers.AddTask(cxt))
+
+	r.GET("/admin", handlers.ShowAdmin(cxt))
+	r.POST("/admin", handlers.AddUser(cxt))
+
+	//r.GET("/tasks", handlers.GetTasks(cxt))
 	cxt.Log.Infow("Server starting", "port", port)
 	if err := r.Run(":" + port); err != nil {
 		cxt.Log.Fatalw("Server failed", "error", err)

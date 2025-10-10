@@ -44,7 +44,6 @@ func AddTask(appCtx *appcontext.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		// После добавления возвращаем на список
 		c.Redirect(http.StatusSeeOther, "/tasks")
 	}
 }
