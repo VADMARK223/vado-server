@@ -24,11 +24,16 @@ WORKDIR /app
 
 # Копируем бинарник из builder-этапа
 COPY --from=builder /app/vado-server .
-# Копируем шаблоны внутрь
-COPY --from=build /app/templates ./templates
+# Копируем шаблоны и статику
+COPY --from=builder /app/internal/templates ./internal/templates
+COPY --from=builder /app/internal/static ./internal/static
 
 # Пробрасываем порт
 EXPOSE 5556
+
+# Задаём переменные окружения по умолчанию
+ENV PORT=5556 \
+    GIN_MODE=release
 
 # Запускаем сервер
 CMD ["./vado-server"]

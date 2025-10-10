@@ -16,7 +16,6 @@ services:
 #      - "5432:5432" # Не пробрасываем порт, потому что локально уже запущен Postgres на этом порту
     volumes:
       - postgres-data:/var/lib/postgresql/data # том для сохранения БД
-      - ./data:/app/data   # монтируем локальную папку внутрь контейнера
       - ./db:/docker-entrypoint-initdb.d # SQL-скрипты при старте
 
   vado-server:
@@ -34,8 +33,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy # app ждет healthcheck БД
-    volumes:
-      - ./templates:/app/templates   # монтируем шаблоны внутрь контейнера
 
 volumes:
   postgres-data:

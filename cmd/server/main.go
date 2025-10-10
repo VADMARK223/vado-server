@@ -56,10 +56,13 @@ func startServer(cxt *appcontext.AppContext, port string) {
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
 	_ = r.SetTrustedProxies(nil)
-	r.LoadHTMLGlob("templates/*")
+	r.Static("/static", "./internal/static")
+	r.LoadHTMLGlob("internal/templates/*")
 
+	r.GET("/", handlers.ShowIndex)
 	//r.GET("/tasks", handlers.GetTasks(cxt))
 	r.GET("/tasks", handlers.ShowTasks(cxt))
+	r.POST("/tasks", handlers.AddTask(cxt))
 	cxt.Log.Infow("Server starting", "port", port)
 	if err := r.Run(":" + port); err != nil {
 		cxt.Log.Fatalw("Server failed", "error", err)
