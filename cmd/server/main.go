@@ -2,14 +2,13 @@ package main
 
 import (
 	"vado_server/internal/db"
-	"vado_server/internal/handlers"
+	"vado_server/internal/router"
 	"vado_server/internal/util"
 
 	"time"
 	"vado_server/internal/appcontext"
 	"vado_server/internal/logger"
 
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
 	"github.com/joho/godotenv"
@@ -52,25 +51,8 @@ func initDB(appCtx *appcontext.AppContext) *gorm.DB {
 }
 
 func startServer(cxt *appcontext.AppContext, port string) {
-	gin.SetMode(util.GetEnv("GIN_MODE"))
-	r := gin.New()
-	r.Use(gin.Logger(), gin.Recovery())
-	_ = r.SetTrustedProxies(nil)
-	r.Static("/static", "./internal/static")
-	r.LoadHTMLGlob("internal/templates/*")
+	r := router.SetupRouter(cxt)
 
-	r.GET("/", handlers.ShowIndex)
-
-	r.GET("/tasks", handlers.ShowTasks(cxt))
-	r.POST("/tasks", handlers.AddTask(cxt))
-	r.DELETE("/tasks/:id", handlers.DeleteTask(cxt))
-
-	r.GET("/users", handlers.ShowUsers(cxt))
-	r.POST("/users", handlers.AddUser(cxt))
-
-	r.DELETE("/users/:id", handlers.DeleteUser(cxt))
-
-	//r.GET("/tasks", handlers.GetTasks(cxt))
 	cxt.Log.Infow("Server starting", "port", port)
 	if err := r.Run(":" + port); err != nil {
 		cxt.Log.Fatalw("Server failed", "error", err)

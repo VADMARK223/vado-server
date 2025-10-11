@@ -4,18 +4,77 @@ import (
 	"net/http"
 	"vado_server/internal/appcontext"
 	"vado_server/internal/models"
+	"vado_server/internal/services"
 
 	"github.com/gin-gonic/gin"
 )
 
-func GetTasks(ctx *appcontext.AppContext) gin.HandlerFunc {
+// GetTasksJSON JSON-версия: /api/tasks
+func GetTasksJSON(service *services.TaskService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var tasks []models.Task
-		if err := ctx.DB.Find(&tasks).Error; err != nil {
-			ctx.Log.Errorw("Failed to get tasks", "error", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch tasks"})
+		tasks, err := service.GetAllTasks()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get tasks"})
 			return
 		}
 		c.JSON(http.StatusOK, tasks)
+	}
+}
+
+func ShowTasksPage(service *services.TaskService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		tasks, err := service.GetAllTasks()
+		if err != nil {
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"Message": "Не удалось загрузить задачи",
+			})
+			return
+		}
+
+		c.HTML(http.StatusOK, "tasks.html", gin.H{
+			"Tasks": tasks,
+		})
+	}
+}
+
+func AddTask(appCtx *appcontext.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		name := c.PostForm("name")
+		desc := c.PostForm("description")
+		completed := c.PostForm("completed")
+		appCtx.Log.Infow("Add task", "name", name, "desc", desc, "completed", completed)
+
+		if name == "" {
+			c.String(http.StatusBadRequest, "Название задачи обязательно")
+			return
+		}
+
+		task := models.Task{
+			Name:        name,
+			Description: desc,
+			Completed:   completed == "on",
+			UserID:      1, // TODO: for test
+		}
+		if err := appCtx.DB.Create(&task).Error; err != nil {
+			appCtx.Log.Errorw("failed to create task", "error", err)
+			c.String(http.StatusInternalServerError, "Ошибка добавления задачи")
+			return
+		}
+
+		c.Redirect(http.StatusSeeOther, "/tasks")
+	}
+}
+
+func DeleteTask(appCtx *appcontext.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+
+		if err := appCtx.DB.Delete(&models.Task{}, id).Error; err != nil {
+			appCtx.Log.Errorw("failed to delete task", "error", err)
+			c.String(http.StatusInternalServerError, "Ошибка удаления задачи")
+			return
+		}
+
+		c.Redirect(http.StatusSeeOther, "/tasks")
 	}
 }
