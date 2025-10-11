@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<header>
+    <h1>Вход</h1>
+</header>
+
+<main>
+    <div class="container">
+        <form method="POST" action="/login" class="add-form">
+            <label>
+                <input name="username" placeholder="Имя пользователя" required>
+            </label>
+            <label>
+                <input name="password" type="password" placeholder="Пароль" required>
+            </label>
+            {{if .Error}}<p class="error">{{.Error}}</p>{{end}}
+            <button class="btn" type="submit">Войти</button>
+            <p><a href="/register">Регистрация</a></p>
+        </form>
+    </div>
+</main>
+</body>
+</html>
