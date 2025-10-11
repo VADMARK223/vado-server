@@ -11,7 +11,7 @@ import (
 func ShowUsers(appCtx *appcontext.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var users []models.User
-		if err := appCtx.DB.Find(&users).Error; err != nil {
+		if err := appCtx.DB.Preload("Roles").Find(&users).Error; err != nil {
 			ShowError(c, "Не удалось загрузить пользователей", err.Error())
 			return
 		}
@@ -26,6 +26,7 @@ func AddUser(appCtx *appcontext.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		username := c.PostForm("username")
 		password := c.PostForm("password")
+		email := c.PostForm("email")
 
 		if username == "" {
 			c.String(http.StatusBadRequest, "Имя обязательно")
@@ -40,6 +41,7 @@ func AddUser(appCtx *appcontext.AppContext) gin.HandlerFunc {
 		user := models.User{
 			Username: username,
 			Password: password,
+			Email:    email,
 		}
 		if err := appCtx.DB.Create(&user).Error; err != nil {
 			appCtx.Log.Errorw("failed to create user", "error", err)

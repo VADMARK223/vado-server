@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Админка</title>
+    <title>Пользователи</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
@@ -30,6 +30,18 @@
             <li class="task-item" id="user-{{.ID}}">
                 <div class="task-info">
                     <h3>{{.Username}}</h3>
+                    {{if .Roles}}
+                    <p class="roles">
+                        Роли:
+                        {{range .Roles}}
+                        <span class="role">{{.Name}}</span>
+                        {{end}}
+                    </p>
+                    {{else}}
+                    <p class="roles">Без роли</p>
+                    {{end}}
+
+                    <p>{{.Email}}</p>
                 </div>
 
                 <button class="btn-small btn-danger" onclick="deleteUser('{{.ID}}')">Удалить</button>

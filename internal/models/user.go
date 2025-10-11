@@ -11,6 +11,8 @@ type User struct {
 
 	// Связь с задачами (1 пользователь и много задач)
 	Tasks []Task `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+
+	Roles []Role `gorm:"many2many:user_roles;constraint:OnDelete:CASCADE;"`
 }
 
 func (u User) TableName() string {
