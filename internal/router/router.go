@@ -20,8 +20,10 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 
 	r.GET("/", handlers.ShowIndex)
 
-	repo := repository.NewTaskRepository(cxt.DB)
-	taskService := services.NewTaskService(repo)
+	taskRepo := repository.NewTaskRepository(cxt.DB)
+	roleRepo := repository.NewRoleRepository(cxt.DB)
+	taskService := services.NewTaskService(taskRepo)
+	roleService := services.NewRoleService(roleRepo)
 	// HTML-страница
 	r.GET("/tasks", handlers.ShowTasksPage(taskService))
 	// JSON API
@@ -33,7 +35,7 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 	r.GET("/users", handlers.ShowUsers(cxt))
 	r.POST("/users", handlers.AddUser(cxt))
 
-	r.GET("/roles", handlers.ShowRoles(cxt))
+	r.GET("/roles", handlers.ShowRoles(roleService))
 
 	r.DELETE("/users/:id", handlers.DeleteUser(cxt))
 

@@ -12,8 +12,7 @@ func ShowUsers(appCtx *appcontext.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var users []models.User
 		if err := appCtx.DB.Find(&users).Error; err != nil {
-			appCtx.Log.Errorw("failed to get users", "error", err)
-			c.String(http.StatusInternalServerError, "Ошибка получения пользователей")
+			ShowError(c, "Не удалось загрузить пользователей", err.Error())
 			return
 		}
 
