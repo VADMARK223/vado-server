@@ -33,6 +33,8 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 	r.GET("/users", handlers.ShowUsers(cxt))
 	r.POST("/users", handlers.AddUser(cxt))
 
+	r.GET("/roles", handlers.ShowRoles(cxt))
+
 	r.DELETE("/users/:id", handlers.DeleteUser(cxt))
 
 	return r

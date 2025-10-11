@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Роли</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<header>
+    <h1>Роли</h1>
+</header>
+
+<main>
+    <div class="container">
+        <ul class="vado-list">
+            {{range .Roles}}
+            <li class="task-item">
+                <div>
+                    <h3>{{.Name}}</h3>
+                </div>
+            </li>
+            {{else}}
+            <p class="empty">Пока нет ролей</p>
+            {{end}}
+        </ul>
+    </div>
+    <script src="/static/js/main.js"></script>
+</main>
+
+<footer>
+    <a href="/" class="link">На главную</a>
+</footer>
+</body>
+</html>

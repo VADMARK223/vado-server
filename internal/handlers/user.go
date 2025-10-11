@@ -17,7 +17,7 @@ func ShowUsers(appCtx *appcontext.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		c.HTML(http.StatusOK, "admin.html", gin.H{
+		c.HTML(http.StatusOK, "users.html", gin.H{
 			"Users": users,
 		})
 	}
