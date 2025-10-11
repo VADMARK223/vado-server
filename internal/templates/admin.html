@@ -12,34 +12,34 @@
 
 <main>
     <div class="container">
-        <form class="add-form" action="/admin" method="POST">
+        <form class="add-form" action="/users" method="POST">
             <label>
                 <input type="text" name="username" placeholder="Имя пользователя" required>
             </label>
             <label>
                 <input type="text" name="password" placeholder="Пароль пользователя" required>
             </label>
+            <label>
+                <input type="email" name="email" placeholder="Почта пользователя" required>
+            </label>
             <button type="submit" class="btn">Добавить пользователя</button>
         </form>
 
-        <ul class="task-list">
+        <ul class="vado-list">
             {{range .Users}}
-            <li class="task-item">
+            <li class="task-item" id="user-{{.ID}}">
                 <div class="task-info">
                     <h3>{{.Username}}</h3>
                 </div>
 
-                <form action="/tasks/{{.ID}}/toggle" method="POST">
-                    <button class="btn-small" type="submit">
-                        Удалить
-                    </button>
-                </form>
+                <button class="btn-small btn-danger" onclick="deleteUser('{{.ID}}')">Удалить</button>
             </li>
             {{else}}
             <p class="empty">Пока нет пользователей</p>
             {{end}}
         </ul>
     </div>
+    <script src="/static/js/main.js"></script>
 </main>
 
 <footer>

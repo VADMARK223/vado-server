@@ -63,9 +63,12 @@ func startServer(cxt *appcontext.AppContext, port string) {
 
 	r.GET("/tasks", handlers.ShowTasks(cxt))
 	r.POST("/tasks", handlers.AddTask(cxt))
+	r.DELETE("/tasks/:id", handlers.DeleteTask(cxt))
 
-	r.GET("/admin", handlers.ShowAdmin(cxt))
-	r.POST("/admin", handlers.AddUser(cxt))
+	r.GET("/users", handlers.ShowUsers(cxt))
+	r.POST("/users", handlers.AddUser(cxt))
+
+	r.DELETE("/users/:id", handlers.DeleteUser(cxt))
 
 	//r.GET("/tasks", handlers.GetTasks(cxt))
 	cxt.Log.Infow("Server starting", "port", port)

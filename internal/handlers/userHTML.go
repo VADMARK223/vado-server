@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ShowAdmin(appCtx *appcontext.AppContext) gin.HandlerFunc {
+func ShowUsers(appCtx *appcontext.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var users []models.User
 		if err := appCtx.DB.Find(&users).Error; err != nil {
@@ -48,6 +48,20 @@ func AddUser(appCtx *appcontext.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		c.Redirect(http.StatusSeeOther, "/admin")
+		c.Redirect(http.StatusSeeOther, "/users")
+	}
+}
+
+func DeleteUser(appCtx *appcontext.AppContext) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+
+		if err := appCtx.DB.Delete(&models.User{}, id).Error; err != nil {
+			appCtx.Log.Errorw("failed to delete user", "error", err)
+			c.String(http.StatusInternalServerError, "Ошибка удаления пользователя")
+			return
+		}
+
+		c.Redirect(http.StatusSeeOther, "/users")
 	}
 }
