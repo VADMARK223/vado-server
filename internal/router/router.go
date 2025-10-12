@@ -18,8 +18,11 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 	// Сервисы
 	taskRepo := repository.NewTaskRepository(cxt.DB)
 	roleRepo := repository.NewRoleRepository(cxt.DB)
+	userRepo := repository.NewUserRepository(cxt.DB)
+
 	taskService := services.NewTaskService(taskRepo)
 	roleService := services.NewRoleService(roleRepo)
+	userService := services.NewUserService(userRepo)
 
 	gin.SetMode(util.GetEnv("GIN_MODE"))
 	r := gin.New()
@@ -39,7 +42,7 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 	r.GET(route.Login, handlers.ShowLoginPage())
 	r.POST(route.Login, handlers.PerformLogin(cxt))
 	r.GET(route.Register, handlers.ShowRegisterPage())
-	r.POST(route.Register, handlers.PerformRegister(cxt))
+	r.POST(route.Register, handlers.PerformRegister(userService))
 
 	r.POST(route.Logout, handlers.Logout())
 
@@ -51,7 +54,7 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 		auth.POST(route.Tasks, handlers.AddTask(cxt))
 		auth.DELETE("/tasks/:id", handlers.DeleteTask(cxt))
 		auth.GET(route.Users, handlers.ShowUsers(cxt))
-		auth.POST(route.Users, handlers.AddUser(cxt))
+		auth.POST(route.Users, handlers.AddUser(userService))
 		auth.GET(route.Roles, handlers.ShowRoles(roleService))
 		auth.DELETE("/users/:id", handlers.DeleteUser(cxt))
 	}

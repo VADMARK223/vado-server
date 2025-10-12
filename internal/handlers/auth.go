@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"vado_server/internal/appcontext"
 	"vado_server/internal/constants/code"
 	"vado_server/internal/constants/route"
 	"vado_server/internal/models"
+	"vado_server/internal/services"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -28,11 +30,6 @@ func PerformLogin(appCtx *appcontext.AppContext) gin.HandlerFunc {
 			c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": "Пользователь не найден"})
 			return
 		}
-
-		//if user.Password != password {
-		//	c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": "Неверный пароль"})
-		//	return
-		//}
 
 		if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
 			c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": "Неверный пароль"})
@@ -61,17 +58,18 @@ func ShowRegisterPage() gin.HandlerFunc {
 	}
 }
 
-func PerformRegister(appCtx *appcontext.AppContext) gin.HandlerFunc {
+func PerformRegister(service *services.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		username := c.PostForm("username")
 		email := c.PostForm("email")
 		password := c.PostForm("password")
 
-		hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-		user := models.User{Username: username, Email: email, Password: string(hash)}
+		err := service.CreateUser(models.UserDTO{Username: username, Email: email, Password: password})
 
-		if err := appCtx.DB.Create(&user).Error; err != nil {
-			c.HTML(http.StatusBadRequest, "register.html", gin.H{"Error": "Ошибка при регистрации"})
+		if err != nil {
+			c.HTML(http.StatusBadRequest, "register.html", gin.H{
+				"Error": fmt.Sprintf("Ошибка при регистрации: %s", err.Error()),
+			})
 			return
 		}
 

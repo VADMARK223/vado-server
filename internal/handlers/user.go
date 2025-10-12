@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"vado_server/internal/appcontext"
 	"vado_server/internal/models"
+	"vado_server/internal/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,7 +23,7 @@ func ShowUsers(appCtx *appcontext.AppContext) gin.HandlerFunc {
 	}
 }
 
-func AddUser(appCtx *appcontext.AppContext) gin.HandlerFunc {
+func AddUser(service *services.UserService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		username := c.PostForm("username")
 		password := c.PostForm("password")
@@ -38,17 +39,21 @@ func AddUser(appCtx *appcontext.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		user := models.User{
+		userDto := models.UserDTO{
 			Username: username,
 			Password: password,
 			Email:    email,
 		}
-		if err := appCtx.DB.Create(&user).Error; err != nil {
-			appCtx.Log.Errorw("failed to create user", "error", err)
-			c.String(http.StatusInternalServerError, "Ошибка добавления пользователя")
+
+		err := service.CreateUser(userDto)
+
+		if err != nil {
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"Message": "Ошибка добавления пользователя c ролью",
+				"Error":   err.Error(),
+			})
 			return
 		}
-
 		c.Redirect(http.StatusSeeOther, "/users")
 	}
 }

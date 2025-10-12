@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"vado_server/internal/models"
 	"vado_server/internal/repository"
 )
@@ -19,6 +18,5 @@ func (s *TaskService) GetAllTasks() ([]models.Task, error) {
 }
 
 func (s *TaskService) GetAllByUser(userID uint) ([]models.Task, error) {
-	fmt.Println(userID)
 	return s.repo.GetAllByUser(userID)
 }

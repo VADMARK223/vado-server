@@ -12,6 +12,32 @@
 
 <main>
     <div class="container">
+        <ul class="vado-list">
+            {{range .Users}}
+            <li class="task-item" id="user-{{.ID}}">
+                <div class="task-info">
+                    <h3>{{.Username}} (ID {{.ID}})</h3>
+                    {{if .Roles}}
+                    <p class="roles">
+                        Роли:
+                        {{range .Roles}}
+                        <span class="role">{{.Name}}</span>
+                        {{end}}
+                    </p>
+                    {{else}}
+                    <p class="roles">Без роли</p>
+                    {{end}}
+
+                    <p>Почта: {{.Email}}</p>
+                </div>
+
+                <button class="btn-small btn-danger" onclick="deleteUser('{{.ID}}')">Удалить</button>
+            </li>
+            {{else}}
+            <p class="empty">Пока нет пользователей</p>
+            {{end}}
+        </ul>
+
         <form class="add-form" action="/users" method="POST">
             <label>
                 <input type="text" name="username" placeholder="Имя пользователя" required>
@@ -24,33 +50,8 @@
             </label>
             <button type="submit" class="btn">Добавить пользователя</button>
         </form>
-
-        <ul class="vado-list">
-            {{range .Users}}
-            <li class="task-item" id="user-{{.ID}}">
-                <div class="task-info">
-                    <h3>{{.Username}}</h3>
-                    {{if .Roles}}
-                    <p class="roles">
-                        Роли:
-                        {{range .Roles}}
-                        <span class="role">{{.Name}}</span>
-                        {{end}}
-                    </p>
-                    {{else}}
-                    <p class="roles">Без роли</p>
-                    {{end}}
-
-                    <p>{{.Email}}</p>
-                </div>
-
-                <button class="btn-small btn-danger" onclick="deleteUser('{{.ID}}')">Удалить</button>
-            </li>
-            {{else}}
-            <p class="empty">Пока нет пользователей</p>
-            {{end}}
-        </ul>
     </div>
+
     <script src="/static/js/main.js"></script>
 </main>
 
