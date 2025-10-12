@@ -1,10 +1,10 @@
 package router
 
 import (
-	"fmt"
-	"net/http"
 	"vado_server/internal/appcontext"
+	"vado_server/internal/constants/route"
 	"vado_server/internal/handlers"
+	"vado_server/internal/middleware"
 	"vado_server/internal/repository"
 	"vado_server/internal/services"
 	"vado_server/internal/util"
@@ -15,6 +15,12 @@ import (
 )
 
 func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
+	// Сервисы
+	taskRepo := repository.NewTaskRepository(cxt.DB)
+	roleRepo := repository.NewRoleRepository(cxt.DB)
+	taskService := services.NewTaskService(taskRepo)
+	roleService := services.NewRoleService(roleRepo)
+
 	gin.SetMode(util.GetEnv("GIN_MODE"))
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
@@ -26,31 +32,25 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 	// Настраиваем cookie-сессии
 	store := cookie.NewStore([]byte("super-secret-key"))
 	r.Use(sessions.Sessions("vado-session", store))
-
-	// Сервисы
-	taskRepo := repository.NewTaskRepository(cxt.DB)
-	roleRepo := repository.NewRoleRepository(cxt.DB)
-	taskService := services.NewTaskService(taskRepo)
-	roleService := services.NewRoleService(roleRepo)
+	r.Use(middleware.AuthStatusMiddleware())
 
 	// Публичные маршруты
-	r.GET("/", handlers.ShowIndex)
-	r.GET("/login", handlers.ShowLoginPage())
-	r.POST("/login", handlers.PerformLogin(cxt))
+	r.GET(route.Index, handlers.ShowIndex)
+	r.GET(route.Login, handlers.ShowLoginPage())
+	r.POST(route.Login, handlers.PerformLogin(cxt))
 
-	r.POST("/logout", handlers.Logout())
+	r.POST(route.Logout, handlers.Logout())
 
 	// Защищенные маршруты
 	auth := r.Group("/")
-	auth.Use(AuthRequired())
+	auth.Use(middleware.AuthRequiredMiddleware())
 	{
-		fmt.Println("Auth")
-		auth.GET("/tasks", handlers.ShowTasksPage(taskService))
-		auth.POST("/tasks", handlers.AddTask(cxt))
+		auth.GET(route.Tasks, handlers.ShowTasksPage(taskService))
+		auth.POST(route.Tasks, handlers.AddTask(cxt))
 		auth.DELETE("/tasks/:id", handlers.DeleteTask(cxt))
-		auth.GET("/users", handlers.ShowUsers(cxt))
-		auth.POST("/users", handlers.AddUser(cxt))
-		auth.GET("/roles", handlers.ShowRoles(roleService))
+		auth.GET(route.Users, handlers.ShowUsers(cxt))
+		auth.POST(route.Users, handlers.AddUser(cxt))
+		auth.GET(route.Roles, handlers.ShowRoles(roleService))
 		auth.DELETE("/users/:id", handlers.DeleteUser(cxt))
 	}
 
@@ -58,18 +58,4 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 	//r.GET("/api/tasks", handlers.GetTasksJSON(taskService))
 
 	return r
-}
-
-func AuthRequired() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session := sessions.Default(c)
-		userID := session.Get("user_id")
-
-		if userID == nil {
-			c.Redirect(http.StatusFound, "/login")
-			c.Abort()
-			return
-		}
-		c.Next()
-	}
 }

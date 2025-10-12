@@ -18,6 +18,6 @@ func Logout() gin.HandlerFunc {
 		})
 		_ = session.Save()
 
-		c.Redirect(http.StatusFound, "/login")
+		c.Redirect(http.StatusFound, "/")
 	}
 }

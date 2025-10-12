@@ -11,13 +11,25 @@
 </header>
 
 <main>
-    <div class="container">
-        <a href="/tasks" class="btn">Задачи</a>
-        <a href="/users" class="btn">Пользователи</a>
-        <a href="/roles" class="btn">Роли</a>
-        <form action="/logout" method="POST" style="display:inline;">
-            <button class="btn btn-danger">Выйти</button>
-        </form>
+    <div class="vado-menu">
+        <div>
+            <a href="/tasks" class="btn">Задачи</a>
+            <a href="/users" class="btn">Пользователи</a>
+            <a href="/roles" class="btn">Роли</a>
+        </div>
+
+        <div>
+            {{if .IsAuth}}
+            <form action="/logout" method="POST" style="display:inline;">
+                <button class="btn">Выйти</button>
+            </form>
+            {{else}}
+<!--            <a href="/login" class="btn">Войти</a>-->
+            <form action="/login" method="GET" style="display:inline;">
+                <button class="btn">Войти</button>
+            </form>
+            {{end}}
+        </div>
     </div>
 </main>
 

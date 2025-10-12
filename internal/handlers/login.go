@@ -3,6 +3,8 @@ package handlers
 import (
 	"net/http"
 	"vado_server/internal/appcontext"
+	"vado_server/internal/constants/code"
+	"vado_server/internal/constants/route"
 	"vado_server/internal/models"
 
 	"github.com/gin-contrib/sessions"
@@ -37,9 +39,17 @@ func PerformLogin(appCtx *appcontext.AppContext) gin.HandlerFunc {
 		}*/
 
 		session := sessions.Default(c)
-		session.Set("user_id", user.ID)
+		session.Set(code.UserId, user.ID)
+
+		redirectTo := session.Get(code.RedirectTo)
+		if redirectTo == nil {
+			redirectTo = route.Index
+		} else {
+			session.Delete(code.RedirectTo)
+		}
+
 		_ = session.Save()
 
-		c.Redirect(http.StatusFound, "/tasks")
+		c.Redirect(http.StatusFound, redirectTo.(string))
 	}
 }

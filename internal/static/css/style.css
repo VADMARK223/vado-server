@@ -36,6 +36,25 @@ a:hover {
     color: var(--orange);
 }
 
+.vado-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    /*Максимальная ширина*/
+    max-width: 800px;
+    /*20px это сверху и снизу, остальные автоматически рассчитываются*/
+    margin: 20px auto;
+    /*Внутренний отступ*/
+    padding: 20px;
+    /*Фон подложки*/
+    background: var(--bg-alt);
+    /*Радиус закругления подложки*/
+    border-radius: 10px;
+    /*Тень подложки*/
+    box-shadow: 0 0 10px #0008;
+}
+
 .container {
     max-width: 800px;
     margin: 40px auto;
