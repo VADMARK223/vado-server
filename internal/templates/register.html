@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<header>
+    <h1>Вход</h1>
+</header>
+
+<main>
+    <div class="container">
+        <form method="POST" action="/register" class="add-form">
+            <h2>Регистрация</h2>
+            <label><input name="username" placeholder="Имя пользователя" required></label>
+            <label><input name="password" type="password" placeholder="Пароль" required></label>
+            <label><input name="email" type="email" placeholder="Почта" required></label>
+            {{if .Error}}<p class="error">{{.Error}}</p>{{end}}
+            <button class="btn" type="submit">Создать аккаунт</button>
+        </form>
+    </div>
+</main>
+
+<footer>
+    <a href="/" class="link">На главную</a>
+</footer>
+
+</body>
+</html>

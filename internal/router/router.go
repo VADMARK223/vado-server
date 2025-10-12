@@ -38,6 +38,8 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 	r.GET(route.Index, handlers.ShowIndex)
 	r.GET(route.Login, handlers.ShowLoginPage())
 	r.POST(route.Login, handlers.PerformLogin(cxt))
+	r.GET(route.Register, handlers.ShowRegisterPage())
+	r.POST(route.Register, handlers.PerformRegister(cxt))
 
 	r.POST(route.Logout, handlers.Logout())
 

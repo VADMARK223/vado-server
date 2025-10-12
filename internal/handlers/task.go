@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"vado_server/internal/appcontext"
+	"vado_server/internal/constants/code"
 	"vado_server/internal/models"
 	"vado_server/internal/services"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +26,9 @@ func GetTasksJSON(service *services.TaskService) gin.HandlerFunc {
 
 func ShowTasksPage(service *services.TaskService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tasks, err := service.GetAllTasks()
+		userID := sessions.Default(c).Get(code.UserId)
+
+		tasks, err := service.GetAllByUser(userID.(uint))
 		if err != nil {
 			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
 				"Message": "Не удалось загрузить задачи",
@@ -49,15 +54,19 @@ func AddTask(appCtx *appcontext.AppContext) gin.HandlerFunc {
 			return
 		}
 
+		s := sessions.Default(c)
+		sessionUserID := s.Get(code.UserId)
+		fmt.Println(sessionUserID)
+
 		task := models.Task{
 			Name:        name,
 			Description: desc,
 			Completed:   completed == "on",
-			UserID:      1, // TODO: for test
+			UserID:      sessionUserID.(uint),
 		}
 		if err := appCtx.DB.Create(&task).Error; err != nil {
 			appCtx.Log.Errorw("failed to create task", "error", err)
-			c.String(http.StatusInternalServerError, "Ошибка добавления задачи")
+			ShowError(c, "Ошибка добавления задачи", err.Error())
 			return
 		}
 

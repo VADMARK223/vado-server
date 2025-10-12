@@ -19,3 +19,9 @@ func (r *TaskRepository) GetAll() ([]models.Task, error) {
 	err := r.db.Find(&tasks).Error
 	return tasks, err
 }
+
+func (r *TaskRepository) GetAllByUser(userID uint) ([]models.Task, error) {
+	var tasks []models.Task
+	err := r.db.Where("user_id = ?", userID).Find(&tasks).Error
+	return tasks, err
+}

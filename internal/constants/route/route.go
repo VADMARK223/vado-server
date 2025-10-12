@@ -1,10 +1,11 @@
 package route
 
 const (
-	Index  = "/"
-	Login  = "/login"
-	Logout = "/logout"
-	Tasks  = "/tasks"
-	Users  = "/users"
-	Roles  = "/roles"
+	Index    = "/"
+	Login    = "/login"
+	Logout   = "/logout"
+	Register = "/register"
+	Tasks    = "/tasks"
+	Users    = "/users"
+	Roles    = "/roles"
 )
