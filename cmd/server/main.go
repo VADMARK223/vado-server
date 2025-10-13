@@ -18,7 +18,8 @@ import (
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 
-	pb "vado_server/internal/pb/hello"
+	pb "vado_server/internal/pb/chat"
+	pbHello "vado_server/internal/pb/hello"
 
 	"google.golang.org/grpc"
 )
@@ -70,11 +71,48 @@ func startHTTPServer(cxt *appcontext.AppContext, wg *sync.WaitGroup, port string
 }
 
 type grpcSrv struct {
-	pb.UnimplementedHelloServiceServer
+	pbHello.UnimplementedHelloServiceServer
 }
 
-func (s *grpcSrv) SeyHello(_ context.Context, req *pb.HelloRequest) (*pb.HelloResponse, error) {
-	return &pb.HelloResponse{
+type chatServer struct {
+	pb.UnimplementedChatServiceServer
+	mu      sync.Mutex
+	clients map[pb.ChatService_ChatStreamServer]struct{}
+}
+
+func newChatService() *chatServer {
+	return &chatServer{clients: make(map[pb.ChatService_ChatStreamServer]struct{})}
+}
+
+func (s *chatServer) SendMessage(_ context.Context, msg *pb.ChatMessage) (*pb.Empty, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	// рассылаем всем
+	for client := range s.clients {
+		err := client.Send(msg)
+		if err != nil {
+			delete(s.clients, client)
+		}
+	}
+	return &pb.Empty{}, nil
+}
+
+func (s *chatServer) ChatStream(empty *pb.Empty, stream pb.ChatService_ChatStreamServer) error {
+	s.mu.Lock()
+	s.clients[stream] = struct{}{}
+	s.mu.Unlock()
+
+	// остаёмся в стриме
+	<-stream.Context().Done()
+	s.mu.Lock()
+	delete(s.clients, stream)
+	s.mu.Unlock()
+	return nil
+}
+
+func (s *grpcSrv) SeyHello(_ context.Context, req *pbHello.HelloRequest) (*pbHello.HelloResponse, error) {
+	return &pbHello.HelloResponse{
 		Message: fmt.Sprintf("Привет, %s! Это ответ с gRPC-сервера.", req.Name),
 	}, nil
 }
@@ -87,7 +125,8 @@ func startGRPCServer(appCtx *appcontext.AppContext, wg *sync.WaitGroup, port str
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterHelloServiceServer(grpcServer, &grpcSrv{})
+	pbHello.RegisterHelloServiceServer(grpcServer, &grpcSrv{})
+	pb.RegisterChatServiceServer(grpcServer, newChatService())
 	appCtx.Log.Infow("gRPC server starting", "port", port)
 	if err := grpcServer.Serve(lis); err != nil {
 		appCtx.Log.Fatalf("Ошибка запуска gRPC: %v", err)
