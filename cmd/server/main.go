@@ -1,6 +1,10 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"net"
+	"sync"
 	"vado_server/internal/db"
 	"vado_server/internal/router"
 	"vado_server/internal/util"
@@ -13,6 +17,10 @@ import (
 
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
+
+	pb "vado_server/internal/pb/hello"
+
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -21,11 +29,12 @@ func main() {
 	appCtx.Log.Infow("Start vado-server.", "time", time.Now().Format("2006-01-02 15:04:05"))
 	database := initDB(appCtx)
 	appCtx.DB = database
-	//defer func(database *gorm.DB) {
-	//	_ = database.Close()
-	//}(database)
 
-	startServer(appCtx, util.GetEnv("PORT"))
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go startHTTPServer(appCtx, &wg, util.GetEnv("PORT"))
+	go startGRPCServer(appCtx, &wg, "50051")
+	wg.Wait()
 }
 
 func initLogger() *zap.SugaredLogger {
@@ -50,11 +59,37 @@ func initDB(appCtx *appcontext.AppContext) *gorm.DB {
 	return database
 }
 
-func startServer(cxt *appcontext.AppContext, port string) {
+func startHTTPServer(cxt *appcontext.AppContext, wg *sync.WaitGroup, port string) {
+	defer wg.Done()
 	r := router.SetupRouter(cxt)
 
-	cxt.Log.Infow("Server starting", "port", port)
+	cxt.Log.Infow("HTTP (Gin) Server starting", "port", port)
 	if err := r.Run(":" + port); err != nil {
 		cxt.Log.Fatalw("Server failed", "error", err)
+	}
+}
+
+type grpcSrv struct {
+	pb.UnimplementedHelloServiceServer
+}
+
+func (s *grpcSrv) SeyHello(_ context.Context, req *pb.HelloRequest) (*pb.HelloResponse, error) {
+	return &pb.HelloResponse{
+		Message: fmt.Sprintf("Привет, %s! Это ответ с gRPC-сервера.", req.Name),
+	}, nil
+}
+
+func startGRPCServer(appCtx *appcontext.AppContext, wg *sync.WaitGroup, port string) {
+	defer wg.Done()
+	lis, lisErr := net.Listen("tcp", ":"+port)
+	if lisErr != nil {
+		appCtx.Log.Fatalf("Error listen gRPC: %v", lisErr)
+	}
+
+	grpcServer := grpc.NewServer()
+	pb.RegisterHelloServiceServer(grpcServer, &grpcSrv{})
+	appCtx.Log.Infow("gRPC server starting", "port", port)
+	if err := grpcServer.Serve(lis); err != nil {
+		appCtx.Log.Fatalf("Ошибка запуска gRPC: %v", err)
 	}
 }

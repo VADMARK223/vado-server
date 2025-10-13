@@ -1,3 +1,18 @@
+# gRPC
+
+Генерация из `.proto` файла
+
+```shell
+protoc --go_out=./ --go-grpc_out=./ internal/proto/hello.proto
+```
+
+# Linux
+
+Прибить порт
+```shell
+sudo lsof -i:8080
+sudo kill -9 PID
+```
 # Docker
 ## Postgres
 
@@ -36,6 +51,7 @@ go run ./cmd/server/main.go
 ```
 
 # Stack
+- gRPC
 - Postgres
 - Zap
 - Gin

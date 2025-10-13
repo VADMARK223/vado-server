@@ -38,6 +38,7 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 	r.Use(middleware.CheckJWT())
 
 	// Публичные маршруты
+	r.GET("/ping", func(c *gin.Context) { c.JSON(200, gin.H{"message": "pong"}) })
 	r.GET(route.Index, handlers.ShowIndex)
 	r.GET(route.Login, handlers.ShowLoginPage())
 	r.POST(route.Login, handlers.PerformLogin(cxt))
@@ -60,6 +61,7 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 	}
 
 	// JSON API
+	r.GET("/api/hello", handlers.GetHello())
 	//r.GET("/api/tasks", handlers.GetTasksJSON(taskService))
 
 	return r
