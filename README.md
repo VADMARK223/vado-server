@@ -40,5 +40,6 @@ go run ./cmd/server/main.go
 - Zap
 - Gin
 - Gorm
+- JWT
 
 На будущее: golang-migrate

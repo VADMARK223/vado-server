@@ -3,25 +3,23 @@ package middleware
 import (
 	"net/http"
 	"vado_server/internal/constants/code"
-	"vado_server/internal/constants/route"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
-func AuthRequiredMiddleware() gin.HandlerFunc {
+func CheckAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		session := sessions.Default(c)
-		userID := session.Get(code.UserId)
-
-		if userID == nil {
+		isAuth, ok := c.Get(code.IsAuth)
+		if !ok || isAuth == false {
+			session := sessions.Default(c)
 			session.Set(code.RedirectTo, c.Request.URL.Path)
 			_ = session.Save()
-
-			c.Redirect(http.StatusFound, route.Login)
+			c.Redirect(http.StatusFound, "/login")
 			c.Abort()
 			return
 		}
+
 		c.Next()
 	}
 }

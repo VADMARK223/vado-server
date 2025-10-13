@@ -3,7 +3,9 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"time"
 	"vado_server/internal/appcontext"
+	"vado_server/internal/auth"
 	"vado_server/internal/constants/code"
 	"vado_server/internal/constants/route"
 	"vado_server/internal/models"
@@ -36,8 +38,23 @@ func PerformLogin(appCtx *appcontext.AppContext) gin.HandlerFunc {
 			return
 		}
 
+		token, err := auth.CreateToken(user.ID, []string{"user"}, time.Minute*15)
+		if err != nil {
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"Message": "Ошибка генерации токена",
+				"Error":   err.Error(),
+			})
+			return
+		}
+
+		c.SetCookie(code.JwtVado,
+			token,
+			3600*24,
+			"/",
+			"",
+			false,
+			true)
 		session := sessions.Default(c)
-		session.Set(code.UserId, user.ID)
 
 		redirectTo := session.Get(code.RedirectTo)
 		if redirectTo == nil {
@@ -79,14 +96,17 @@ func PerformRegister(service *services.UserService) gin.HandlerFunc {
 
 func Logout() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		session := sessions.Default(c)
-		session.Clear() // удаляем все данные из сессии
-		session.Options(sessions.Options{
-			Path:     "/", // обязательно, иначе cookie не перезапишется
-			MaxAge:   -1,  // удалить cookie сразу
-			HttpOnly: true,
-		})
-		_ = session.Save()
+		c.SetCookie(
+			code.JwtVado, // имя cookie
+			"",           // пустое значение
+			-1,           // MaxAge < 0 = удалить
+			"/",          // путь
+			"",           // домен
+			false,        // secure (поставь true если HTTPS)
+			true,         // httpOnly
+		)
+
+		c.Set(code.IsAuth, false)
 
 		c.Redirect(http.StatusFound, "/")
 	}

@@ -30,6 +30,7 @@ services:
       PORT: 5556
       POSTGRES_DSN: postgres://vadmark:5125341@postgres:5432/vadodb?sslmode=disable
       GIN_MODE: release
+      JWT_SECRET: asdnc9sadc8n23
     depends_on:
       postgres:
         condition: service_healthy # app ждет healthcheck БД

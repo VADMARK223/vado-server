@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Vado Task Manager</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
 <header>
@@ -21,12 +22,15 @@
         <div>
             {{if .IsAuth}}
             <form action="/logout" method="POST" style="display:inline;">
-                <button class="btn">Выйти</button>
+                <button class="btn">
+                    <i class="fa-solid fa-right-from-bracket"></i> Выйти
+                </button>
             </form>
             {{else}}
-<!--            <a href="/login" class="btn">Войти</a>-->
             <form action="/login" method="GET" style="display:inline;">
-                <button class="btn">Войти</button>
+                <button class="btn">
+                    <i class="fa-solid fa-right-to-bracket"></i> Войти
+                </button>
             </form>
             {{end}}
         </div>

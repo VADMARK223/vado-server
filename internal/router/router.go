@@ -35,7 +35,7 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 	// Настраиваем cookie-сессии
 	store := cookie.NewStore([]byte("super-secret-key"))
 	r.Use(sessions.Sessions("vado-session", store))
-	r.Use(middleware.AuthStatusMiddleware())
+	r.Use(middleware.CheckJWT())
 
 	// Публичные маршруты
 	r.GET(route.Index, handlers.ShowIndex)
@@ -48,7 +48,7 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 
 	// Защищенные маршруты
 	auth := r.Group("/")
-	auth.Use(middleware.AuthRequiredMiddleware())
+	auth.Use(middleware.CheckAuth())
 	{
 		auth.GET(route.Tasks, handlers.ShowTasksPage(taskService))
 		auth.POST(route.Tasks, handlers.AddTask(cxt))
