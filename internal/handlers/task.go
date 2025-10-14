@@ -12,21 +12,21 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetTasksJSON JSON-версия: /api/tasks
-func GetTasksJSON(service *services.TaskService) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		tasks, err := service.GetAllTasks()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get tasks"})
-			return
-		}
-		c.JSON(http.StatusOK, tasks)
-	}
-}
-
 func ShowTasksPage(service *services.TaskService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userID := sessions.Default(c).Get(code.UserId)
+		userID, ok := c.Get(code.UserId)
+		if !ok {
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"Message": "Нет ключа в session",
+				"Error":   fmt.Sprintf("Значение ключа: %v", userID),
+			})
+		}
+
+		if userID == nil {
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"Message": "user_id is nil",
+			})
+		}
 
 		tasks, err := service.GetAllByUser(userID.(uint))
 		if err != nil {
@@ -56,7 +56,6 @@ func AddTask(appCtx *appcontext.AppContext) gin.HandlerFunc {
 
 		s := sessions.Default(c)
 		sessionUserID := s.Get(code.UserId)
-		fmt.Println(sessionUserID)
 
 		task := models.Task{
 			Name:        name,
@@ -85,5 +84,17 @@ func DeleteTask(appCtx *appcontext.AppContext) gin.HandlerFunc {
 		}
 
 		c.Redirect(http.StatusSeeOther, "/tasks")
+	}
+}
+
+// GetTasksJSON JSON-версия: /api/tasks
+func GetTasksJSON(service *services.TaskService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		tasks, err := service.GetAllTasks()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get tasks"})
+			return
+		}
+		c.JSON(http.StatusOK, tasks)
 	}
 }

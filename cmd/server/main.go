@@ -6,6 +6,7 @@ import (
 	"net"
 	"strings"
 	"sync"
+	"vado_server/internal/constants/code"
 	"vado_server/internal/db"
 	grpcServer2 "vado_server/internal/grpc/auth"
 	"vado_server/internal/grpc/server"
@@ -121,9 +122,7 @@ func (s *chatServer) ChatStream(_ *pb.Empty, stream pb.ChatService_ChatStreamSer
 }
 
 func (s *helloServer) SeyHello(ctx context.Context, req *pbHello.HelloRequest) (*pbHello.HelloResponse, error) {
-	fmt.Println("SAY HELLO")
-	userId := ctx.Value("userID")
-	fmt.Println("Сообщение от:", userId)
+	userId := ctx.Value(code.UserId)
 	return &pbHello.HelloResponse{
 		Message: fmt.Sprintf("Привет, %s! Твой ID в БД=%f", req.Name, userId.(float64)),
 	}, nil
@@ -156,11 +155,10 @@ func AuthInterceptor(
 	info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler,
 ) (interface{}, error) {
-	// Не проверяем токен для публичных методов (например, Ping)
+	// Не проверяем токен для публичных методов
 	if strings.Contains(info.FullMethod, "Ping") {
 		return handler(ctx, req)
 	}
-	// Не проверяем токен для публичных методов (например, Login)
 	if strings.Contains(info.FullMethod, "Login") {
 		return handler(ctx, req)
 	}
@@ -179,19 +177,13 @@ func AuthInterceptor(
 	token := strings.TrimPrefix(values[0], "Bearer ")
 	claims, err := middleware.ParseToken(token) // твоя функция проверки JWT
 	if err != nil {
-		fmt.Println("ERRROR VALID TOKEN")
-		fmt.Println(err.Error())
 		return nil, status.Error(codes.Unauthenticated, "некорректный токен")
 	}
 
-	// Добавляем userID в контекст
-	if userID, ok := claims["user_id"]; ok {
-		fmt.Println("ADDD userID")
-		fmt.Println(userID)
-		ctx = context.WithValue(ctx, "userID", userID)
+	if claims.UserID != 0 {
+		ctx = context.WithValue(ctx, code.UserId, claims.UserID)
 	}
 
-	// Передаём дальше в хэндлер
 	return handler(ctx, req)
 }
 
@@ -225,7 +217,7 @@ func AuthInterceptor(
 	// Оборачиваем stream с контекстом, где уже есть userID
 	wrapped := &wrappedStream{
 		ServerStream: ss,
-		ctx:          context.WithValue(ss.Context(), "userID", claims.UserID),
+		ctx:          context.WithValue(ss.Context(), code.UserId, claims.UserID),
 	}
 
 	return handler(srv, wrapped)

@@ -11,9 +11,11 @@
 </header>
 
 <main>
+    {{if .Error}}
     <div class="container">
         {{.Error}}
     </div>
+    {{end}}
 </main>
 
 <footer>

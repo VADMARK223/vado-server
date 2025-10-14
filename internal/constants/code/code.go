@@ -3,7 +3,8 @@ package code
 const (
 	RedirectTo = "redirect_to"
 	UserId     = "user_id"
-	IsAuth     = "IsAuth" // TODO: change!
+	IsAuth     = "is_auth"
 	JwtVado    = "jwt_vado"
 	Exp        = "exp"
+	Mode       = "mode"
 )

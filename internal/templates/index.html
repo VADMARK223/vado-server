@@ -8,7 +8,7 @@
 </head>
 <body>
 <header>
-    <h1>Vado Task Manager ({{.Mode}})</h1>
+    <h1>Vado Task Manager ({{.mode}})</h1>
 </header>
 
 <main>
@@ -19,8 +19,9 @@
             <a href="/roles" class="btn">Роли</a>
         </div>
 
-        <div>
-            {{if .IsAuth}}
+        <div class="vado-user-info">
+            <p>Привет, {{if .user_id}}{{.user_id}}{{else}}Гость{{end}}!</p>
+            {{if .is_auth}}
             <form action="/logout" method="POST" style="display:inline;">
                 <button class="btn">
                     <i class="fa-solid fa-right-from-bracket"></i> Выйти

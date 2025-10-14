@@ -9,8 +9,10 @@ import (
 
 func ShowIndex(c *gin.Context) {
 	isAuth, _ := c.Get(code.IsAuth)
+	userId, _ := c.Get(code.UserId)
 	c.HTML(http.StatusOK, "index.html", gin.H{
-		"Mode":      gin.Mode(),
+		code.Mode:   gin.Mode(),
 		code.IsAuth: isAuth,
+		code.UserId: userId,
 	})
 }
