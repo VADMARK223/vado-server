@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"strings"
 	"sync"
 	"vado_server/internal/db"
+	grpcServer2 "vado_server/internal/grpcServer"
+	"vado_server/internal/middleware"
 	"vado_server/internal/router"
 	"vado_server/internal/util"
 
@@ -13,11 +16,15 @@ import (
 	"vado_server/internal/appcontext"
 	"vado_server/internal/logger"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 
+	pbAuth "vado_server/internal/pb/auth"
 	pb "vado_server/internal/pb/chat"
 	pbHello "vado_server/internal/pb/hello"
 
@@ -70,7 +77,7 @@ func startHTTPServer(cxt *appcontext.AppContext, wg *sync.WaitGroup, port string
 	}
 }
 
-type grpcSrv struct {
+type helloServer struct {
 	pbHello.UnimplementedHelloServiceServer
 }
 
@@ -111,9 +118,12 @@ func (s *chatServer) ChatStream(empty *pb.Empty, stream pb.ChatService_ChatStrea
 	return nil
 }
 
-func (s *grpcSrv) SeyHello(_ context.Context, req *pbHello.HelloRequest) (*pbHello.HelloResponse, error) {
+func (s *helloServer) SeyHello(ctx context.Context, req *pbHello.HelloRequest) (*pbHello.HelloResponse, error) {
+	fmt.Println("SAY HELLO")
+	userId := ctx.Value("userID")
+	fmt.Println("Сообщение от:", userId)
 	return &pbHello.HelloResponse{
-		Message: fmt.Sprintf("Привет, %s! Это ответ с gRPC-сервера.", req.Name),
+		Message: fmt.Sprintf("Привет, %s! Твой ID в БД=%f", req.Name, userId.(float64)),
 	}, nil
 }
 
@@ -124,11 +134,104 @@ func startGRPCServer(appCtx *appcontext.AppContext, wg *sync.WaitGroup, port str
 		appCtx.Log.Fatalf("Error listen gRPC: %v", lisErr)
 	}
 
-	grpcServer := grpc.NewServer()
-	pbHello.RegisterHelloServiceServer(grpcServer, &grpcSrv{})
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(AuthInterceptor), // Перехват для обычных запросов
+		//grpc.UnaryInterceptor(AuthStreamInterceptor),
+	)
+	pbAuth.RegisterAuthServiceServer(grpcServer, &grpcServer2.AuthServerGRPC{AppCtx: appCtx})
+	pbHello.RegisterHelloServiceServer(grpcServer, &helloServer{})
 	pb.RegisterChatServiceServer(grpcServer, newChatService())
 	appCtx.Log.Infow("gRPC server starting", "port", port)
 	if err := grpcServer.Serve(lis); err != nil {
 		appCtx.Log.Fatalf("Ошибка запуска gRPC: %v", err)
 	}
 }
+
+func AuthInterceptor(
+	ctx context.Context,
+	req interface{},
+	info *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler,
+) (interface{}, error) {
+	fmt.Println("==========")
+	fmt.Println(info.FullMethod)
+	// Не проверяем токен для публичных методов (например, Login)
+	if strings.Contains(info.FullMethod, "Login") {
+		return handler(ctx, req)
+	}
+
+	// Достаём токен из metadata
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "metadata отсутствует")
+	}
+
+	values := md["authorization"]
+	if len(values) == 0 {
+		return nil, status.Error(codes.Unauthenticated, "токен не найден")
+	}
+
+	token := strings.TrimPrefix(values[0], "Bearer ")
+	claims, err := middleware.ParseToken(token) // твоя функция проверки JWT
+	if err != nil {
+		fmt.Println("ERRROR VALID TOKEN")
+		fmt.Println(err.Error())
+		return nil, status.Error(codes.Unauthenticated, "некорректный токен")
+	}
+
+	// Добавляем userID в контекст
+	if userID, ok := claims["user_id"]; ok {
+		fmt.Println("ADDD userID")
+		fmt.Println(userID)
+		ctx = context.WithValue(ctx, "userID", userID)
+	}
+
+	// Передаём дальше в хэндлер
+	return handler(ctx, req)
+}
+
+/*func AuthStreamInterceptor(
+	srv interface{},
+	ss grpc.ServerStream,
+	info *grpc.StreamServerInfo,
+	handler grpc.StreamHandler,
+) error {
+
+	if strings.Contains(info.FullMethod, "Login") {
+		return handler(srv, ss)
+	}
+
+	md, ok := metadata.FromIncomingContext(ss.Context())
+	if !ok {
+		return status.Error(codes.Unauthenticated, "metadata отсутствует")
+	}
+
+	values := md["authorization"]
+	if len(values) == 0 {
+		return status.Error(codes.Unauthenticated, "токен не найден")
+	}
+
+	token := strings.TrimPrefix(values[0], "Bearer ")
+	claims, err := auth.ParseToken(token)
+	if err != nil {
+		return status.Error(codes.Unauthenticated, "токен невалиден")
+	}
+
+	// Оборачиваем stream с контекстом, где уже есть userID
+	wrapped := &wrappedStream{
+		ServerStream: ss,
+		ctx:          context.WithValue(ss.Context(), "userID", claims.UserID),
+	}
+
+	return handler(srv, wrapped)
+}
+
+// вспомогательная обёртка
+type wrappedStream struct {
+	grpc.ServerStream
+	ctx context.Context
+}
+
+func (w *wrappedStream) Context() context.Context {
+	return w.ctx
+}*/

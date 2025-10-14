@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"time"
 	"vado_server/internal/constants/code"
 	"vado_server/internal/constants/env"
@@ -33,18 +34,42 @@ func CheckJWT() gin.HandlerFunc {
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
-			if exp, ok := claims["exp"].(float64); ok && int64(exp) < time.Now().Unix() {
+			if exp, ok := claims[code.Exp].(float64); ok && int64(exp) < time.Now().Unix() {
 				c.Set(code.IsAuth, false)
 				c.Next()
 				return
 			}
 
-			if userID, ok := claims["user_id"]; ok {
-				c.Set("user_id", userID)
+			if userID, ok := claims[code.UserId]; ok {
+				c.Set(code.UserId, userID)
 			}
 		}
 
 		c.Set(code.IsAuth, true)
 		c.Next()
 	}
+}
+
+func ParseToken(tokenStr string) (jwt.MapClaims, error) {
+	if tokenStr == "" {
+		return nil, errors.New("token is null")
+	}
+
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return []byte(util.GetEnv(env.JwtSecret)), nil
+	})
+
+	if err != nil || !token.Valid {
+		return nil, errors.New("token not valid")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, errors.New("not OK!")
+	}
+
+	return claims, nil
 }
