@@ -7,8 +7,10 @@ import (
 	"strings"
 	"sync"
 	"vado_server/internal/db"
-	grpcServer2 "vado_server/internal/grpcServer"
+	grpcServer2 "vado_server/internal/grpc/auth"
+	"vado_server/internal/grpc/server"
 	"vado_server/internal/middleware"
+	pbServer "vado_server/internal/pb/server"
 	"vado_server/internal/router"
 	"vado_server/internal/util"
 
@@ -105,7 +107,7 @@ func (s *chatServer) SendMessage(_ context.Context, msg *pb.ChatMessage) (*pb.Em
 	return &pb.Empty{}, nil
 }
 
-func (s *chatServer) ChatStream(empty *pb.Empty, stream pb.ChatService_ChatStreamServer) error {
+func (s *chatServer) ChatStream(_ *pb.Empty, stream pb.ChatService_ChatStreamServer) error {
 	s.mu.Lock()
 	s.clients[stream] = struct{}{}
 	s.mu.Unlock()
@@ -141,6 +143,7 @@ func startGRPCServer(appCtx *appcontext.AppContext, wg *sync.WaitGroup, port str
 	pbAuth.RegisterAuthServiceServer(grpcServer, &grpcServer2.AuthServerGRPC{AppCtx: appCtx})
 	pbHello.RegisterHelloServiceServer(grpcServer, &helloServer{})
 	pb.RegisterChatServiceServer(grpcServer, newChatService())
+	pbServer.RegisterServerServiceServer(grpcServer, &server.ServerService{})
 	appCtx.Log.Infow("gRPC server starting", "port", port)
 	if err := grpcServer.Serve(lis); err != nil {
 		appCtx.Log.Fatalf("Ошибка запуска gRPC: %v", err)
@@ -153,8 +156,10 @@ func AuthInterceptor(
 	info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler,
 ) (interface{}, error) {
-	fmt.Println("==========")
-	fmt.Println(info.FullMethod)
+	// Не проверяем токен для публичных методов (например, Ping)
+	if strings.Contains(info.FullMethod, "Ping") {
+		return handler(ctx, req)
+	}
 	// Не проверяем токен для публичных методов (например, Login)
 	if strings.Contains(info.FullMethod, "Login") {
 		return handler(ctx, req)
