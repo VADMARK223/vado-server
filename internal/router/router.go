@@ -1,6 +1,7 @@
 package router
 
 import (
+	"html/template"
 	"vado_server/internal/appcontext"
 	"vado_server/internal/constants/route"
 	"vado_server/internal/handlers"
@@ -26,11 +27,13 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 
 	gin.SetMode(util.GetEnv("GIN_MODE"))
 	r := gin.New()
+	tmpl := template.Must(template.ParseGlob("internal/templates/*.html"))
+	r.SetHTMLTemplate(tmpl)
 	r.Use(gin.Logger(), gin.Recovery())
 	_ = r.SetTrustedProxies(nil)
 	// Статика и шаблоны
 	r.Static("/static", "./internal/static")
-	r.LoadHTMLGlob("internal/templates/*")
+	//r.LoadHTMLGlob("internal/templates/*")
 
 	// Настраиваем cookie-сессии
 	store := cookie.NewStore([]byte("super-secret-key"))

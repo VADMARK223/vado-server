@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"vado_server/internal/appcontext"
+	"vado_server/internal/constants/code"
 	"vado_server/internal/models"
 	"vado_server/internal/services"
 
@@ -17,8 +18,12 @@ func ShowUsers(appCtx *appcontext.AppContext) gin.HandlerFunc {
 			return
 		}
 
+		isAuth, _ := c.Get(code.IsAuth)
+		userId, _ := c.Get(code.UserId)
 		c.HTML(http.StatusOK, "users.html", gin.H{
-			"Users": users,
+			code.IsAuth: isAuth,
+			code.UserId: userId,
+			"Users":     users,
 		})
 	}
 }

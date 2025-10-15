@@ -36,8 +36,11 @@ func ShowTasksPage(service *services.TaskService) gin.HandlerFunc {
 			return
 		}
 
+		isAuth, _ := c.Get(code.IsAuth)
 		c.HTML(http.StatusOK, "tasks.html", gin.H{
-			"Tasks": tasks,
+			code.IsAuth: isAuth,
+			code.UserId: userID,
+			"Tasks":     tasks,
 		})
 	}
 }

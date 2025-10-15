@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"vado_server/internal/constants/code"
 	"vado_server/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -15,8 +16,12 @@ func ShowRoles(service *services.RoleService) gin.HandlerFunc {
 			return
 		}
 
+		isAuth, _ := c.Get(code.IsAuth)
+		userId, _ := c.Get(code.UserId)
 		c.HTML(http.StatusOK, "roles.html", gin.H{
-			"Roles": roles,
+			code.IsAuth: isAuth,
+			code.UserId: userId,
+			"Roles":     roles,
 		})
 	}
 }

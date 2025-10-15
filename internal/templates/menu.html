@@ -1,0 +1,26 @@
+{{ define "menu" }}
+<div class="vado-menu">
+    <div>
+        <a href="/tasks" class="btn">Задачи</a>
+        <a href="/users" class="btn">Пользователи</a>
+        <a href="/roles" class="btn">Роли</a>
+    </div>
+
+    <div class="vado-user-info">
+        <p>Привет, {{if .user_id}}{{.user_id}}{{else}}Гость{{end}}!</p>
+        {{if .is_auth}}
+        <form action="/logout" method="POST" style="display:inline;">
+            <button class="btn">
+                <i class="fa-solid fa-right-from-bracket"></i> Выйти
+            </button>
+        </form>
+        {{else}}
+        <form action="/login" method="GET" style="display:inline;">
+            <button class="btn">
+                <i class="fa-solid fa-right-to-bracket"></i> Войти
+            </button>
+        </form>
+        {{end}}
+    </div>
+</div>
+{{ end }}
