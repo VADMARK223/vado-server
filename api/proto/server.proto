@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "api/pb/server;server";
+
+service ServerService {
+  rpc Ping(google.protobuf.Empty) returns (ServerResponse);
+}
+message ServerResponse {
+  bool run = 1;
+}

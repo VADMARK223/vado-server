@@ -25,8 +25,8 @@ WORKDIR /app
 # Копируем бинарник из builder-этапа
 COPY --from=builder /app/vado-server .
 # Копируем шаблоны и статику
-COPY --from=builder /app/internal/templates ./internal/templates
-COPY --from=builder /app/internal/static ./internal/static
+COPY --from=builder /app/web/templates ./web/templates
+COPY --from=builder /app/web/static ./web/static
 
 # Пробрасываем порт
 EXPOSE 5556

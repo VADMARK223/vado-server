@@ -6,12 +6,12 @@ import (
 	"net"
 	"strings"
 	"sync"
+	pbServer "vado_server/api/pb/server"
 	"vado_server/internal/constants/code"
 	"vado_server/internal/db"
-	grpcServer2 "vado_server/internal/grpc/auth"
-	"vado_server/internal/grpc/server"
+	grpcServer2 "vado_server/internal/handler/grpc/auth"
+	"vado_server/internal/handler/grpc/server"
 	"vado_server/internal/middleware"
-	pbServer "vado_server/internal/pb/server"
 	"vado_server/internal/router"
 	"vado_server/internal/util"
 
@@ -27,9 +27,9 @@ import (
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 
-	pbAuth "vado_server/internal/pb/auth"
-	pb "vado_server/internal/pb/chat"
-	pbHello "vado_server/internal/pb/hello"
+	pbAuth "vado_server/api/pb/auth"
+	pb "vado_server/api/pb/chat"
+	pbHello "vado_server/api/pb/hello"
 
 	"google.golang.org/grpc"
 )

@@ -4,7 +4,7 @@ import (
 	"html/template"
 	"vado_server/internal/appcontext"
 	"vado_server/internal/constants/route"
-	"vado_server/internal/handlers"
+	"vado_server/internal/handler/http"
 	"vado_server/internal/middleware"
 	"vado_server/internal/repository"
 	"vado_server/internal/services"
@@ -27,13 +27,12 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 
 	gin.SetMode(util.GetEnv("GIN_MODE"))
 	r := gin.New()
-	tmpl := template.Must(template.ParseGlob("internal/templates/*.html"))
+	tmpl := template.Must(template.ParseGlob("web/templates/*.html"))
 	r.SetHTMLTemplate(tmpl)
 	r.Use(gin.Logger(), gin.Recovery())
 	_ = r.SetTrustedProxies(nil)
 	// Статика и шаблоны
-	r.Static("/static", "./internal/static")
-	//r.LoadHTMLGlob("internal/templates/*")
+	r.Static("/static", "./web/static")
 
 	// Настраиваем cookie-сессии
 	store := cookie.NewStore([]byte("super-secret-key"))
@@ -42,30 +41,30 @@ func SetupRouter(cxt *appcontext.AppContext) *gin.Engine {
 
 	// Публичные маршруты
 	r.GET("/ping", func(c *gin.Context) { c.JSON(200, gin.H{"message": "pong"}) })
-	r.GET(route.Index, handlers.ShowIndex)
-	r.GET(route.Login, handlers.ShowLoginPage())
-	r.POST(route.Login, handlers.PerformLogin(cxt))
-	r.GET(route.Register, handlers.ShowRegisterPage())
-	r.POST(route.Register, handlers.PerformRegister(userService))
+	r.GET(route.Index, http.ShowIndex)
+	r.GET(route.Login, http.ShowLoginPage())
+	r.POST(route.Login, http.PerformLogin(cxt))
+	r.GET(route.Register, http.ShowRegisterPage())
+	r.POST(route.Register, http.PerformRegister(userService))
 
-	r.POST(route.Logout, handlers.Logout())
+	r.POST(route.Logout, http.Logout())
 
 	// Защищенные маршруты
 	auth := r.Group("/")
 	auth.Use(middleware.CheckAuth())
 	{
-		auth.GET(route.Tasks, handlers.ShowTasksPage(taskService))
-		auth.POST(route.Tasks, handlers.AddTask(cxt))
-		auth.DELETE("/tasks/:id", handlers.DeleteTask(cxt))
-		auth.GET(route.Users, handlers.ShowUsers(cxt))
-		auth.POST(route.Users, handlers.AddUser(userService))
-		auth.GET(route.Roles, handlers.ShowRoles(roleService))
-		auth.DELETE("/users/:id", handlers.DeleteUser(cxt))
+		auth.GET(route.Tasks, http.ShowTasksPage(taskService))
+		auth.POST(route.Tasks, http.AddTask(cxt))
+		auth.DELETE("/tasks/:id", http.DeleteTask(cxt))
+		auth.GET(route.Users, http.ShowUsers(cxt))
+		auth.POST(route.Users, http.AddUser(userService))
+		auth.GET(route.Roles, http.ShowRoles(roleService))
+		auth.DELETE("/users/:id", http.DeleteUser(cxt))
 	}
 
 	// JSON API
-	r.GET("/api/hello", handlers.GetHello())
-	//r.GET("/api/tasks", handlers.GetTasksJSON(taskService))
+	r.GET("/api/hello", http.GetHello())
+	//r.GET("/api/tasks", handler.GetTasksJSON(taskService))
 
 	return r
 }
