@@ -2,14 +2,17 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net"
+	"os"
+	"os/signal"
 	"strings"
 	"sync"
 	pbServer "vado_server/api/pb/server"
 	"vado_server/internal/constants/code"
 	"vado_server/internal/db"
 	grpcServer2 "vado_server/internal/handler/grpc/auth"
+	"vado_server/internal/handler/grpc/chat"
+	"vado_server/internal/handler/grpc/hello"
 	"vado_server/internal/handler/grpc/server"
 	"vado_server/internal/middleware"
 	"vado_server/internal/router"
@@ -36,16 +39,48 @@ import (
 
 func main() {
 	_ = godotenv.Load(".env")
-	appCtx := appcontext.NewAppContext(initLogger())
+
+	zapLogger := initLogger()
+	defer func() { _ = zapLogger.Sync() }()
+
+	appCtx := appcontext.NewAppContext(zapLogger)
 	appCtx.Log.Infow("Start vado-server.", "time", time.Now().Format("2006-01-02 15:04:05"))
+
 	database := initDB(appCtx)
 	appCtx.DB = database
+	defer func() {
+		if sqlDB, err := database.DB(); err == nil {
+			_ = sqlDB.Close()
+		}
+	}()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	var wg sync.WaitGroup
-	wg.Add(2)
-	go startHTTPServer(appCtx, &wg, util.GetEnv("PORT"))
-	go startGRPCServer(appCtx, &wg, "50051")
+	// HTTP сервер
+	wg.Add(1)
+	go startHTTPServer(ctx, appCtx, &wg, util.GetEnv("PORT"))
+
+	// gRPC сервер
+	wg.Add(1)
+	grpcServerInstance := startGRPCServer(ctx, appCtx, &wg, "50051")
+
+	// Graceful shutdown
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+
+	appCtx.Log.Info("Shutting down servers...")
+	cancel()
+
+	// Останавливаем gRPC сервер
+	if grpcServerInstance != nil {
+		grpcServerInstance.GracefulStop()
+	}
+
 	wg.Wait()
+	appCtx.Log.Infow("Servers stopped.")
 }
 
 func initLogger() *zap.SugaredLogger {
@@ -53,7 +88,6 @@ func initLogger() *zap.SugaredLogger {
 	if zapLoggerInitErr != nil {
 		panic(zapLoggerInitErr)
 	}
-	defer func() { _ = zapLogger.Sync() }()
 
 	return zapLogger
 }
@@ -70,83 +104,52 @@ func initDB(appCtx *appcontext.AppContext) *gorm.DB {
 	return database
 }
 
-func startHTTPServer(cxt *appcontext.AppContext, wg *sync.WaitGroup, port string) {
+func startHTTPServer(ctx context.Context, appCtx *appcontext.AppContext, wg *sync.WaitGroup, port string) {
 	defer wg.Done()
-	r := router.SetupRouter(cxt)
 
-	cxt.Log.Infow("HTTP (Gin) Server starting", "port", port)
-	if err := r.Run(":" + port); err != nil {
-		cxt.Log.Fatalw("Server failed", "error", err)
-	}
-}
+	r := router.SetupRouter(appCtx)
+	appCtx.Log.Infow("HTTP (Gin) Server starting", "port", port)
 
-type helloServer struct {
-	pbHello.UnimplementedHelloServiceServer
-}
-
-type chatServer struct {
-	pb.UnimplementedChatServiceServer
-	mu      sync.Mutex
-	clients map[pb.ChatService_ChatStreamServer]struct{}
-}
-
-func newChatService() *chatServer {
-	return &chatServer{clients: make(map[pb.ChatService_ChatStreamServer]struct{})}
-}
-
-func (s *chatServer) SendMessage(_ context.Context, msg *pb.ChatMessage) (*pb.Empty, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	// рассылаем всем
-	for client := range s.clients {
-		err := client.Send(msg)
-		if err != nil {
-			delete(s.clients, client)
+	// Запускаем сервер в отдельной горутине для graceful shutdown
+	go func() {
+		if err := r.Run(":" + port); err != nil {
+			appCtx.Log.Errorw("HTTP Server error", "error", err)
 		}
-	}
-	return &pb.Empty{}, nil
+	}()
+
+	<-ctx.Done()
+	appCtx.Log.Info("HTTP Server shutting down")
 }
 
-func (s *chatServer) ChatStream(_ *pb.Empty, stream pb.ChatService_ChatStreamServer) error {
-	s.mu.Lock()
-	s.clients[stream] = struct{}{}
-	s.mu.Unlock()
-
-	// остаёмся в стриме
-	<-stream.Context().Done()
-	s.mu.Lock()
-	delete(s.clients, stream)
-	s.mu.Unlock()
-	return nil
-}
-
-func (s *helloServer) SeyHello(ctx context.Context, req *pbHello.HelloRequest) (*pbHello.HelloResponse, error) {
-	userId := ctx.Value(code.UserId)
-	return &pbHello.HelloResponse{
-		Message: fmt.Sprintf("Привет, %s! Твой ID в БД=%f", req.Name, userId.(float64)),
-	}, nil
-}
-
-func startGRPCServer(appCtx *appcontext.AppContext, wg *sync.WaitGroup, port string) {
+func startGRPCServer(ctx context.Context, appCtx *appcontext.AppContext, wg *sync.WaitGroup, port string) *grpc.Server {
 	defer wg.Done()
+
 	lis, lisErr := net.Listen("tcp", ":"+port)
 	if lisErr != nil {
 		appCtx.Log.Fatalf("Error listen gRPC: %v", lisErr)
 	}
 
-	grpcServer := grpc.NewServer(
+	grpcServerInstance := grpc.NewServer(
 		grpc.UnaryInterceptor(AuthInterceptor), // Перехват для обычных запросов
 		//grpc.UnaryInterceptor(AuthStreamInterceptor),
 	)
-	pbAuth.RegisterAuthServiceServer(grpcServer, &grpcServer2.AuthServerGRPC{AppCtx: appCtx})
-	pbHello.RegisterHelloServiceServer(grpcServer, &helloServer{})
-	pb.RegisterChatServiceServer(grpcServer, newChatService())
-	pbServer.RegisterServerServiceServer(grpcServer, &server.ServerService{})
+	pbAuth.RegisterAuthServiceServer(grpcServerInstance, &grpcServer2.AuthServerGRPC{AppCtx: appCtx})
+	pbHello.RegisterHelloServiceServer(grpcServerInstance, &hello.HelloServer{})
+	pb.RegisterChatServiceServer(grpcServerInstance, chat.NewChatService())
+	pbServer.RegisterServerServiceServer(grpcServerInstance, &server.ServerService{})
+
 	appCtx.Log.Infow("gRPC server starting", "port", port)
-	if err := grpcServer.Serve(lis); err != nil {
-		appCtx.Log.Fatalf("Ошибка запуска gRPC: %v", err)
-	}
+
+	go func() {
+		if err := grpcServerInstance.Serve(lis); err != nil {
+			appCtx.Log.Errorw("gRPC Server error", "error", err)
+		}
+	}()
+
+	<-ctx.Done()
+	appCtx.Log.Info("gRPC Server shutting down")
+
+	return grpcServerInstance
 }
 
 func AuthInterceptor(
