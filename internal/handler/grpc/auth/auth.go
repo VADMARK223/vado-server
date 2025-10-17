@@ -13,12 +13,12 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type AuthServerGRPC struct {
+type ServerGRPC struct {
 	pb.UnimplementedAuthServiceServer
 	AppCtx *appcontext.AppContext
 }
 
-func (s *AuthServerGRPC) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
+func (s *ServerGRPC) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
 	s.AppCtx.Log.Infow("LOGIN", "username", req.Username, "password", req.Password)
 
 	var user models.User
@@ -35,5 +35,8 @@ func (s *AuthServerGRPC) Login(_ context.Context, req *pb.LoginRequest) (*pb.Log
 		return nil, status.Error(codes.Internal, "failed to create token")
 	}
 
-	return &pb.LoginResponse{Token: token}, nil
+	return &pb.LoginResponse{
+		Token:    token,
+		Username: user.Username,
+	}, nil
 }

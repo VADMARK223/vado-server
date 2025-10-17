@@ -22,6 +22,7 @@ import (
 	"vado_server/internal/appcontext"
 	"vado_server/internal/logger"
 
+	"github.com/k0kubun/pp"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -151,10 +152,10 @@ func startGRPCServer(appCtx *appcontext.AppContext, wg *sync.WaitGroup, port str
 	)
 
 	// регистрируем сервисы
-	pbAuth.RegisterAuthServiceServer(grpcServerInstance, &grpcServer2.AuthServerGRPC{AppCtx: appCtx})
-	pbHello.RegisterHelloServiceServer(grpcServerInstance, &hello.HelloServer{})
+	pbAuth.RegisterAuthServiceServer(grpcServerInstance, &grpcServer2.ServerGRPC{AppCtx: appCtx})
+	pbHello.RegisterHelloServiceServer(grpcServerInstance, &hello.Server{})
 	pb.RegisterChatServiceServer(grpcServerInstance, chat.NewChatService())
-	pbServer.RegisterServerServiceServer(grpcServerInstance, &server.ServerService{})
+	pbServer.RegisterServerServiceServer(grpcServerInstance, &server.Service{})
 
 	appCtx.Log.Infow("gRPC server starting", "port", port)
 
@@ -185,6 +186,7 @@ func AuthInterceptor(
 	}
 
 	// Достаём токен из metadata
+	_, _ = pp.Println(info.FullMethod)
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "metadata отсутствует")
@@ -198,6 +200,7 @@ func AuthInterceptor(
 	token := strings.TrimPrefix(values[0], "Bearer ")
 	claims, err := middleware.ParseToken(token) // твоя функция проверки JWT
 	if err != nil {
+		_, _ = pp.Printf("not valid token: %v", err)
 		return nil, status.Error(codes.Unauthenticated, "некорректный токен")
 	}
 

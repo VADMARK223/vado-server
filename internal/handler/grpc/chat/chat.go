@@ -6,17 +6,17 @@ import (
 	"vado_server/api/pb/chat"
 )
 
-type ChatServer struct {
+type Server struct {
 	chat.UnimplementedChatServiceServer
 	mu      sync.Mutex
 	clients map[chat.ChatService_ChatStreamServer]struct{}
 }
 
-func NewChatService() *ChatServer {
-	return &ChatServer{clients: make(map[chat.ChatService_ChatStreamServer]struct{})}
+func NewChatService() *Server {
+	return &Server{clients: make(map[chat.ChatService_ChatStreamServer]struct{})}
 }
 
-func (s *ChatServer) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Empty, error) {
+func (s *Server) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Empty, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -29,7 +29,7 @@ func (s *ChatServer) SendMessage(_ context.Context, msg *chat.ChatMessage) (*cha
 	return &chat.Empty{}, nil
 }
 
-func (s *ChatServer) ChatStream(_ *chat.Empty, stream chat.ChatService_ChatStreamServer) error {
+func (s *Server) ChatStream(_ *chat.Empty, stream chat.ChatService_ChatStreamServer) error {
 	s.mu.Lock()
 	s.clients[stream] = struct{}{}
 	s.mu.Unlock()
