@@ -64,19 +64,37 @@ func main() {
 
 	// gRPC сервер
 	wg.Add(1)
-	grpcServerInstance := startGRPCServer(ctx, appCtx, &wg, "50051")
+	grpcServerInstance, err := startGRPCServer(appCtx, &wg, util.GetEnv("GRPC_PORT"))
+	if err != nil {
+		appCtx.Log.Fatalw("failed to start grpc server", "error", err)
+	}
 
 	// Graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 
-	appCtx.Log.Info("Shutting down servers...")
+	appCtx.Log.Info("Shutdown signal received")
+	// даём сервисам небольшое время завершиться
 	cancel()
 
-	// Останавливаем gRPC сервер
+	// Останавливаем gRPC сервер корректно
 	if grpcServerInstance != nil {
-		grpcServerInstance.GracefulStop()
+		// GracefulStop не принимает контекст; оборачиваем в go func чтобы не блокировать
+		done := make(chan struct{})
+		go func() {
+			appCtx.Log.Info("gRPC: GracefulStop called")
+			grpcServerInstance.GracefulStop()
+			close(done)
+		}()
+
+		select {
+		case <-done:
+			appCtx.Log.Info("gRPC server stopped gracefully")
+		case <-time.After(10 * time.Second):
+			appCtx.Log.Warn("gRPC graceful stop timeout, forcing Stop()")
+			grpcServerInstance.Stop()
+		}
 	}
 
 	wg.Wait()
@@ -121,18 +139,18 @@ func startHTTPServer(ctx context.Context, appCtx *appcontext.AppContext, wg *syn
 	appCtx.Log.Info("HTTP Server shutting down")
 }
 
-func startGRPCServer(ctx context.Context, appCtx *appcontext.AppContext, wg *sync.WaitGroup, port string) *grpc.Server {
-	defer wg.Done()
-
+func startGRPCServer(appCtx *appcontext.AppContext, wg *sync.WaitGroup, port string) (*grpc.Server, error) {
 	lis, lisErr := net.Listen("tcp", ":"+port)
 	if lisErr != nil {
-		appCtx.Log.Fatalf("Error listen gRPC: %v", lisErr)
+		return nil, lisErr
 	}
 
 	grpcServerInstance := grpc.NewServer(
 		grpc.UnaryInterceptor(AuthInterceptor), // Перехват для обычных запросов
 		//grpc.UnaryInterceptor(AuthStreamInterceptor),
 	)
+
+	// регистрируем сервисы
 	pbAuth.RegisterAuthServiceServer(grpcServerInstance, &grpcServer2.AuthServerGRPC{AppCtx: appCtx})
 	pbHello.RegisterHelloServiceServer(grpcServerInstance, &hello.HelloServer{})
 	pb.RegisterChatServiceServer(grpcServerInstance, chat.NewChatService())
@@ -141,15 +159,15 @@ func startGRPCServer(ctx context.Context, appCtx *appcontext.AppContext, wg *syn
 	appCtx.Log.Infow("gRPC server starting", "port", port)
 
 	go func() {
+		defer wg.Done()
 		if err := grpcServerInstance.Serve(lis); err != nil {
-			appCtx.Log.Errorw("gRPC Server error", "error", err)
+			appCtx.Log.Errorw("gRPC Server Serve error", "error", err)
 		}
+		appCtx.Log.Info("gRPC Serve returned")
 	}()
 
-	<-ctx.Done()
-	appCtx.Log.Info("gRPC Server shutting down")
-
-	return grpcServerInstance
+	// возвращаем сервер сразу (негатив: Serve находится в горутине; остановка — через GracefulStop в main)
+	return grpcServerInstance, nil
 }
 
 func AuthInterceptor(
