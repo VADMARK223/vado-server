@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 	pbServer "vado_server/api/pb/server"
-	"vado_server/internal/constants/code"
+	"vado_server/internal/auth"
 	"vado_server/internal/db"
 	grpcServer2 "vado_server/internal/handler/grpc/auth"
 	"vado_server/internal/handler/grpc/chat"
@@ -204,9 +204,11 @@ func AuthInterceptor(
 		return nil, status.Error(codes.Unauthenticated, "некорректный токен")
 	}
 
-	if claims.UserID != 0 {
-		ctx = context.WithValue(ctx, code.UserId, claims.UserID)
+	if claims.UserID == 0 {
+		return nil, status.Error(codes.Unauthenticated, "пустой userID в токене")
 	}
+
+	ctx = auth.Wrap(ctx, claims.UserID)
 
 	return handler(ctx, req)
 }
