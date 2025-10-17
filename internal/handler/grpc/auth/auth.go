@@ -13,6 +13,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const TokenAliveMinutes = 150
+
 type ServerGRPC struct {
 	pb.UnimplementedAuthServiceServer
 	AppCtx *appcontext.AppContext
@@ -30,7 +32,7 @@ func (s *ServerGRPC) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRe
 		return nil, status.Error(codes.Unauthenticated, "invalid password")
 	}
 
-	token, err := auth.CreateToken(user.ID, []string{"user"}, 15*time.Minute)
+	token, err := auth.CreateToken(user.ID, []string{"user"}, TokenAliveMinutes*time.Minute)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to create token")
 	}
