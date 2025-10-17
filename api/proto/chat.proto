@@ -8,8 +8,9 @@ service ChatService {
 }
 
 message ChatMessage {
-  string user = 1;
-  string text = 2;
+  string id = 1;
+  string user = 2;
+  string text = 3;
 }
 
 message Empty {}

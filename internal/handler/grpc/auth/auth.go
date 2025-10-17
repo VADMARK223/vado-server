@@ -38,6 +38,7 @@ func (s *ServerGRPC) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRe
 	}
 
 	return &pb.LoginResponse{
+		Id:       uint64(user.ID),
 		Token:    token,
 		Username: user.Username,
 	}, nil

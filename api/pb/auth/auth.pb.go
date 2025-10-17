@@ -75,8 +75,9 @@ func (x *LoginRequest) GetPassword() string {
 
 type LoginResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -111,6 +112,13 @@ func (*LoginResponse) Descriptor() ([]byte, []int) {
 	return file_api_proto_auth_proto_rawDescGZIP(), []int{1}
 }
 
+func (x *LoginResponse) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 func (x *LoginResponse) GetToken() string {
 	if x != nil {
 		return x.Token
@@ -132,10 +140,11 @@ const file_api_proto_auth_proto_rawDesc = "" +
 	"\x14api/proto/auth.proto\"F\n" +
 	"\fLoginRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"A\n" +
-	"\rLoginResponse\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1a\n" +
-	"\busername\x18\x02 \x01(\tR\busername25\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"Q\n" +
+	"\rLoginResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x14\n" +
+	"\x05token\x18\x02 \x01(\tR\x05token\x12\x1a\n" +
+	"\busername\x18\x03 \x01(\tR\busername25\n" +
 	"\vAuthService\x12&\n" +
 	"\x05Login\x12\r.LoginRequest\x1a\x0e.LoginResponseB\x12Z\x10api/pb/auth;authb\x06proto3"
 

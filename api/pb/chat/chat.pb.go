@@ -23,8 +23,9 @@ const (
 
 type ChatMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	User          string                 `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
-	Text          string                 `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	User          string                 `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	Text          string                 `protobuf:"bytes,3,opt,name=text,proto3" json:"text,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -57,6 +58,13 @@ func (x *ChatMessage) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ChatMessage.ProtoReflect.Descriptor instead.
 func (*ChatMessage) Descriptor() ([]byte, []int) {
 	return file_api_proto_chat_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *ChatMessage) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
 }
 
 func (x *ChatMessage) GetUser() string {
@@ -113,10 +121,11 @@ var File_api_proto_chat_proto protoreflect.FileDescriptor
 
 const file_api_proto_chat_proto_rawDesc = "" +
 	"\n" +
-	"\x14api/proto/chat.proto\"5\n" +
-	"\vChatMessage\x12\x12\n" +
-	"\x04user\x18\x01 \x01(\tR\x04user\x12\x12\n" +
-	"\x04text\x18\x02 \x01(\tR\x04text\"\a\n" +
+	"\x14api/proto/chat.proto\"E\n" +
+	"\vChatMessage\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04user\x18\x02 \x01(\tR\x04user\x12\x12\n" +
+	"\x04text\x18\x03 \x01(\tR\x04text\"\a\n" +
 	"\x05Empty2X\n" +
 	"\vChatService\x12#\n" +
 	"\vSendMessage\x12\f.ChatMessage\x1a\x06.Empty\x12$\n" +
