@@ -2,18 +2,22 @@ package chat
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"vado_server/api/pb/chat"
 )
 
+var clientColor = []string{"#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#33FFF5"}
+var clientIndex = 0
+
 type Server struct {
 	chat.UnimplementedChatServiceServer
 	mu      sync.Mutex
-	clients map[chat.ChatService_ChatStreamServer]struct{}
+	clients map[chat.ChatService_ChatStreamServer]*Client
 }
 
 func NewChatService() *Server {
-	return &Server{clients: make(map[chat.ChatService_ChatStreamServer]struct{})}
+	return &Server{clients: make(map[chat.ChatService_ChatStreamServer]*Client)}
 }
 
 func (s *Server) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Empty, error) {
@@ -31,14 +35,38 @@ func (s *Server) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Em
 
 func (s *Server) ChatStream(_ *chat.Empty, stream chat.ChatService_ChatStreamServer) error {
 	s.mu.Lock()
-	s.clients[stream] = struct{}{}
+	color := clientColor[clientIndex%len(clientColor)]
+	clientIndex++
+
+	s.clients[stream] = &Client{
+		stream: stream,
+		color:  color,
+	}
+	s.broadcastSystemMessage("Новый участник вошел", len(s.clients))
 	s.mu.Unlock()
 
 	<-stream.Context().Done()
 
 	s.mu.Lock()
 	delete(s.clients, stream)
+	s.broadcastSystemMessage("Участник покинул", len(s.clients))
 	s.mu.Unlock()
 
 	return nil
+}
+
+func (s *Server) broadcastSystemMessage(text string, users int) {
+	msg := &chat.ChatMessage{
+		User:  "System",
+		Text:  fmt.Sprintf("%s | Сейчас в чате: %d", text, users),
+		Color: "#888888",
+	}
+
+	for _, c := range s.clients {
+		errSend := c.stream.Send(msg)
+		if errSend != nil {
+			fmt.Println("Error send message:" + errSend.Error())
+		}
+	}
+
 }

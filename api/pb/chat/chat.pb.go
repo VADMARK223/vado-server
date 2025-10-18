@@ -26,6 +26,7 @@ type ChatMessage struct {
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	User          string                 `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
 	Text          string                 `protobuf:"bytes,3,opt,name=text,proto3" json:"text,omitempty"`
+	Color         string                 `protobuf:"bytes,4,opt,name=color,proto3" json:"color,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -81,6 +82,13 @@ func (x *ChatMessage) GetText() string {
 	return ""
 }
 
+func (x *ChatMessage) GetColor() string {
+	if x != nil {
+		return x.Color
+	}
+	return ""
+}
+
 type Empty struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -121,11 +129,12 @@ var File_api_proto_chat_proto protoreflect.FileDescriptor
 
 const file_api_proto_chat_proto_rawDesc = "" +
 	"\n" +
-	"\x14api/proto/chat.proto\"E\n" +
+	"\x14api/proto/chat.proto\"[\n" +
 	"\vChatMessage\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04user\x18\x02 \x01(\tR\x04user\x12\x12\n" +
-	"\x04text\x18\x03 \x01(\tR\x04text\"\a\n" +
+	"\x04text\x18\x03 \x01(\tR\x04text\x12\x14\n" +
+	"\x05color\x18\x04 \x01(\tR\x05color\"\a\n" +
 	"\x05Empty2X\n" +
 	"\vChatService\x12#\n" +
 	"\vSendMessage\x12\f.ChatMessage\x1a\x06.Empty\x12$\n" +
