@@ -6,4 +6,5 @@ type Client struct {
 	stream chat.ChatService_ChatStreamServer
 	color  string
 	name   string
+	id     uint64
 }

@@ -26,7 +26,13 @@ func (s *Server) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Em
 	defer s.mu.Unlock()
 
 	for client := range s.clients {
-		messageWithTime(msg, chat.MessageType_MESSAGE_SYSTEM)
+		var messageType chat.MessageType
+		if s.clients[client].id == msg.Id {
+			messageType = chat.MessageType_MESSAGE_SELF
+		} else {
+			messageType = chat.MessageType_MESSAGE_USER
+		}
+		messageWithTime(msg, messageType)
 		err := client.Send(msg)
 		if err != nil {
 			delete(s.clients, client)
@@ -35,13 +41,14 @@ func (s *Server) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Em
 	return &chat.Empty{}, nil
 }
 
-func (s *Server) ChatStream(_ *chat.Empty, stream chat.ChatService_ChatStreamServer) error {
+func (s *Server) ChatStream(req *chat.ChatStreamRequest, stream chat.ChatService_ChatStreamServer) error {
 	s.mu.Lock()
 	color := clientColor[clientIndex%len(clientColor)]
 	clientIndex++
 
 	s.clients[stream] = &Client{
 		stream: stream,
+		id:     req.Id,
 		color:  color,
 	}
 	s.broadcastSystemMessage("Новый участник вошел", len(s.clients))

@@ -75,7 +75,7 @@ func (MessageType) EnumDescriptor() ([]byte, []int) {
 
 type ChatMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // Это ID пользователя (ПОМЕНЯТЬ!) Поменять на число
 	User          string                 `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
 	Text          string                 `protobuf:"bytes,3,opt,name=text,proto3" json:"text,omitempty"`
 	Color         string                 `protobuf:"bytes,4,opt,name=color,proto3" json:"color,omitempty"`
@@ -115,11 +115,11 @@ func (*ChatMessage) Descriptor() ([]byte, []int) {
 	return file_api_proto_chat_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ChatMessage) GetId() string {
+func (x *ChatMessage) GetId() uint64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 func (x *ChatMessage) GetUser() string {
@@ -157,6 +157,50 @@ func (x *ChatMessage) GetType() MessageType {
 	return MessageType_MESSAGE_UNKNOWN
 }
 
+type ChatStreamRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChatStreamRequest) Reset() {
+	*x = ChatStreamRequest{}
+	mi := &file_api_proto_chat_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChatStreamRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChatStreamRequest) ProtoMessage() {}
+
+func (x *ChatStreamRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_proto_chat_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChatStreamRequest.ProtoReflect.Descriptor instead.
+func (*ChatStreamRequest) Descriptor() ([]byte, []int) {
+	return file_api_proto_chat_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ChatStreamRequest) GetId() uint64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 type Empty struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -165,7 +209,7 @@ type Empty struct {
 
 func (x *Empty) Reset() {
 	*x = Empty{}
-	mi := &file_api_proto_chat_proto_msgTypes[1]
+	mi := &file_api_proto_chat_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -177,7 +221,7 @@ func (x *Empty) String() string {
 func (*Empty) ProtoMessage() {}
 
 func (x *Empty) ProtoReflect() protoreflect.Message {
-	mi := &file_api_proto_chat_proto_msgTypes[1]
+	mi := &file_api_proto_chat_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -190,7 +234,7 @@ func (x *Empty) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Empty.ProtoReflect.Descriptor instead.
 func (*Empty) Descriptor() ([]byte, []int) {
-	return file_api_proto_chat_proto_rawDescGZIP(), []int{1}
+	return file_api_proto_chat_proto_rawDescGZIP(), []int{2}
 }
 
 var File_api_proto_chat_proto protoreflect.FileDescriptor
@@ -199,22 +243,24 @@ const file_api_proto_chat_proto_rawDesc = "" +
 	"\n" +
 	"\x14api/proto/chat.proto\"\x9b\x01\n" +
 	"\vChatMessage\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
 	"\x04user\x18\x02 \x01(\tR\x04user\x12\x12\n" +
 	"\x04text\x18\x03 \x01(\tR\x04text\x12\x14\n" +
 	"\x05color\x18\x04 \x01(\tR\x05color\x12\x1c\n" +
 	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\x12 \n" +
-	"\x04type\x18\x06 \x01(\x0e2\f.MessageTypeR\x04type\"\a\n" +
+	"\x04type\x18\x06 \x01(\x0e2\f.MessageTypeR\x04type\"#\n" +
+	"\x11ChatStreamRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id\"\a\n" +
 	"\x05Empty*Z\n" +
 	"\vMessageType\x12\x13\n" +
 	"\x0fMESSAGE_UNKNOWN\x10\x00\x12\x10\n" +
 	"\fMESSAGE_USER\x10\x01\x12\x12\n" +
 	"\x0eMESSAGE_SYSTEM\x10\x02\x12\x10\n" +
-	"\fMESSAGE_SELF\x10\x032X\n" +
+	"\fMESSAGE_SELF\x10\x032d\n" +
 	"\vChatService\x12#\n" +
-	"\vSendMessage\x12\f.ChatMessage\x1a\x06.Empty\x12$\n" +
+	"\vSendMessage\x12\f.ChatMessage\x1a\x06.Empty\x120\n" +
 	"\n" +
-	"ChatStream\x12\x06.Empty\x1a\f.ChatMessage0\x01B\x12Z\x10api/pb/chat;chatb\x06proto3"
+	"ChatStream\x12\x12.ChatStreamRequest\x1a\f.ChatMessage0\x01B\x12Z\x10api/pb/chat;chatb\x06proto3"
 
 var (
 	file_api_proto_chat_proto_rawDescOnce sync.Once
@@ -229,17 +275,18 @@ func file_api_proto_chat_proto_rawDescGZIP() []byte {
 }
 
 var file_api_proto_chat_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_api_proto_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_api_proto_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_api_proto_chat_proto_goTypes = []any{
-	(MessageType)(0),    // 0: MessageType
-	(*ChatMessage)(nil), // 1: ChatMessage
-	(*Empty)(nil),       // 2: Empty
+	(MessageType)(0),          // 0: MessageType
+	(*ChatMessage)(nil),       // 1: ChatMessage
+	(*ChatStreamRequest)(nil), // 2: ChatStreamRequest
+	(*Empty)(nil),             // 3: Empty
 }
 var file_api_proto_chat_proto_depIdxs = []int32{
 	0, // 0: ChatMessage.type:type_name -> MessageType
 	1, // 1: ChatService.SendMessage:input_type -> ChatMessage
-	2, // 2: ChatService.ChatStream:input_type -> Empty
-	2, // 3: ChatService.SendMessage:output_type -> Empty
+	2, // 2: ChatService.ChatStream:input_type -> ChatStreamRequest
+	3, // 3: ChatService.SendMessage:output_type -> Empty
 	1, // 4: ChatService.ChatStream:output_type -> ChatMessage
 	3, // [3:5] is the sub-list for method output_type
 	1, // [1:3] is the sub-list for method input_type
@@ -259,7 +306,7 @@ func file_api_proto_chat_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_proto_chat_proto_rawDesc), len(file_api_proto_chat_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

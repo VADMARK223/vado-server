@@ -4,11 +4,11 @@ option go_package = "api/pb/chat;chat";
 
 service ChatService {
   rpc SendMessage (ChatMessage) returns (Empty);
-  rpc ChatStream (Empty) returns (stream ChatMessage);
+  rpc ChatStream (ChatStreamRequest) returns (stream ChatMessage);
 }
 
 message ChatMessage {
-  string id = 1;
+  uint64 id = 1; // Это ID пользователя (ПОМЕНЯТЬ!) Поменять на число
   string user = 2;
   string text = 3;
   string color = 4;
@@ -21,6 +21,10 @@ enum MessageType {
   MESSAGE_USER = 1;     // обычное сообщение пользователя
   MESSAGE_SYSTEM = 2;   // системное сообщение
   MESSAGE_SELF = 3;     // сообщение от самого себя
+}
+
+message ChatStreamRequest {
+  uint64 id = 1;
 }
 
 message Empty {}
