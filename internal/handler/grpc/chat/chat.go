@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 	"vado_server/api/pb/chat"
 )
 
@@ -25,6 +26,7 @@ func (s *Server) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Em
 	defer s.mu.Unlock()
 
 	for client := range s.clients {
+		messageWithTime(msg, chat.MessageType_MESSAGE_SYSTEM)
 		err := client.Send(msg)
 		if err != nil {
 			delete(s.clients, client)
@@ -63,10 +65,16 @@ func (s *Server) broadcastSystemMessage(text string, users int) {
 	}
 
 	for _, c := range s.clients {
+		messageWithTime(msg, chat.MessageType_MESSAGE_USER)
 		errSend := c.stream.Send(msg)
 		if errSend != nil {
 			fmt.Println("Error send message:" + errSend.Error())
 		}
 	}
 
+}
+
+func messageWithTime(msg *chat.ChatMessage, messageType chat.MessageType) {
+	msg.Timestamp = time.Now().Unix()
+	msg.Type = messageType
 }
