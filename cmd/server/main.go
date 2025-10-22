@@ -28,12 +28,11 @@ import (
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 
-	"github.com/joho/godotenv"
-	"go.uber.org/zap"
-
 	pbAuth "vado_server/api/pb/auth"
 	pb "vado_server/api/pb/chat"
 	pbHello "vado_server/api/pb/hello"
+
+	"github.com/joho/godotenv"
 
 	"google.golang.org/grpc"
 )
@@ -41,7 +40,7 @@ import (
 func main() {
 	_ = godotenv.Load(".env")
 
-	zapLogger := initLogger()
+	zapLogger := logger.Init(true)
 	defer func() { _ = zapLogger.Sync() }()
 
 	appCtx := appcontext.NewAppContext(zapLogger)
@@ -100,15 +99,6 @@ func main() {
 
 	wg.Wait()
 	appCtx.Log.Infow("Servers stopped.")
-}
-
-func initLogger() *zap.SugaredLogger {
-	zapLogger, zapLoggerInitErr := logger.Init(true)
-	if zapLoggerInitErr != nil {
-		panic(zapLoggerInitErr)
-	}
-
-	return zapLogger
 }
 
 func initDB(appCtx *appcontext.AppContext) *gorm.DB {

@@ -34,6 +34,10 @@ psql -U vadmark -d vadodb
 ```shell
 \d tasks
 ```
+Удаление volume, чтобы база создалась заново
+```shell
+docker volume rm vado-server_postgres-data
+```
 
 # Golang
 

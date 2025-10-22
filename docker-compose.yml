@@ -25,6 +25,7 @@ services:
     container_name: vado-server
     ports:
       - "5556:5556" # порт хоста: порт контейнера
+      - "50051:50051" # gRPC
     restart: unless-stopped
     environment:
       PORT: 5556
