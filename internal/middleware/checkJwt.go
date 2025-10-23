@@ -1,16 +1,11 @@
 package middleware
 
 import (
-	"errors"
-	"fmt"
 	"time"
 	"vado_server/internal/auth"
 	"vado_server/internal/constants/code"
-	"vado_server/internal/constants/env"
-	"vado_server/internal/util"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 /*func CheckJWT() gin.HandlerFunc {
@@ -86,7 +81,7 @@ func CheckJWT() gin.HandlerFunc {
 			return
 		}
 
-		claims, err := ParseToken(tokenStr)
+		claims, err := auth.ParseToken(tokenStr)
 		if err != nil {
 			c.Set(code.IsAuth, false)
 			c.Next()
@@ -107,27 +102,4 @@ func CheckJWT() gin.HandlerFunc {
 
 		c.Next()
 	}
-}
-
-func ParseToken(tokenStr string) (*auth.CustomClaims, error) {
-	if tokenStr == "" {
-		return nil, errors.New("token is empty")
-	}
-
-	token, err := jwt.ParseWithClaims(tokenStr, &auth.CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, jwt.ErrSignatureInvalid
-		}
-		return []byte(util.GetEnv(env.JwtSecret)), nil
-	})
-	if err != nil {
-		return nil, fmt.Errorf("parse error: %w", err)
-	}
-
-	claims, ok := token.Claims.(*auth.CustomClaims)
-	if !ok || !token.Valid {
-		return nil, errors.New("invalid token claims")
-	}
-
-	return claims, nil
 }

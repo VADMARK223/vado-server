@@ -14,7 +14,6 @@ import (
 	"vado_server/internal/handler/grpc/chat"
 	"vado_server/internal/handler/grpc/hello"
 	"vado_server/internal/handler/grpc/server"
-	"vado_server/internal/middleware"
 	"vado_server/internal/router"
 	"vado_server/internal/util"
 
@@ -174,8 +173,10 @@ func AuthInterceptor(
 	if strings.Contains(info.FullMethod, "Login") {
 		return handler(ctx, req)
 	}
+	if strings.Contains(info.FullMethod, "Refresh") {
+		return handler(ctx, req)
+	}
 
-	// Достаём токен из metadata
 	_, _ = pp.Println(info.FullMethod)
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
@@ -188,7 +189,7 @@ func AuthInterceptor(
 	}
 
 	token := strings.TrimPrefix(values[0], "Bearer ")
-	claims, err := middleware.ParseToken(token) // твоя функция проверки JWT
+	claims, err := auth.ParseToken(token) // твоя функция проверки JWT
 	if err != nil {
 		_, _ = pp.Printf("not valid token: %v", err)
 		return nil, status.Error(codes.Unauthenticated, "некорректный токен")

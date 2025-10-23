@@ -8,6 +8,7 @@ import (
 	"vado_server/internal/auth"
 	"vado_server/internal/constants/code"
 	"vado_server/internal/constants/route"
+	auth2 "vado_server/internal/handler/grpc/auth"
 	"vado_server/internal/models"
 	"vado_server/internal/services"
 
@@ -38,7 +39,7 @@ func PerformLogin(appCtx *appcontext.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		token, err := auth.CreateToken(user.ID, []string{"user"}, time.Minute*15)
+		token, err := auth.CreateToken(user.ID, []string{"user"}, time.Minute*auth2.TokenAliveMinutes)
 		if err != nil {
 			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
 				"Message": "Ошибка генерации токена",

@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"errors"
+	"fmt"
 	"time"
 	"vado_server/internal/constants/env"
 	"vado_server/internal/util"
@@ -28,4 +30,27 @@ func CreateToken(userID uint, roles []string, ttl time.Duration) (string, error)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(util.GetEnv(env.JwtSecret)))
+}
+
+func ParseToken(tokenStr string) (*CustomClaims, error) {
+	if tokenStr == "" {
+		return nil, errors.New("token is empty")
+	}
+
+	token, err := jwt.ParseWithClaims(tokenStr, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+		return []byte(util.GetEnv(env.JwtSecret)), nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("parse error: %w", err)
+	}
+
+	claims, ok := token.Claims.(*CustomClaims)
+	if !ok || !token.Valid {
+		return nil, errors.New("invalid token claims")
+	}
+
+	return claims, nil
 }
