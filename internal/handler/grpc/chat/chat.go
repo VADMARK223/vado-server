@@ -33,6 +33,7 @@ func (s *Server) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Em
 			messageType = chat.MessageType_MESSAGE_USER
 		}
 		messageWithTime(msg, messageType)
+		//msg.Color = s.clients[client].color
 		err := client.Send(msg)
 		if err != nil {
 			delete(s.clients, client)
@@ -64,15 +65,16 @@ func (s *Server) ChatStream(req *chat.ChatStreamRequest, stream chat.ChatService
 	return nil
 }
 
-func (s *Server) broadcastSystemMessage(text string, users int) {
+func (s *Server) broadcastSystemMessage(text string, usersCount int) {
 	msg := &chat.ChatMessage{
 		User:  "System",
-		Text:  fmt.Sprintf("%s | Сейчас в чате: %d", text, users),
+		Text:  fmt.Sprintf("%s", text),
 		Color: "#888888",
 	}
 
 	for _, c := range s.clients {
-		messageWithTime(msg, chat.MessageType_MESSAGE_USER)
+		messageWithTime(msg, chat.MessageType_MESSAGE_SYSTEM)
+		msg.UsersCount = uint32(usersCount)
 		errSend := c.stream.Send(msg)
 		if errSend != nil {
 			fmt.Println("Error send message:" + errSend.Error())

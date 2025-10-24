@@ -14,6 +14,7 @@ message ChatMessage {
   string color = 4;
   int64 timestamp = 5; // время отправки (Unix time, в миллисекундах или секундах)
   MessageType type = 6; // тип сообщения
+  uint32 users_count = 7; // Кол-во участников чата
 }
 
 enum MessageType {

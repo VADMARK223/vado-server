@@ -79,8 +79,9 @@ type ChatMessage struct {
 	User          string                 `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
 	Text          string                 `protobuf:"bytes,3,opt,name=text,proto3" json:"text,omitempty"`
 	Color         string                 `protobuf:"bytes,4,opt,name=color,proto3" json:"color,omitempty"`
-	Timestamp     int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`        // время отправки (Unix time, в миллисекундах или секундах)
-	Type          MessageType            `protobuf:"varint,6,opt,name=type,proto3,enum=MessageType" json:"type,omitempty"` // тип сообщения
+	Timestamp     int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                     // время отправки (Unix time, в миллисекундах или секундах)
+	Type          MessageType            `protobuf:"varint,6,opt,name=type,proto3,enum=MessageType" json:"type,omitempty"`              // тип сообщения
+	UsersCount    uint32                 `protobuf:"varint,7,opt,name=users_count,json=usersCount,proto3" json:"users_count,omitempty"` // Кол-во участников чата
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -155,6 +156,13 @@ func (x *ChatMessage) GetType() MessageType {
 		return x.Type
 	}
 	return MessageType_MESSAGE_UNKNOWN
+}
+
+func (x *ChatMessage) GetUsersCount() uint32 {
+	if x != nil {
+		return x.UsersCount
+	}
+	return 0
 }
 
 type ChatStreamRequest struct {
@@ -241,14 +249,16 @@ var File_api_proto_chat_proto protoreflect.FileDescriptor
 
 const file_api_proto_chat_proto_rawDesc = "" +
 	"\n" +
-	"\x14api/proto/chat.proto\"\x9b\x01\n" +
+	"\x14api/proto/chat.proto\"\xbc\x01\n" +
 	"\vChatMessage\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
 	"\x04user\x18\x02 \x01(\tR\x04user\x12\x12\n" +
 	"\x04text\x18\x03 \x01(\tR\x04text\x12\x14\n" +
 	"\x05color\x18\x04 \x01(\tR\x05color\x12\x1c\n" +
 	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\x12 \n" +
-	"\x04type\x18\x06 \x01(\x0e2\f.MessageTypeR\x04type\"#\n" +
+	"\x04type\x18\x06 \x01(\x0e2\f.MessageTypeR\x04type\x12\x1f\n" +
+	"\vusers_count\x18\a \x01(\rR\n" +
+	"usersCount\"#\n" +
 	"\x11ChatStreamRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\"\a\n" +
 	"\x05Empty*Z\n" +

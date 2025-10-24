@@ -45,10 +45,26 @@ docker volume rm vado-server_postgres-data
 ```shell
 go mod init vado_server
 ```
+Чистит зависимости (добавляет/удаляет лишние)
+```shell
+go mod tidy
+```
+
+Показывает, почему модуль был добавлен
+```shell
+go mod why <package>
+```
+
 Установка `zap`
 ```shell
 go get -u go.uber.org/zap
 ```
+
+Показывает все модули
+```shell
+go list -m all
+```
+
 Запуск проекта
 ```shell
 go run ./cmd/server/main.go
@@ -60,6 +76,6 @@ go run ./cmd/server/main.go
 - Zap
 - Gin
 - Gorm
-- JWT
+- JWT (access + refresh)
 
 На будущее: golang-migrate
