@@ -8,13 +8,18 @@ service ChatService {
 }
 
 message ChatMessage {
-  uint64 id = 1; // Это ID пользователя (ПОМЕНЯТЬ!) Поменять на число
-  string user = 2;
+  string id = 1;
+  User user = 2;
   string text = 3;
-  string color = 4;
-  int64 timestamp = 5; // время отправки (Unix time, в миллисекундах или секундах)
-  MessageType type = 6; // тип сообщения
-  uint32 users_count = 7; // Кол-во участников чата
+  int64 timestamp = 4; // время отправки (Unix time, в миллисекундах или секундах)
+  MessageType type = 5; // тип сообщения
+  uint32 users_count = 6; // Кол-во участников чата
+}
+
+message User {
+  uint64 id = 1;
+  string username = 2;
+  string color = 3;
 }
 
 enum MessageType {

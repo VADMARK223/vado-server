@@ -21,27 +21,6 @@ func NewChatService() *Server {
 	return &Server{clients: make(map[chat.ChatService_ChatStreamServer]*Client)}
 }
 
-func (s *Server) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Empty, error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	for client := range s.clients {
-		var messageType chat.MessageType
-		if s.clients[client].id == msg.Id {
-			messageType = chat.MessageType_MESSAGE_SELF
-		} else {
-			messageType = chat.MessageType_MESSAGE_USER
-		}
-		messageWithTime(msg, messageType)
-		//msg.Color = s.clients[client].color
-		err := client.Send(msg)
-		if err != nil {
-			delete(s.clients, client)
-		}
-	}
-	return &chat.Empty{}, nil
-}
-
 func (s *Server) ChatStream(req *chat.ChatStreamRequest, stream chat.ChatService_ChatStreamServer) error {
 	s.mu.Lock()
 	color := clientColor[clientIndex%len(clientColor)]
@@ -49,8 +28,7 @@ func (s *Server) ChatStream(req *chat.ChatStreamRequest, stream chat.ChatService
 
 	s.clients[stream] = &Client{
 		stream: stream,
-		id:     req.Id,
-		color:  color,
+		user:   &chat.User{Id: req.Id, Color: color},
 	}
 	s.broadcastSystemMessage("Новый участник вошел", len(s.clients))
 	s.mu.Unlock()
@@ -65,11 +43,45 @@ func (s *Server) ChatStream(req *chat.ChatStreamRequest, stream chat.ChatService
 	return nil
 }
 
+func (s *Server) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Empty, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	var sender *Client
+	for _, c := range s.clients {
+		if c.user != nil && c.user.Id == msg.User.Id {
+			sender = c
+			break
+		}
+	}
+
+	if sender == nil {
+		return nil, fmt.Errorf("unknown sender")
+	}
+
+	color := sender.user.Color
+
+	for client := range s.clients {
+		var messageType chat.MessageType
+		if s.clients[client].user.Id == msg.User.Id {
+			messageType = chat.MessageType_MESSAGE_SELF
+		} else {
+			messageType = chat.MessageType_MESSAGE_USER
+		}
+		messageWithTime(msg, messageType)
+		msg.User.Color = color
+		err := client.Send(msg)
+		if err != nil {
+			delete(s.clients, client)
+		}
+	}
+	return &chat.Empty{}, nil
+}
+
 func (s *Server) broadcastSystemMessage(text string, usersCount int) {
 	msg := &chat.ChatMessage{
-		User:  "System",
-		Text:  fmt.Sprintf("%s", text),
-		Color: "#888888",
+		User: &chat.User{Id: 0, Username: "System", Color: "#888888"},
+		Text: fmt.Sprintf("%s", text),
 	}
 
 	for _, c := range s.clients {
