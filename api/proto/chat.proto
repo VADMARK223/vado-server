@@ -30,7 +30,7 @@ enum MessageType {
 }
 
 message ChatStreamRequest {
-  uint64 id = 1;
+  User user = 1;
 }
 
 message Empty {}

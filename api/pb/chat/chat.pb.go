@@ -219,7 +219,7 @@ func (x *User) GetColor() string {
 
 type ChatStreamRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	User          *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -254,11 +254,11 @@ func (*ChatStreamRequest) Descriptor() ([]byte, []int) {
 	return file_api_proto_chat_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *ChatStreamRequest) GetId() uint64 {
+func (x *ChatStreamRequest) GetUser() *User {
 	if x != nil {
-		return x.Id
+		return x.User
 	}
-	return 0
+	return nil
 }
 
 type Empty struct {
@@ -313,9 +313,9 @@ const file_api_proto_chat_proto_rawDesc = "" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
-	"\x05color\x18\x03 \x01(\tR\x05color\"#\n" +
-	"\x11ChatStreamRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x04R\x02id\"\a\n" +
+	"\x05color\x18\x03 \x01(\tR\x05color\".\n" +
+	"\x11ChatStreamRequest\x12\x19\n" +
+	"\x04user\x18\x01 \x01(\v2\x05.UserR\x04user\"\a\n" +
 	"\x05Empty*Z\n" +
 	"\vMessageType\x12\x13\n" +
 	"\x0fMESSAGE_UNKNOWN\x10\x00\x12\x10\n" +
@@ -351,15 +351,16 @@ var file_api_proto_chat_proto_goTypes = []any{
 var file_api_proto_chat_proto_depIdxs = []int32{
 	2, // 0: ChatMessage.user:type_name -> User
 	0, // 1: ChatMessage.type:type_name -> MessageType
-	1, // 2: ChatService.SendMessage:input_type -> ChatMessage
-	3, // 3: ChatService.ChatStream:input_type -> ChatStreamRequest
-	4, // 4: ChatService.SendMessage:output_type -> Empty
-	1, // 5: ChatService.ChatStream:output_type -> ChatMessage
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2, // 2: ChatStreamRequest.user:type_name -> User
+	1, // 3: ChatService.SendMessage:input_type -> ChatMessage
+	3, // 4: ChatService.ChatStream:input_type -> ChatStreamRequest
+	4, // 5: ChatService.SendMessage:output_type -> Empty
+	1, // 6: ChatService.ChatStream:output_type -> ChatMessage
+	5, // [5:7] is the sub-list for method output_type
+	3, // [3:5] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_api_proto_chat_proto_init() }

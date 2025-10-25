@@ -13,12 +13,13 @@ var clientIndex = 0
 
 type Server struct {
 	chat.UnimplementedChatServiceServer
-	mu      sync.Mutex
-	clients map[chat.ChatService_ChatStreamServer]*Client
+	mu sync.Mutex
+	//clients map[chat.ChatService_ChatStreamServer]*Client
+	clients map[uint64]*Client
 }
 
 func NewChatService() *Server {
-	return &Server{clients: make(map[chat.ChatService_ChatStreamServer]*Client)}
+	return &Server{clients: make(map[uint64]*Client)}
 }
 
 func (s *Server) ChatStream(req *chat.ChatStreamRequest, stream chat.ChatService_ChatStreamServer) error {
@@ -26,18 +27,20 @@ func (s *Server) ChatStream(req *chat.ChatStreamRequest, stream chat.ChatService
 	color := clientColor[clientIndex%len(clientColor)]
 	clientIndex++
 
-	s.clients[stream] = &Client{
+	userID := req.User.Id
+
+	s.clients[userID] = &Client{
 		stream: stream,
-		user:   &chat.User{Id: req.Id, Color: color},
+		user:   &chat.User{Id: userID, Username: req.User.Username, Color: color},
 	}
-	s.broadcastSystemMessage("Новый участник вошел", len(s.clients))
+	s.broadcastSystemMessage(req.User.Id, fmt.Sprintf("Новый участник: %s", req.User.Username), len(s.clients))
 	s.mu.Unlock()
 
 	<-stream.Context().Done()
 
 	s.mu.Lock()
-	delete(s.clients, stream)
-	s.broadcastSystemMessage("Участник покинул", len(s.clients))
+	delete(s.clients, userID)
+	s.broadcastSystemMessage(req.User.Id, fmt.Sprintf("Участник покинул: %s", req.User.Username), len(s.clients))
 	s.mu.Unlock()
 
 	return nil
@@ -47,40 +50,33 @@ func (s *Server) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Em
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	var sender *Client
-	for _, c := range s.clients {
-		if c.user != nil && c.user.Id == msg.User.Id {
-			sender = c
-			break
-		}
-	}
-
-	if sender == nil {
-		return nil, fmt.Errorf("unknown sender")
+	sender, ok := s.clients[msg.User.Id]
+	if !ok {
+		return nil, fmt.Errorf("unknown sender with id %d", msg.User.Id)
 	}
 
 	color := sender.user.Color
 
-	for client := range s.clients {
+	for id, client := range s.clients {
 		var messageType chat.MessageType
-		if s.clients[client].user.Id == msg.User.Id {
+		if id == msg.User.Id {
 			messageType = chat.MessageType_MESSAGE_SELF
 		} else {
 			messageType = chat.MessageType_MESSAGE_USER
 		}
 		messageWithTime(msg, messageType)
 		msg.User.Color = color
-		err := client.Send(msg)
+		err := client.stream.Send(msg)
 		if err != nil {
-			delete(s.clients, client)
+			delete(s.clients, id)
 		}
 	}
 	return &chat.Empty{}, nil
 }
 
-func (s *Server) broadcastSystemMessage(text string, usersCount int) {
+func (s *Server) broadcastSystemMessage(userId uint64, text string, usersCount int) {
 	msg := &chat.ChatMessage{
-		User: &chat.User{Id: 0, Username: "System", Color: "#888888"},
+		User: &chat.User{Id: userId, Username: "System", Color: "#888888"},
 		Text: fmt.Sprintf("%s", text),
 	}
 
