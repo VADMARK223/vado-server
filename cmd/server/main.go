@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"net"
 	"os"
 	"os/signal"
@@ -34,6 +36,8 @@ import (
 	"github.com/joho/godotenv"
 
 	"google.golang.org/grpc"
+
+	"github.com/segmentio/kafka-go"
 )
 
 func main() {
@@ -67,6 +71,12 @@ func main() {
 	if err != nil {
 		appCtx.Log.Fatalw("failed to start grpc server", "error", err)
 	}
+
+	// Kafka
+	//StartChatConsumer(util.GetEnv("KAFKA_BROKER"), util.GetEnv("KAFKA_TOPIC"), func(user, msg string) {
+	StartChatConsumer(appCtx, "localhost:9094", "chat", func(key, msg string) {
+		fmt.Printf("📩 Получено сообщение:\n  key=%s\n  value=%s\n", key, msg)
+	})
 
 	// Graceful shutdown
 	quit := make(chan os.Signal, 1)
@@ -204,48 +214,28 @@ func AuthInterceptor(
 	return handler(ctx, req)
 }
 
-/*func AuthStreamInterceptor(
-	srv interface{},
-	ss grpc.ServerStream,
-	info *grpc.StreamServerInfo,
-	handler grpc.StreamHandler,
-) error {
+func StartChatConsumer(ctx *appcontext.AppContext, broker, topic string, handle func(user string, msg string)) {
+	ctx.Log.Infow("Kafka consumer starting", "broker", broker, "topic", topic)
 
-	if strings.Contains(info.FullMethod, "Login") {
-		return handler(srv, ss)
+	r := kafka.NewReader(kafka.ReaderConfig{
+		Brokers: []string{broker},
+		Topic:   topic,
+		GroupID: "chat-consumer-group",
+	})
+	defer func(r *kafka.Reader) {
+		err := r.Close()
+		if err != nil {
+			log.Printf("Kafka close error: %v", err)
+		}
+	}(r)
+
+	fmt.Println("👂 Читаем сообщение из Kafka...")
+	for {
+		m, err := r.ReadMessage(context.Background())
+		if err != nil {
+			log.Printf("Kafka read error: %v", err)
+			continue
+		}
+		handle(string(m.Key), string(m.Value))
 	}
-
-	md, ok := metadata.FromIncomingContext(ss.Context())
-	if !ok {
-		return status.Error(codes.Unauthenticated, "metadata отсутствует")
-	}
-
-	values := md["authorization"]
-	if len(values) == 0 {
-		return status.Error(codes.Unauthenticated, "токен не найден")
-	}
-
-	token := strings.TrimPrefix(values[0], "Bearer ")
-	claims, err := auth.ParseToken(token)
-	if err != nil {
-		return status.Error(codes.Unauthenticated, "токен невалиден")
-	}
-
-	// Оборачиваем stream с контекстом, где уже есть userID
-	wrapped := &wrappedStream{
-		ServerStream: ss,
-		ctx:          context.WithValue(ss.Context(), code.UserId, claims.UserID),
-	}
-
-	return handler(srv, wrapped)
 }
-
-// вспомогательная обёртка
-type wrappedStream struct {
-	grpc.ServerStream
-	ctx context.Context
-}
-
-func (w *wrappedStream) Context() context.Context {
-	return w.ctx
-}*/

@@ -4,14 +4,14 @@ services:
     container_name: kafka
     hostname: kafka
     ports:
-      - "9092:9092" # для хоста
-      - "9093:9093" # для Docker сети
+      - "9092:9092"  # для контейнеров внутри сети Docker
+      - "9094:9094"  # для твоего Go-клиента на хосте
     environment:
-      # === KRaft (без Zookeeper) ===
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://:9092,EXTERNAL://:9094,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       CLUSTER_ID: rRaftCluster-001
