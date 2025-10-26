@@ -157,7 +157,7 @@ No test framework is currently configured. Before adding tests, check with the t
 - **Web Framework**: Gin
 - **Database**: PostgreSQL 15 with GORM
 - **RPC**: gRPC with Protocol Buffers
-- **Auth**: JWT (golang-jwt/jwt/v5) with access + refresh tokens
+- **Auth**: JWT (golang-jwt/jwt/v5) with access and refresh tokens
 - **Logging**: Zap
 - **Sessions**: gin-contrib/sessions (cookie store)
 - **Password Hashing**: golang.org/x/crypto
