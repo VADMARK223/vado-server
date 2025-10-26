@@ -2,13 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"net"
 	"os"
 	"os/signal"
 	"strings"
 	"sync"
+	"syscall"
 	pbServer "vado_server/api/pb/server"
 	"vado_server/internal/auth"
 	"vado_server/internal/db"
@@ -16,6 +15,7 @@ import (
 	"vado_server/internal/handler/grpc/chat"
 	"vado_server/internal/handler/grpc/hello"
 	"vado_server/internal/handler/grpc/server"
+	kafka2 "vado_server/internal/kafka"
 	"vado_server/internal/router"
 	"vado_server/internal/util"
 
@@ -36,8 +36,6 @@ import (
 	"github.com/joho/godotenv"
 
 	"google.golang.org/grpc"
-
-	"github.com/segmentio/kafka-go"
 )
 
 func main() {
@@ -73,19 +71,29 @@ func main() {
 	}
 
 	// Kafka
-	//StartChatConsumer(util.GetEnv("KAFKA_BROKER"), util.GetEnv("KAFKA_TOPIC"), func(user, msg string) {
-	StartChatConsumer(appCtx, "localhost:9094", "chat", func(key, msg string) {
-		fmt.Printf("📩 Получено сообщение:\n  key=%s\n  value=%s\n", key, msg)
-	})
+	consumer := kafka2.NewConsumer(appCtx)
+	go func() {
+		consumerRun := consumer.Run(ctx, func(key, value []byte) error {
+			user := string(key)
+			msg := string(value)
+			appCtx.Log.Infow("Processing message", "user", user, "msg", msg)
+			return nil
+		})
+
+		if consumerRun != nil {
+			appCtx.Log.Errorw("Consumer stopped", "error", consumerRun)
+		}
+	}()
 
 	// Graceful shutdown
 	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	<-quit
 
 	appCtx.Log.Info("Shutdown signal received")
 	// даём сервисам небольшое время завершиться
 	cancel()
+	_ = consumer.Close()
 
 	// Останавливаем gRPC сервер корректно
 	if grpcServerInstance != nil {
@@ -147,7 +155,6 @@ func startGRPCServer(appCtx *appcontext.AppContext, wg *sync.WaitGroup, port str
 
 	grpcServerInstance := grpc.NewServer(
 		grpc.UnaryInterceptor(AuthInterceptor), // Перехват для обычных запросов
-		//grpc.UnaryInterceptor(AuthStreamInterceptor),
 	)
 
 	// регистрируем сервисы
@@ -212,30 +219,4 @@ func AuthInterceptor(
 	ctx = auth.Wrap(ctx, claims.UserID)
 
 	return handler(ctx, req)
-}
-
-func StartChatConsumer(ctx *appcontext.AppContext, broker, topic string, handle func(user string, msg string)) {
-	ctx.Log.Infow("Kafka consumer starting", "broker", broker, "topic", topic)
-
-	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers: []string{broker},
-		Topic:   topic,
-		GroupID: "chat-consumer-group",
-	})
-	defer func(r *kafka.Reader) {
-		err := r.Close()
-		if err != nil {
-			log.Printf("Kafka close error: %v", err)
-		}
-	}(r)
-
-	fmt.Println("👂 Читаем сообщение из Kafka...")
-	for {
-		m, err := r.ReadMessage(context.Background())
-		if err != nil {
-			log.Printf("Kafka read error: %v", err)
-			continue
-		}
-		handle(string(m.Key), string(m.Value))
-	}
 }
