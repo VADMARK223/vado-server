@@ -14,7 +14,10 @@ type GormRepository struct {
 }
 
 func NewGormRepo(ctx *context.AppContext) user.Repository {
-	return &GormRepository{db: ctx.DB, log: ctx.Log}
+	return &GormRepository{
+		db:  ctx.DB,
+		log: ctx.Log,
+	}
 }
 
 func (r *GormRepository) CreateUser(u user.User) error {
@@ -33,12 +36,22 @@ func (r *GormRepository) CreateUser(u user.User) error {
 	return nil
 }
 
-func (r *GormRepository) GetByID(id uint) (*user.User, error) {
-	//TODO implement me
-	panic("implement me")
+func (r *GormRepository) GetByUsername(username string) (*user.User, error) {
+	var entity Entity
+	if err := r.db.Where("username = ?", username).First(&entity).Error; err != nil {
+		return nil, err
+	}
+
+	return &user.User{
+		ID:        entity.ID,
+		Username:  entity.Username,
+		Password:  entity.Password,
+		Email:     entity.Email,
+		CreatedAt: entity.CreatedAt,
+	}, nil
 }
 
-func (r *GormRepository) GetByUsername(username string) (*user.User, error) {
+func (r *GormRepository) GetByID(id uint) (*user.User, error) {
 	//TODO implement me
 	panic("implement me")
 }

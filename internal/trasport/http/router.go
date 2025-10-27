@@ -2,8 +2,10 @@ package http
 
 import (
 	"html/template"
+	"time"
 	"vado_server/internal/app/context"
 	"vado_server/internal/config/route"
+	"vado_server/internal/config/token"
 	"vado_server/internal/domain/role"
 	"vado_server/internal/domain/task"
 	"vado_server/internal/domain/user"
@@ -19,9 +21,9 @@ import (
 )
 
 func SetupRouter(ctx *context.AppContext) *gin.Engine {
-	taskService := task.NewService(task.NewRepo(ctx.DB))
-	roleService := role.NewService(role.NewRepo(ctx.DB))
-	userService := user.NewService(user2.NewGormRepo(ctx))
+	taskSvc := task.NewService(task.NewRepo(ctx.DB))
+	roleSvc := role.NewService(role.NewRepo(ctx.DB))
+	userSvc := user.NewService(user2.NewGormRepo(ctx), token.AccessAliveMinutes*time.Minute)
 
 	gin.SetMode(util.GetEnv("GIN_MODE"))
 	r := gin.New()
@@ -38,12 +40,12 @@ func SetupRouter(ctx *context.AppContext) *gin.Engine {
 	r.Use(checkJWT())
 
 	// Публичные маршруты
-	r.GET("/ping", func(c *gin.Context) { c.JSON(200, gin.H{"message": "pong"}) })
+	authH := handler.NewAuthHandler(userSvc)
 	r.GET(route.Index, handler.ShowIndex)
 	r.GET(route.Login, handler.ShowLoginPage())
-	r.POST(route.Login, handler.PerformLogin(ctx))
+	r.POST(route.Login, authH.Login)
 	r.GET(route.Register, handler.ShowRegisterPage())
-	r.POST(route.Register, handler.PerformRegister(userService))
+	r.POST(route.Register, handler.PerformRegister(userSvc))
 
 	r.POST(route.Logout, handler.Logout())
 
@@ -51,18 +53,17 @@ func SetupRouter(ctx *context.AppContext) *gin.Engine {
 	auth := r.Group("/")
 	auth.Use(checkAuth())
 	{
-		auth.GET(route.Tasks, handler.ShowTasksPage(taskService))
+		auth.GET(route.Tasks, handler.ShowTasksPage(taskSvc))
 		auth.POST(route.Tasks, handler.AddTask(ctx))
 		auth.DELETE("/tasks/:id", handler.DeleteTask(ctx))
 		auth.GET(route.Users, handler.ShowUsers(ctx))
-		auth.POST(route.Users, handler.AddUser(userService))
-		auth.GET(route.Roles, handler.ShowRoles(roleService))
+		auth.POST(route.Users, handler.AddUser(userSvc))
+		auth.GET(route.Roles, handler.ShowRoles(roleSvc))
 		auth.DELETE("/users/:id", handler.DeleteUser(ctx))
 	}
 
 	// JSON API
 	r.GET("/api/hello", handler.GetHello())
-	//r.GET("/api/tasks", handler.GetTasksJSON(taskService))
 
 	return r
 }

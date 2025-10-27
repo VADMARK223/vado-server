@@ -3,19 +3,51 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"time"
-	"vado_server/internal/app/context"
-	"vado_server/internal/auth"
 	"vado_server/internal/config/code"
 	"vado_server/internal/config/route"
 	"vado_server/internal/domain/user"
-	user2 "vado_server/internal/infra/persistence/user"
-	auth3 "vado_server/internal/trasport/grpc/auth"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
+
+type AuthHandler struct {
+	service *user.Service
+}
+
+func NewAuthHandler(service *user.Service) *AuthHandler {
+	return &AuthHandler{service: service}
+}
+
+func (h *AuthHandler) Login(c *gin.Context) {
+	username := c.PostForm("username")
+	password := c.PostForm("password")
+
+	token, err := h.service.Login(username, password)
+	if err != nil {
+		c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": err.Error()})
+	}
+
+	c.SetCookie(code.JwtVado,
+		token,
+		3600*24,
+		"/",
+		"",
+		false,
+		true)
+	session := sessions.Default(c)
+
+	redirectTo := session.Get(code.RedirectTo)
+	if redirectTo == nil {
+		redirectTo = route.Index
+	} else {
+		session.Delete(code.RedirectTo)
+	}
+
+	_ = session.Save()
+
+	c.Redirect(http.StatusFound, redirectTo.(string))
+}
 
 func ShowLoginPage() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -23,12 +55,10 @@ func ShowLoginPage() gin.HandlerFunc {
 	}
 }
 
-func PerformLogin(appCtx *context.AppContext) gin.HandlerFunc {
+/*func PerformLogin(appCtx *context.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		username := c.PostForm("username")
-		password := c.PostForm("password")
 
-		//var u user.User
+
 		var u user2.Entity
 		if err := appCtx.DB.Where("username = ?", username).First(&u).Error; err != nil {
 			c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": "Пользователь не найден"})
@@ -69,7 +99,7 @@ func PerformLogin(appCtx *context.AppContext) gin.HandlerFunc {
 
 		c.Redirect(http.StatusFound, redirectTo.(string))
 	}
-}
+}*/
 
 func ShowRegisterPage() gin.HandlerFunc {
 	return func(c *gin.Context) {

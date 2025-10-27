@@ -67,7 +67,7 @@ func DeleteUser(appCtx *context.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 
-		if err := appCtx.DB.Delete(&user.User{}, id).Error; err != nil {
+		if err := appCtx.DB.Delete(&user2.Entity{}, id).Error; err != nil {
 			appCtx.Log.Errorw("failed to delete user", "error", err)
 			c.String(http.StatusInternalServerError, "Ошибка удаления пользователя")
 			return
