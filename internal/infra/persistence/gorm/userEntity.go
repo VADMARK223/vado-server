@@ -2,8 +2,6 @@ package gorm
 
 import (
 	"time"
-	"vado_server/internal/domain/role"
-	"vado_server/internal/domain/task"
 )
 
 type UserEntity struct {
@@ -14,9 +12,9 @@ type UserEntity struct {
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 
 	// Связь с задачами (1 пользователь и много задач)
-	Tasks []task.Task `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+	//Tasks []task.Task `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 
-	Roles []role.Role `gorm:"many2many:user_roles;constraint:OnDelete:CASCADE;"`
+	Roles []RoleEntity `gorm:"many2many:user_roles;joinForeignKey:UserID;joinReferences:RoleID;constraint:OnDelete:CASCADE;"`
 }
 
 func (UserEntity) TableName() string {

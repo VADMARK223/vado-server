@@ -51,17 +51,35 @@ func (r *UserRepository) GetByUsername(username string) (*user.User, error) {
 	}, nil
 }
 
-func (r *UserRepository) GetByID(id uint) (*user.User, error) {
-	//TODO implement me
-	panic("implement me")
-}
+func (r *UserRepository) GetAllWithRoles() ([]user.WithRoles, error) {
+	var entities []UserEntity
 
-func (r *UserRepository) Update(user user.User) error {
-	//TODO implement me
-	panic("implement me")
-}
+	if err := r.db.Preload("Roles").Find(&entities).Error; err != nil {
+		r.log.Errorw("failed to get users with roles", "error", err)
+		return nil, err
+	}
 
-func (r *UserRepository) Delete(id uint) error {
-	//TODO implement me
-	panic("implement me")
+	result := make([]user.WithRoles, 0, len(entities))
+
+	for _, entity := range entities {
+		roles := make([]user.RoleDTO, 0, len(entity.Roles))
+		for _, roleEntity := range entity.Roles {
+			roles = append(roles, user.RoleDTO{
+				ID:   roleEntity.ID,
+				Name: roleEntity.Name,
+			})
+		}
+
+		result = append(result, user.WithRoles{
+			User: user.User{
+				ID:        entity.ID,
+				Username:  entity.Username,
+				Email:     entity.Email,
+				CreatedAt: entity.CreatedAt,
+			},
+			Roles: roles,
+		})
+	}
+
+	return result, nil
 }

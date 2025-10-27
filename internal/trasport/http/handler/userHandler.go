@@ -11,22 +11,28 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ShowUsers(appCtx *context.AppContext) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var users []user2.UserEntity
-		if err := appCtx.DB. /*Preload("Roles").*/ Find(&users).Error; err != nil {
-			ShowError(c, "Не удалось загрузить пользователей", err.Error())
-			return
-		}
+type UserHandler struct {
+	service *user.Service
+}
 
-		isAuth, _ := c.Get(code.IsAuth)
-		userId, _ := c.Get(code.UserId)
-		c.HTML(http.StatusOK, "users.html", gin.H{
-			code.IsAuth: isAuth,
-			code.UserId: userId,
-			"Users":     users,
-		})
+func (h *UserHandler) ShowUsers(c *gin.Context) {
+	var users, err = h.service.GetAllUsersWithRoles()
+	if err != nil {
+		ShowError(c, "Не удалось загрузить пользователей", err.Error())
+		return
 	}
+
+	isAuth, _ := c.Get(code.IsAuth)
+	userId, _ := c.Get(code.UserId)
+	c.HTML(http.StatusOK, "users.html", gin.H{
+		code.IsAuth: isAuth,
+		code.UserId: userId,
+		"Users":     users,
+	})
+}
+
+func NewUserHandler(service *user.Service) *UserHandler {
+	return &UserHandler{service: service}
 }
 
 func AddUser(service *user.Service) func(c *gin.Context) {

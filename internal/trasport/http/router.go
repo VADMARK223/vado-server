@@ -22,9 +22,13 @@ import (
 )
 
 func SetupRouter(ctx *context.AppContext) *gin.Engine {
+	// Сервисы
 	taskSvc := task.NewService(task.NewRepo(ctx.DB))
 	roleSvc := role.NewService(role.NewRepo(ctx.DB))
 	userSvc := user.NewService(user2.NewUserRepo(ctx), token.AccessAliveMinutes*time.Minute)
+	// Хендлеры
+	authH := handler.NewAuthHandler(userSvc)
+	userH := handler.NewUserHandler(userSvc)
 
 	gin.SetMode(util.GetEnv("GIN_MODE"))
 	r := gin.New()
@@ -41,7 +45,7 @@ func SetupRouter(ctx *context.AppContext) *gin.Engine {
 	r.Use(middleware.CheckJWT())
 
 	// Публичные маршруты
-	authH := handler.NewAuthHandler(userSvc)
+
 	r.GET(route.Index, handler.ShowIndex)
 	r.GET(route.Login, handler.ShowLoginPage())
 	r.POST(route.Login, authH.Login)
@@ -57,7 +61,7 @@ func SetupRouter(ctx *context.AppContext) *gin.Engine {
 		auth.GET(route.Tasks, handler.ShowTasksPage(taskSvc))
 		auth.POST(route.Tasks, handler.AddTask(ctx))
 		auth.DELETE("/tasks/:id", handler.DeleteTask(ctx))
-		auth.GET(route.Users, handler.ShowUsers(ctx))
+		auth.GET(route.Users, userH.ShowUsers)
 		auth.POST(route.Users, handler.AddUser(userSvc))
 		auth.GET(route.Roles, handler.ShowRoles(roleSvc))
 		auth.DELETE("/users/:id", handler.DeleteUser(ctx))

@@ -47,3 +47,7 @@ func (s *Service) Login(username string, password string) (string, error) {
 
 	return token, nil
 }
+
+func (s *Service) GetAllUsersWithRoles() ([]WithRoles, error) {
+	return s.repo.GetAllWithRoles()
+}

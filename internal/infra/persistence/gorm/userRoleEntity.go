@@ -1,4 +1,4 @@
-package userRole
+package gorm
 
 type UserRole struct {
 	UserID uint `gorm:"not null"`
