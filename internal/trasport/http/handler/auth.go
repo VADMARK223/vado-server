@@ -6,8 +6,8 @@ import (
 	"time"
 	"vado_server/internal/app/context"
 	"vado_server/internal/auth"
-	"vado_server/internal/constants/code"
-	"vado_server/internal/constants/route"
+	"vado_server/internal/config/code"
+	"vado_server/internal/config/route"
 	"vado_server/internal/domain/user"
 	auth3 "vado_server/internal/trasport/grpc/auth"
 

@@ -15,7 +15,7 @@ COPY . .
 # Собираем бинарник
 # * CGO_ENABLED=0 компилято выключает исользование С, и Go собирает чистый статический бинарник. Если чистое CLI, для GUI может все сломать
 # * -o указывает название выходного бинарника
-RUN CGO_ENABLED=0 go build -o vado-server ./cmd/server
+RUN CGO_ENABLED=0 go build -o vado-ping ./cmd/server
 
 # Запуск этапа (минимальный финальный образ)
 FROM debian:bookworm-slim

@@ -6,13 +6,13 @@ import (
 	pbAuth "vado_server/api/pb/auth"
 	pbChat "vado_server/api/pb/chat"
 	pbHello "vado_server/api/pb/hello"
-	pbServer "vado_server/api/pb/server"
+	pbPing "vado_server/api/pb/ping"
 	"vado_server/internal/app/context"
 
 	"vado_server/internal/trasport/grpc/auth"
 	"vado_server/internal/trasport/grpc/chat"
 	"vado_server/internal/trasport/grpc/hello"
-	"vado_server/internal/trasport/grpc/server"
+	"vado_server/internal/trasport/grpc/ping"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -41,22 +41,22 @@ func NewServer(ctx *context.AppContext, port string) (*Server, error) {
 	pbAuth.RegisterAuthServiceServer(s.grpcServer, &auth.Server{AppCtx: ctx})
 	pbHello.RegisterHelloServiceServer(s.grpcServer, &hello.Server{})
 	pbChat.RegisterChatServiceServer(s.grpcServer, chat.New())
-	pbServer.RegisterServerServiceServer(s.grpcServer, &server.Server{})
+	pbPing.RegisterPingServiceServer(s.grpcServer, &ping.Server{})
 
 	return s, nil
 }
 
 func (s *Server) Start() error {
-	s.log.Infow("gRPC server starting", "address", s.listener.Addr().String())
+	s.log.Infow("gRPC ping starting", "address", s.listener.Addr().String())
 	return s.grpcServer.Serve(s.listener)
 }
 
 func (s *Server) GracefulStop() {
-	s.log.Infow("gRPC server graceful stopping...")
+	s.log.Infow("gRPC ping graceful stopping...")
 	s.grpcServer.GracefulStop()
 }
 
 func (s *Server) Stop() {
-	s.log.Infow("gRPC server stopping...")
+	s.log.Infow("gRPC ping stopping...")
 	s.grpcServer.Stop()
 }

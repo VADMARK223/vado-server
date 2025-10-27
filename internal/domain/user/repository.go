@@ -1,7 +1,7 @@
 package user
 
 import (
-	"vado_server/internal/constants/role"
+	"vado_server/internal/config/role"
 	"vado_server/internal/domain/userRole"
 
 	"golang.org/x/crypto/bcrypt"

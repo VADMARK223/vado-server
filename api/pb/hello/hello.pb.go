@@ -119,7 +119,7 @@ const file_api_proto_hello_proto_rawDesc = "" +
 	"\rHelloResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage29\n" +
 	"\fHelloService\x12)\n" +
-	"\bSeyHello\x12\r.HelloRequest\x1a\x0e.HelloResponseB\x14Z\x12api/pb/hello;hellob\x06proto3"
+	"\bSayHello\x12\r.HelloRequest\x1a\x0e.HelloResponseB\x14Z\x12api/pb/hello;hellob\x06proto3"
 
 var (
 	file_api_proto_hello_proto_rawDescOnce sync.Once
@@ -139,8 +139,8 @@ var file_api_proto_hello_proto_goTypes = []any{
 	(*HelloResponse)(nil), // 1: HelloResponse
 }
 var file_api_proto_hello_proto_depIdxs = []int32{
-	0, // 0: HelloService.SeyHello:input_type -> HelloRequest
-	1, // 1: HelloService.SeyHello:output_type -> HelloResponse
+	0, // 0: HelloService.SayHello:input_type -> HelloRequest
+	1, // 1: HelloService.SayHello:output_type -> HelloResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

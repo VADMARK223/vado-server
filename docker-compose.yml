@@ -22,7 +22,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: vado-server
+    container_name: vado-ping
     ports:
       - "5556:5556" # порт хоста: порт контейнера
       - "50051:50051" # gRPC

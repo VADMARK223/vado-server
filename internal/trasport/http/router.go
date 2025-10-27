@@ -3,7 +3,7 @@ package http
 import (
 	"html/template"
 	"vado_server/internal/app/context"
-	"vado_server/internal/constants/route"
+	"vado_server/internal/config/route"
 	"vado_server/internal/domain/role"
 	"vado_server/internal/domain/task"
 	"vado_server/internal/domain/user"

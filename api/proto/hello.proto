@@ -3,7 +3,7 @@ syntax = "proto3";
 option go_package = "api/pb/hello;hello";
 
 service HelloService {
-  rpc SeyHello(HelloRequest) returns (HelloResponse);
+  rpc SayHello(HelloRequest) returns (HelloResponse);
 }
 
 message HelloRequest {

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 	"vado_server/internal/auth"
-	"vado_server/internal/constants/code"
+	"vado_server/internal/config/code"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"

@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 	"vado_server/internal/app/context"
-	"vado_server/internal/constants/code"
+	"vado_server/internal/config/code"
 	"vado_server/internal/domain/user"
 
 	"github.com/gin-gonic/gin"

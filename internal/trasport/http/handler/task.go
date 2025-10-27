@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"vado_server/internal/app/context"
-	"vado_server/internal/constants/code"
+	"vado_server/internal/config/code"
 	"vado_server/internal/domain/task"
 
 	"github.com/gin-gonic/gin"

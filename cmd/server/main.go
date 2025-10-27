@@ -28,7 +28,7 @@ func main() {
 	defer func() { _ = zapLogger.Sync() }()
 
 	appCtx := ctx.NewAppContext(zapLogger)
-	appCtx.Log.Infow("Start vado-server.", "time", time.Now().Format("2006-01-02 15:04:05"))
+	appCtx.Log.Infow("Start vado-ping.", "time", time.Now().Format("2006-01-02 15:04:05"))
 
 	database := initDB(appCtx)
 	appCtx.DB = database
@@ -49,13 +49,13 @@ func main() {
 	// gRPC сервер
 	grpcServer, err := grpc.NewServer(appCtx, util.GetEnv("GRPC_PORT"))
 	if err != nil {
-		appCtx.Log.Fatalw("failed to start grpc server", "error", err)
+		appCtx.Log.Fatalw("failed to start grpc ping", "error", err)
 	}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		if err := grpcServer.Start(); err != nil {
-			appCtx.Log.Errorw("grpc server stopped", "error", err)
+			appCtx.Log.Errorw("grpc ping stopped", "error", err)
 		}
 	}()
 
@@ -96,7 +96,7 @@ func main() {
 
 		select {
 		case <-done:
-			appCtx.Log.Info("gRPC server stopped gracefully")
+			appCtx.Log.Info("gRPC ping stopped gracefully")
 		case <-time.After(10 * time.Second):
 			appCtx.Log.Warn("gRPC graceful stop timeout, forcing Stop()")
 			grpcServer.Stop()

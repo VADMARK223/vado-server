@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"vado_server/internal/constants/code"
+	"vado_server/internal/config/code"
 
 	"github.com/gin-gonic/gin"
 )

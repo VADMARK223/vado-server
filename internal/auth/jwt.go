@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
-	"vado_server/internal/constants/env"
+	"vado_server/internal/config/env"
 	"vado_server/internal/util"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -23,7 +23,7 @@ func CreateToken(userID uint, roles []string, ttl time.Duration) (string, error)
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "vado-server",
+			Issuer:    "vado-ping",
 			Subject:   "access",
 		},
 	}

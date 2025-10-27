@@ -67,7 +67,7 @@ go list -m all
 
 Запуск проекта
 ```shell
-go run ./cmd/server/main.go
+go run ./cmd/ping/main.go
 ```
 
 # Stack

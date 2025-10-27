@@ -47,7 +47,7 @@ The codebase follows a clean architecture pattern with clear separation of conce
 
 ```bash
 # Local development (uses .env file)
-go run ./cmd/server/main.go
+go run ./cmd/ping/main.go
 
 # With Docker Compose (production-like)
 docker-compose up --build
