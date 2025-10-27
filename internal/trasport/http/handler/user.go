@@ -5,14 +5,15 @@ import (
 	"vado_server/internal/app/context"
 	"vado_server/internal/config/code"
 	"vado_server/internal/domain/user"
+	user2 "vado_server/internal/infra/persistence/user"
 
 	"github.com/gin-gonic/gin"
 )
 
 func ShowUsers(appCtx *context.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var users []user.User
-		if err := appCtx.DB.Preload("Roles").Find(&users).Error; err != nil {
+		var users []user2.Entity
+		if err := appCtx.DB. /*Preload("Roles").*/ Find(&users).Error; err != nil {
 			ShowError(c, "Не удалось загрузить пользователей", err.Error())
 			return
 		}

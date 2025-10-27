@@ -7,6 +7,7 @@ import (
 	"vado_server/internal/domain/role"
 	"vado_server/internal/domain/task"
 	"vado_server/internal/domain/user"
+	user2 "vado_server/internal/infra/persistence/user"
 	"vado_server/internal/trasport/http/handler"
 
 	//"vado_server/internal/middleware"
@@ -17,15 +18,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(cxt *context.AppContext) *gin.Engine {
-	// Сервисы
-	taskRepo := task.NewTaskRepository(cxt.DB)
-	roleRepo := role.NewRoleRepository(cxt.DB)
-	userRepo := user.NewUserRepository(cxt.DB)
-
-	taskService := task.NewTaskService(taskRepo)
-	roleService := role.NewRoleService(roleRepo)
-	userService := user.NewUserService(userRepo)
+func SetupRouter(ctx *context.AppContext) *gin.Engine {
+	taskService := task.NewService(task.NewRepo(ctx.DB))
+	roleService := role.NewService(role.NewRepo(ctx.DB))
+	userService := user.NewService(user2.NewGormRepo(ctx))
 
 	gin.SetMode(util.GetEnv("GIN_MODE"))
 	r := gin.New()
@@ -45,7 +41,7 @@ func SetupRouter(cxt *context.AppContext) *gin.Engine {
 	r.GET("/ping", func(c *gin.Context) { c.JSON(200, gin.H{"message": "pong"}) })
 	r.GET(route.Index, handler.ShowIndex)
 	r.GET(route.Login, handler.ShowLoginPage())
-	r.POST(route.Login, handler.PerformLogin(cxt))
+	r.POST(route.Login, handler.PerformLogin(ctx))
 	r.GET(route.Register, handler.ShowRegisterPage())
 	r.POST(route.Register, handler.PerformRegister(userService))
 
@@ -56,12 +52,12 @@ func SetupRouter(cxt *context.AppContext) *gin.Engine {
 	auth.Use(checkAuth())
 	{
 		auth.GET(route.Tasks, handler.ShowTasksPage(taskService))
-		auth.POST(route.Tasks, handler.AddTask(cxt))
-		auth.DELETE("/tasks/:id", handler.DeleteTask(cxt))
-		auth.GET(route.Users, handler.ShowUsers(cxt))
+		auth.POST(route.Tasks, handler.AddTask(ctx))
+		auth.DELETE("/tasks/:id", handler.DeleteTask(ctx))
+		auth.GET(route.Users, handler.ShowUsers(ctx))
 		auth.POST(route.Users, handler.AddUser(userService))
 		auth.GET(route.Roles, handler.ShowRoles(roleService))
-		auth.DELETE("/users/:id", handler.DeleteUser(cxt))
+		auth.DELETE("/users/:id", handler.DeleteUser(ctx))
 	}
 
 	// JSON API

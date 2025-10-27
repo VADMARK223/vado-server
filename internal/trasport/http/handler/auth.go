@@ -9,6 +9,7 @@ import (
 	"vado_server/internal/config/code"
 	"vado_server/internal/config/route"
 	"vado_server/internal/domain/user"
+	user2 "vado_server/internal/infra/persistence/user"
 	auth3 "vado_server/internal/trasport/grpc/auth"
 
 	"github.com/gin-contrib/sessions"
@@ -27,7 +28,8 @@ func PerformLogin(appCtx *context.AppContext) gin.HandlerFunc {
 		username := c.PostForm("username")
 		password := c.PostForm("password")
 
-		var u user.User
+		//var u user.User
+		var u user2.Entity
 		if err := appCtx.DB.Where("username = ?", username).First(&u).Error; err != nil {
 			c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": "Пользователь не найден"})
 			return

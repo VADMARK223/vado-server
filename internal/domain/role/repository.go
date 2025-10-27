@@ -8,7 +8,7 @@ type Repository struct {
 	db *gorm.DB
 }
 
-func NewRoleRepository(db *gorm.DB) *Repository {
+func NewRepo(db *gorm.DB) *Repository {
 	return &Repository{db: db}
 }
 
