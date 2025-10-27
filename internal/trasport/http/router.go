@@ -9,11 +9,10 @@ import (
 	"vado_server/internal/domain/role"
 	"vado_server/internal/domain/task"
 	"vado_server/internal/domain/user"
-	user2 "vado_server/internal/infra/persistence/gorm"
+	"vado_server/internal/infra/persistence/gorm"
 	"vado_server/internal/trasport/http/handler"
 	"vado_server/internal/trasport/http/middleware"
 
-	//"vado_server/internal/middleware"
 	"vado_server/internal/util"
 
 	"github.com/gin-contrib/sessions"
@@ -24,8 +23,8 @@ import (
 func SetupRouter(ctx *context.AppContext) *gin.Engine {
 	// Сервисы
 	taskSvc := task.NewService(task.NewRepo(ctx.DB))
-	roleSvc := role.NewService(role.NewRepo(ctx.DB))
-	userSvc := user.NewService(user2.NewUserRepo(ctx), token.AccessAliveMinutes*time.Minute)
+	roleSvc := role.NewService(gorm.NewRoleRepo(ctx))
+	userSvc := user.NewService(gorm.NewUserRepo(ctx), token.AccessAliveMinutes*time.Minute)
 	// Хендлеры
 	authH := handler.NewAuthHandler(userSvc)
 	userH := handler.NewUserHandler(userSvc)
