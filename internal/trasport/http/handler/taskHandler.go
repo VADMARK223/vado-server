@@ -6,6 +6,7 @@ import (
 	"vado_server/internal/app/context"
 	"vado_server/internal/config/code"
 	"vado_server/internal/domain/task"
+	"vado_server/internal/infra/persistence/gorm"
 
 	"github.com/gin-gonic/gin"
 )
@@ -63,12 +64,13 @@ func AddTask(appCtx *context.AppContext) gin.HandlerFunc {
 			})
 		}
 
-		t := task.Task{
+		t := gorm.TaskEntity{
 			Name:        name,
 			Description: desc,
 			Completed:   completed == "on",
 			UserID:      sessionUserID.(uint),
 		}
+
 		if err := appCtx.DB.Create(&t).Error; err != nil {
 			appCtx.Log.Errorw("failed to create task", "error", err)
 			ShowError(c, "Ошибка добавления задачи", err.Error())

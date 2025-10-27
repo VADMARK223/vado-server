@@ -51,6 +51,21 @@ func (r *UserRepository) GetByUsername(username string) (*user.User, error) {
 	}, nil
 }
 
+func (r *UserRepository) GetByID(id uint) (*user.User, error) {
+	var entity UserEntity
+	if err := r.db.First(&entity, id).First(&entity).Error; err != nil {
+		return nil, err
+	}
+
+	return &user.User{
+		ID:        entity.ID,
+		Username:  entity.Username,
+		Password:  entity.Password,
+		Email:     entity.Email,
+		CreatedAt: entity.CreatedAt,
+	}, nil
+}
+
 func (r *UserRepository) GetAllWithRoles() ([]user.WithRoles, error) {
 	var entities []UserEntity
 

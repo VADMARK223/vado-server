@@ -22,7 +22,7 @@ import (
 
 func SetupRouter(ctx *context.AppContext) *gin.Engine {
 	// Сервисы
-	taskSvc := task.NewService(task.NewRepo(ctx.DB))
+	taskSvc := task.NewService(gorm.NewTaskRepo(ctx.DB))
 	roleSvc := role.NewService(gorm.NewRoleRepo(ctx))
 	userSvc := user.NewService(gorm.NewUserRepo(ctx), token.AccessAliveMinutes*time.Minute)
 	// Хендлеры

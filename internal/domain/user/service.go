@@ -2,10 +2,13 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"time"
 	"vado_server/internal/domain/auth"
 
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Service struct {
@@ -30,22 +33,45 @@ func (s *Service) CreateUser(dto DTO) error {
 	return s.repo.CreateUser(user)
 }
 
-func (s *Service) Login(username string, password string) (string, error) {
+func (s *Service) Login(username string, password string) (*User, string, string, error) {
 	u, errGetUser := s.repo.GetByUsername(username)
 	if errGetUser != nil {
-		return "", errors.New("пользователь не найден")
+		return nil, "", "", errors.New("пользователь не найден")
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)) != nil {
-		return "", errors.New("неверный пароль")
+		return u, "", "", errors.New("неверный пароль")
 	}
 
-	token, errToken := auth.CreateToken(u.ID, []string{"user"}, s.accessTokenDuration)
+	accessToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.accessTokenDuration)
 	if errToken != nil {
-		return "", errToken
+		return u, "", "", errors.New(fmt.Sprintf("Ошибка создания токена (access): %s", errToken.Error()))
 	}
 
-	return token, nil
+	refreshToken, errToken := auth.CreateToken(u.ID, []string{"user"}, 7*24*time.Hour)
+	if errToken != nil {
+		return u, "", "", errors.New(fmt.Sprintf("Ошибка создания токена (refresh): %s", errToken.Error()))
+	}
+
+	return u, accessToken, refreshToken, nil
+}
+
+func (s *Service) Refresh(token string) (*User, string, error) {
+	claims, errParseToken := auth.ParseToken(token)
+	if errParseToken != nil {
+		return nil, "", status.Error(codes.Unauthenticated, "ошибка чтения токена")
+	}
+	u, errGetUser := s.repo.GetByID(claims.UserID)
+	if errGetUser != nil {
+		return nil, "", errors.New("пользователь не найден")
+	}
+
+	newToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.accessTokenDuration)
+	if errToken != nil {
+		return nil, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Ошибка создания нового токена: %s", errToken.Error()))
+	}
+
+	return u, newToken, nil
 }
 
 func (s *Service) GetAllUsersWithRoles() ([]WithRoles, error) {

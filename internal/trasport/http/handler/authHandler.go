@@ -23,7 +23,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 
-	token, err := h.service.Login(username, password)
+	_, token, _, err := h.service.Login(username, password)
 	if err != nil {
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": err.Error()})
 	}

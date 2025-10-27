@@ -1,10 +1,10 @@
 package task
 
 type Service struct {
-	repo *Repository
+	repo Repository
 }
 
-func NewService(repo *Repository) *Service {
+func NewService(repo Repository) *Service {
 	return &Service{repo: repo}
 }
 
@@ -13,5 +13,5 @@ func (s *Service) GetAllTasks() ([]Task, error) {
 }
 
 func (s *Service) GetAllByUser(userID uint) ([]Task, error) {
-	return s.repo.GetAllByUser(userID)
+	return s.repo.GetAllByUserID(userID)
 }

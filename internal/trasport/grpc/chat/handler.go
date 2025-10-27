@@ -18,8 +18,7 @@ var clientIndex = 0
 
 type Server struct {
 	chat.UnimplementedChatServiceServer
-	mu sync.Mutex
-	//clients map[chat.ChatService_ChatStreamServer]*Client
+	mu      sync.Mutex
 	clients map[uint64]*Client
 }
 
@@ -56,6 +55,9 @@ func (s *Server) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Em
 	defer s.mu.Unlock()
 
 	sender, ok := s.clients[msg.User.Id]
+	for id, client := range s.clients {
+		fmt.Println(id, client.user.Username)
+	}
 	if !ok {
 		return nil, fmt.Errorf("unknown sender with id %d", msg.User.Id)
 	}

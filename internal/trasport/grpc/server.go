@@ -3,13 +3,16 @@ package grpc
 import (
 	"fmt"
 	"net"
+	"time"
 	pbAuth "vado_server/api/pb/auth"
 	pbChat "vado_server/api/pb/chat"
 	pbHello "vado_server/api/pb/hello"
 	pbPing "vado_server/api/pb/ping"
 	"vado_server/internal/app/context"
+	"vado_server/internal/config/token"
+	"vado_server/internal/domain/user"
+	"vado_server/internal/infra/persistence/gorm"
 
-	"vado_server/internal/trasport/grpc/auth"
 	"vado_server/internal/trasport/grpc/chat"
 	"vado_server/internal/trasport/grpc/hello"
 	"vado_server/internal/trasport/grpc/ping"
@@ -37,8 +40,10 @@ func NewServer(ctx *context.AppContext, port string) (*Server, error) {
 		listener: lis,
 		log:      ctx.Log,
 	}
+	userSvc := user.NewService(gorm.NewUserRepo(ctx), token.AccessAliveMinutes*time.Minute)
+	authServer := NewAuthServer(userSvc)
 
-	pbAuth.RegisterAuthServiceServer(s.grpcServer, &auth.Server{AppCtx: ctx})
+	pbAuth.RegisterAuthServiceServer(s.grpcServer, authServer)
 	pbHello.RegisterHelloServiceServer(s.grpcServer, &hello.Server{})
 	pbChat.RegisterChatServiceServer(s.grpcServer, chat.New())
 	pbPing.RegisterPingServiceServer(s.grpcServer, &ping.Server{})
