@@ -1,4 +1,4 @@
-package user
+package gorm
 
 import (
 	"time"
@@ -6,7 +6,7 @@ import (
 	"vado_server/internal/domain/task"
 )
 
-type Entity struct {
+type UserEntity struct {
 	ID        uint      `gorm:"primaryKey"`
 	Username  string    `gorm:"unique;not null"`
 	Password  string    `gorm:"not null"`
@@ -19,6 +19,6 @@ type Entity struct {
 	Roles []role.Role `gorm:"many2many:user_roles;constraint:OnDelete:CASCADE;"`
 }
 
-func (Entity) TableName() string {
+func (UserEntity) TableName() string {
 	return "users"
 }

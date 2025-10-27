@@ -9,8 +9,9 @@ import (
 	"vado_server/internal/domain/role"
 	"vado_server/internal/domain/task"
 	"vado_server/internal/domain/user"
-	user2 "vado_server/internal/infra/persistence/user"
+	user2 "vado_server/internal/infra/persistence/gorm"
 	"vado_server/internal/trasport/http/handler"
+	"vado_server/internal/trasport/http/middleware"
 
 	//"vado_server/internal/middleware"
 	"vado_server/internal/util"
@@ -23,7 +24,7 @@ import (
 func SetupRouter(ctx *context.AppContext) *gin.Engine {
 	taskSvc := task.NewService(task.NewRepo(ctx.DB))
 	roleSvc := role.NewService(role.NewRepo(ctx.DB))
-	userSvc := user.NewService(user2.NewGormRepo(ctx), token.AccessAliveMinutes*time.Minute)
+	userSvc := user.NewService(user2.NewUserRepo(ctx), token.AccessAliveMinutes*time.Minute)
 
 	gin.SetMode(util.GetEnv("GIN_MODE"))
 	r := gin.New()
@@ -37,7 +38,7 @@ func SetupRouter(ctx *context.AppContext) *gin.Engine {
 	// Настраиваем cookie-сессии
 	store := cookie.NewStore([]byte("super-secret-key"))
 	r.Use(sessions.Sessions("vado-session", store))
-	r.Use(checkJWT())
+	r.Use(middleware.CheckJWT())
 
 	// Публичные маршруты
 	authH := handler.NewAuthHandler(userSvc)
@@ -51,7 +52,7 @@ func SetupRouter(ctx *context.AppContext) *gin.Engine {
 
 	// Защищенные маршруты
 	auth := r.Group("/")
-	auth.Use(checkAuth())
+	auth.Use(middleware.CheckAuth())
 	{
 		auth.GET(route.Tasks, handler.ShowTasksPage(taskSvc))
 		auth.POST(route.Tasks, handler.AddTask(ctx))
@@ -61,9 +62,6 @@ func SetupRouter(ctx *context.AppContext) *gin.Engine {
 		auth.GET(route.Roles, handler.ShowRoles(roleSvc))
 		auth.DELETE("/users/:id", handler.DeleteUser(ctx))
 	}
-
-	// JSON API
-	r.GET("/api/hello", handler.GetHello())
 
 	return r
 }

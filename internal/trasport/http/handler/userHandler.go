@@ -4,15 +4,16 @@ import (
 	"net/http"
 	"vado_server/internal/app/context"
 	"vado_server/internal/config/code"
+	"vado_server/internal/config/route"
 	"vado_server/internal/domain/user"
-	user2 "vado_server/internal/infra/persistence/user"
+	user2 "vado_server/internal/infra/persistence/gorm"
 
 	"github.com/gin-gonic/gin"
 )
 
 func ShowUsers(appCtx *context.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var users []user2.Entity
+		var users []user2.UserEntity
 		if err := appCtx.DB. /*Preload("Roles").*/ Find(&users).Error; err != nil {
 			ShowError(c, "Не удалось загрузить пользователей", err.Error())
 			return
@@ -59,7 +60,7 @@ func AddUser(service *user.Service) func(c *gin.Context) {
 			})
 			return
 		}
-		c.Redirect(http.StatusSeeOther, "/users")
+		c.Redirect(http.StatusSeeOther, route.Users)
 	}
 }
 
@@ -67,12 +68,12 @@ func DeleteUser(appCtx *context.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 
-		if err := appCtx.DB.Delete(&user2.Entity{}, id).Error; err != nil {
+		if err := appCtx.DB.Delete(&user2.UserEntity{}, id).Error; err != nil {
 			appCtx.Log.Errorw("failed to delete user", "error", err)
 			c.String(http.StatusInternalServerError, "Ошибка удаления пользователя")
 			return
 		}
 
-		c.Redirect(http.StatusSeeOther, "/users")
+		c.Redirect(http.StatusSeeOther, route.Users)
 	}
 }

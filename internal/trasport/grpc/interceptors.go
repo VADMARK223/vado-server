@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 	"strings"
-	"vado_server/internal/auth"
+	"vado_server/internal/domain/auth"
 
 	"github.com/k0kubun/pp"
 	"google.golang.org/grpc"

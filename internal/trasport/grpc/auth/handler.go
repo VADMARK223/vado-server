@@ -5,7 +5,7 @@ import (
 	"time"
 	pb "vado_server/api/pb/auth"
 	context2 "vado_server/internal/app/context"
-	"vado_server/internal/auth"
+	"vado_server/internal/domain/auth"
 	"vado_server/internal/domain/user"
 
 	"golang.org/x/crypto/bcrypt"

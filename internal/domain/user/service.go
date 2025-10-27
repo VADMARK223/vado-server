@@ -3,7 +3,7 @@ package user
 import (
 	"errors"
 	"time"
-	"vado_server/internal/auth"
+	"vado_server/internal/domain/auth"
 
 	"golang.org/x/crypto/bcrypt"
 )

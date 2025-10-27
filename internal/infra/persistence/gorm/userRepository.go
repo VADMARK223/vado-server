@@ -1,4 +1,4 @@
-package user
+package gorm
 
 import (
 	"vado_server/internal/app/context"
@@ -8,20 +8,20 @@ import (
 	"gorm.io/gorm"
 )
 
-type GormRepository struct {
+type UserRepository struct {
 	db  *gorm.DB
 	log *zap.SugaredLogger
 }
 
-func NewGormRepo(ctx *context.AppContext) user.Repository {
-	return &GormRepository{
+func NewUserRepo(ctx *context.AppContext) user.Repository {
+	return &UserRepository{
 		db:  ctx.DB,
 		log: ctx.Log,
 	}
 }
 
-func (r *GormRepository) CreateUser(u user.User) error {
-	entity := &Entity{
+func (r *UserRepository) CreateUser(u user.User) error {
+	entity := &UserEntity{
 		Username: u.Username,
 		Password: u.Password,
 		Email:    u.Email,
@@ -36,8 +36,8 @@ func (r *GormRepository) CreateUser(u user.User) error {
 	return nil
 }
 
-func (r *GormRepository) GetByUsername(username string) (*user.User, error) {
-	var entity Entity
+func (r *UserRepository) GetByUsername(username string) (*user.User, error) {
+	var entity UserEntity
 	if err := r.db.Where("username = ?", username).First(&entity).Error; err != nil {
 		return nil, err
 	}
@@ -51,17 +51,17 @@ func (r *GormRepository) GetByUsername(username string) (*user.User, error) {
 	}, nil
 }
 
-func (r *GormRepository) GetByID(id uint) (*user.User, error) {
+func (r *UserRepository) GetByID(id uint) (*user.User, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (r *GormRepository) Update(user user.User) error {
+func (r *UserRepository) Update(user user.User) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (r *GormRepository) Delete(id uint) error {
+func (r *UserRepository) Delete(id uint) error {
 	//TODO implement me
 	panic("implement me")
 }

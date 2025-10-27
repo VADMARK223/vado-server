@@ -1,16 +1,16 @@
-package http
+package middleware
 
 import (
 	"net/http"
 	"time"
-	"vado_server/internal/auth"
 	"vado_server/internal/config/code"
+	"vado_server/internal/domain/auth"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
-func checkAuth() gin.HandlerFunc {
+func CheckAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		isAuth, ok := c.Get(code.IsAuth)
 		if !ok || isAuth == false {
@@ -26,7 +26,7 @@ func checkAuth() gin.HandlerFunc {
 	}
 }
 
-func checkJWT() gin.HandlerFunc {
+func CheckJWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr, err := c.Cookie(code.JwtVado)
 		if err != nil || tokenStr == "" {
