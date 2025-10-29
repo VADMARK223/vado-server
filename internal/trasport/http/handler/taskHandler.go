@@ -3,7 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"vado_server/internal/app/context"
+	"vado_server/internal/app"
 	"vado_server/internal/config/code"
 	"vado_server/internal/domain/task"
 	"vado_server/internal/infra/persistence/gorm"
@@ -44,7 +44,7 @@ func ShowTasksPage(service *task.Service) gin.HandlerFunc {
 	}
 }
 
-func AddTask(appCtx *context.AppContext) gin.HandlerFunc {
+func AddTask(appCtx *app.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.PostForm("name")
 		desc := c.PostForm("description")
@@ -81,7 +81,7 @@ func AddTask(appCtx *context.AppContext) gin.HandlerFunc {
 	}
 }
 
-func DeleteTask(appCtx *context.AppContext) gin.HandlerFunc {
+func DeleteTask(appCtx *app.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 

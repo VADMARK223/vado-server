@@ -1,7 +1,7 @@
 package gorm
 
 import (
-	"vado_server/internal/app/context"
+	"vado_server/internal/app"
 	"vado_server/internal/domain/user"
 
 	"go.uber.org/zap"
@@ -13,7 +13,7 @@ type UserRepository struct {
 	log *zap.SugaredLogger
 }
 
-func NewUserRepo(ctx *context.AppContext) user.Repository {
+func NewUserRepo(ctx *app.Context) user.Repository {
 	return &UserRepository{
 		db:  ctx.DB,
 		log: ctx.Log,

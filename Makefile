@@ -19,7 +19,7 @@ down-kafka:
 	docker compose -f docker-compose.kafka.yml down
 
 ps:
-	docker compose -p $(PROJECT_NAME) ps -f vado-server
+	docker compose -p $(PROJECT_NAME) ps vado-server
 
 logs:
 	docker compose -p $(PROJECT_NAME) logs vado-server

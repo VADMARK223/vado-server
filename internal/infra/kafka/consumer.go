@@ -3,7 +3,7 @@ package kafka
 import (
 	"context"
 	"time"
-	context2 "vado_server/internal/app/context"
+	"vado_server/internal/app"
 
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
@@ -14,7 +14,7 @@ type Consumer struct {
 	log    *zap.SugaredLogger
 }
 
-func NewConsumer(ctx *context2.AppContext) *Consumer {
+func NewConsumer(ctx *app.Context) *Consumer {
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:        []string{"localhost:9094"},
 		Topic:          "chat",

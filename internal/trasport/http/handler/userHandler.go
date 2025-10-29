@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"vado_server/internal/app/context"
+	"vado_server/internal/app"
 	"vado_server/internal/config/code"
 	"vado_server/internal/config/route"
 	"vado_server/internal/domain/user"
@@ -70,7 +70,7 @@ func AddUser(service *user.Service) func(c *gin.Context) {
 	}
 }
 
-func DeleteUser(appCtx *context.AppContext) gin.HandlerFunc {
+func DeleteUser(appCtx *app.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 

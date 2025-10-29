@@ -1,7 +1,7 @@
 package gorm
 
 import (
-	"vado_server/internal/app/context"
+	"vado_server/internal/app"
 	"vado_server/internal/domain/role"
 
 	"go.uber.org/zap"
@@ -28,7 +28,7 @@ func (r RoleRepo) GetAll() ([]role.Role, error) {
 	return result, err
 }
 
-func NewRoleRepo(ctx *context.AppContext) role.Repository {
+func NewRoleRepo(ctx *app.Context) role.Repository {
 	return &RoleRepo{
 		db:  ctx.DB,
 		log: ctx.Log,

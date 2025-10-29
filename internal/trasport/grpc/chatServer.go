@@ -1,4 +1,4 @@
-package chat
+package grpc
 
 import (
 	"context"
@@ -16,17 +16,17 @@ type Client struct {
 var clientColor = []string{"#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#33FFF5"}
 var clientIndex = 0
 
-type Server struct {
+type ChatServer struct {
 	chat.UnimplementedChatServiceServer
 	mu      sync.Mutex
 	clients map[uint64]*Client
 }
 
-func New() *Server {
-	return &Server{clients: make(map[uint64]*Client)}
+func New() *ChatServer {
+	return &ChatServer{clients: make(map[uint64]*Client)}
 }
 
-func (s *Server) ChatStream(req *chat.ChatStreamRequest, stream chat.ChatService_ChatStreamServer) error {
+func (s *ChatServer) ChatStream(req *chat.ChatStreamRequest, stream chat.ChatService_ChatStreamServer) error {
 	s.mu.Lock()
 	color := clientColor[clientIndex%len(clientColor)]
 	clientIndex++
@@ -50,14 +50,11 @@ func (s *Server) ChatStream(req *chat.ChatStreamRequest, stream chat.ChatService
 	return nil
 }
 
-func (s *Server) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Empty, error) {
+func (s *ChatServer) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Empty, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	sender, ok := s.clients[msg.User.Id]
-	for id, client := range s.clients {
-		fmt.Println(id, client.user.Username)
-	}
 	if !ok {
 		return nil, fmt.Errorf("unknown sender with id %d", msg.User.Id)
 	}
@@ -81,7 +78,7 @@ func (s *Server) SendMessage(_ context.Context, msg *chat.ChatMessage) (*chat.Em
 	return &chat.Empty{}, nil
 }
 
-func (s *Server) broadcastSystemMessage(userId uint64, text string, usersCount int) {
+func (s *ChatServer) broadcastSystemMessage(userId uint64, text string, usersCount int) {
 	msg := &chat.ChatMessage{
 		User: &chat.User{Id: userId, Username: "System", Color: "#888888"},
 		Text: fmt.Sprintf("%s", text),

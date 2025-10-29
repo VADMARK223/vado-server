@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
-	ctx "vado_server/internal/app/context"
+	ctx "vado_server/internal/app"
 	"vado_server/internal/infra/db"
 	"vado_server/internal/infra/kafka"
 	"vado_server/internal/infra/logger"
@@ -107,7 +107,7 @@ func main() {
 	appCtx.Log.Infow("Servers stopped.")
 }
 
-func initDB(appCtx *ctx.AppContext) *gorm.DB {
+func initDB(appCtx *ctx.Context) *gorm.DB {
 	dsn := util.GetEnv("POSTGRES_DSN")
 	database, err := db.Connect(dsn)
 	if err != nil {
@@ -119,7 +119,7 @@ func initDB(appCtx *ctx.AppContext) *gorm.DB {
 	return database
 }
 
-func startHTTPServer(ctx context.Context, appCtx *ctx.AppContext, wg *sync.WaitGroup, port string) {
+func startHTTPServer(ctx context.Context, appCtx *ctx.Context, wg *sync.WaitGroup, port string) {
 	defer wg.Done()
 
 	r := http.SetupRouter(appCtx)

@@ -1,4 +1,4 @@
-package hello
+package grpc
 
 import (
 	"context"
@@ -6,11 +6,11 @@ import (
 	"vado_server/api/pb/hello"
 )
 
-type Server struct {
+type HelloServer struct {
 	hello.UnimplementedHelloServiceServer
 }
 
-func (s *Server) SeyHello(_ context.Context, req *hello.HelloRequest) (*hello.HelloResponse, error) {
+func (s *HelloServer) SeyHello(_ context.Context, req *hello.HelloRequest) (*hello.HelloResponse, error) {
 	return &hello.HelloResponse{
 		Message: fmt.Sprintf("Привет, %s! Твой ID в =)", req.Name),
 	}, nil

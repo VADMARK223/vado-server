@@ -3,7 +3,7 @@ package http
 import (
 	"html/template"
 	"time"
-	"vado_server/internal/app/context"
+	"vado_server/internal/app"
 	"vado_server/internal/config/route"
 	"vado_server/internal/config/token"
 	"vado_server/internal/domain/role"
@@ -20,7 +20,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(ctx *context.AppContext) *gin.Engine {
+func SetupRouter(ctx *app.Context) *gin.Engine {
 	// Сервисы
 	taskSvc := task.NewService(gorm.NewTaskRepo(ctx.DB))
 	roleSvc := role.NewService(gorm.NewRoleRepo(ctx))

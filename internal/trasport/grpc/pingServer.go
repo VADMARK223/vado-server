@@ -1,4 +1,4 @@
-package ping
+package grpc
 
 import (
 	"context"
@@ -7,10 +7,10 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-type Server struct {
+type PingServer struct {
 	pb.UnsafePingServiceServer
 }
 
-func (s *Server) Ping(_ context.Context, _ *emptypb.Empty) (*pb.PingResponse, error) {
+func (s *PingServer) Ping(_ context.Context, _ *emptypb.Empty) (*pb.PingResponse, error) {
 	return &pb.PingResponse{Run: true}, nil
 }
