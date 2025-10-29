@@ -6,6 +6,9 @@ import (
 	"sync"
 	"time"
 	"vado_server/api/pb/chat"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Client struct {
@@ -59,43 +62,64 @@ func (s *ChatServer) SendMessage(_ context.Context, msg *chat.ChatMessage) (*cha
 		return nil, fmt.Errorf("unknown sender with id %d", msg.User.Id)
 	}
 
-	color := sender.user.Color
+	senderUser := sender.user
 
 	for id, client := range s.clients {
-		var messageType chat.MessageType
-		if id == msg.User.Id {
-			messageType = chat.MessageType_MESSAGE_SELF
-		} else {
-			messageType = chat.MessageType_MESSAGE_USER
-		}
-		messageWithTime(msg, messageType)
-		msg.User.Color = color
-		err := client.stream.Send(msg)
-		if err != nil {
-			delete(s.clients, id)
+		our := cloneMsgFor(senderUser, msg, id == senderUser.Id)
+
+		if err := client.stream.Send(our); err != nil {
+			st, _ := status.FromError(err)
+			switch st.Code() {
+			case codes.Canceled:
+				fmt.Println("Client canceled the stream.")
+				delete(s.clients, id)
+			case codes.Unavailable:
+				fmt.Println("Client unavailable.")
+				delete(s.clients, id)
+			default:
+				fmt.Println("Client error:", err)
+				delete(s.clients, id)
+			}
 		}
 	}
 	return &chat.Empty{}, nil
 }
 
-func (s *ChatServer) broadcastSystemMessage(userId uint64, text string, usersCount int) {
-	msg := &chat.ChatMessage{
-		User: &chat.User{Id: userId, Username: "System", Color: "#888888"},
-		Text: fmt.Sprintf("%s", text),
+func cloneMsgFor(sender *chat.User, in *chat.ChatMessage, isSelf bool) *chat.ChatMessage {
+	mt := chat.MessageType_MESSAGE_USER
+
+	if isSelf {
+		mt = chat.MessageType_MESSAGE_SELF
 	}
 
-	for _, c := range s.clients {
-		messageWithTime(msg, chat.MessageType_MESSAGE_SYSTEM)
-		msg.UsersCount = uint32(usersCount)
-		errSend := c.stream.Send(msg)
-		if errSend != nil {
-			fmt.Println("Error send message:" + errSend.Error())
-		}
+	return &chat.ChatMessage{
+		User: &chat.User{
+			Id:       sender.Id,
+			Username: sender.Username,
+			Color:    sender.Color,
+		},
+		Text:      in.Text,
+		Timestamp: time.Now().Unix(),
+		Type:      mt,
 	}
-
 }
 
-func messageWithTime(msg *chat.ChatMessage, messageType chat.MessageType) {
-	msg.Timestamp = time.Now().Unix()
-	msg.Type = messageType
+func (s *ChatServer) broadcastSystemMessage(userId uint64, text string, usersCount int) {
+	for id, c := range s.clients {
+		out := &chat.ChatMessage{
+			User:       &chat.User{Id: userId, Username: "System", Color: "#888888"},
+			Text:       text,
+			Timestamp:  time.Now().Unix(),
+			Type:       chat.MessageType_MESSAGE_SYSTEM,
+			UsersCount: uint32(usersCount),
+		}
+		if err := c.stream.Send(out); err != nil {
+			st, _ := status.FromError(err)
+			if st.Code() == codes.Canceled || st.Code() == codes.Unavailable {
+				delete(s.clients, id)
+				continue
+			}
+			delete(s.clients, id)
+		}
+	}
 }
