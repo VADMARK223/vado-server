@@ -55,52 +55,6 @@ func ShowLoginPage() gin.HandlerFunc {
 	}
 }
 
-/*func PerformLogin(appCtx *context.AppContext) gin.HandlerFunc {
-	return func(c *gin.Context) {
-
-
-		var u user2.Entity
-		if err := appCtx.DB.Where("username = ?", username).First(&u).Error; err != nil {
-			c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": "Пользователь не найден"})
-			return
-		}
-
-		if bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)) != nil {
-			c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": "Неверный пароль"})
-			return
-		}
-
-		token, err := auth.CreateToken(u.ID, []string{"user"}, time.Minute*auth3.TokenAliveMinutes)
-		if err != nil {
-			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
-				"Message": "Ошибка генерации токена",
-				"Error":   err.Error(),
-			})
-			return
-		}
-
-		c.SetCookie(code.JwtVado,
-			token,
-			3600*24,
-			"/",
-			"",
-			false,
-			true)
-		session := sessions.Default(c)
-
-		redirectTo := session.Get(code.RedirectTo)
-		if redirectTo == nil {
-			redirectTo = route.Index
-		} else {
-			session.Delete(code.RedirectTo)
-		}
-
-		_ = session.Save()
-
-		c.Redirect(http.StatusFound, redirectTo.(string))
-	}
-}*/
-
 func ShowRegisterPage() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.HTML(http.StatusOK, "register.html", nil)

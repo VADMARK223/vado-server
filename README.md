@@ -77,6 +77,7 @@ go run ./cmd/ping/main.go
 
 # Stack
 - gRPC
+- gRPC Web
 - Postgres
 - Zap
 - Gin

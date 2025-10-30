@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
+	"vado_server/internal/config/code"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,7 +15,25 @@ func NewGrpcTestHandler() *GrpcTestHandler {
 }
 
 func (h *GrpcTestHandler) ShowTestPage(c *gin.Context) {
+	isAuth, ok := c.Get(code.IsAuth)
+	if !ok {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"Message": fmt.Sprintf("Нет ключа (%s) в session", code.IsAuth),
+			"Error":   fmt.Sprintf("Значение ключа: %v", isAuth),
+		})
+	}
+
+	userID, ok := c.Get(code.UserId)
+
+	if !ok {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"Message": fmt.Sprintf("Нет ключа (%s) в session", code.UserId),
+			"Error":   fmt.Sprintf("Значение ключа: %v", userID),
+		})
+	}
+
 	c.HTML(http.StatusOK, "grpc-test.html", gin.H{
-		"title": "gRPC test",
+		code.IsAuth: isAuth,
+		code.UserId: userID,
 	})
 }
