@@ -24,7 +24,7 @@ services:
       dockerfile: Dockerfile
     container_name: vado-ping
     ports:
-      - "5556:5556" # порт хоста: порт контейнера
+      - "5556:5556"
       - "50051:50051" # gRPC
     restart: unless-stopped
     environment:

@@ -39,6 +39,36 @@ psql:
 clean:
 	docker system prune -af --volumes
 
+
+PROTO_DIR = api/proto
+OUT_DIR = web/static
+
+PROTOC = protoc
+GRPC_WEB_PLUGIN = $(shell which protoc-gen-grpc-web)
+
+PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
+
+.PHONY: all web-proto clean
+
+all: web-proto
+
+# Генерация JS-клиентов для всех .proto файлов
+web-proto:
+	@echo "🚀 Генерация gRPC-Web JS файлов..."
+	@mkdir -p $(OUT_DIR)
+	@for file in $(PROTO_FILES); do \
+		echo "  -> Компиляция $$file"; \
+		$(PROTOC) -I=$(PROTO_DIR) $$file \
+			--plugin=protoc-gen-grpc-web=$(GRPC_WEB_PLUGIN) \
+			--grpc-web_out=import_style=commonjs,mode=grpcwebtext:$(OUT_DIR); \
+	done
+	@echo "✅ Генерация завершена. Файлы в $(OUT_DIR)"
+
+# Очистка сгенерированных файлов
+clean:
+	@echo "🧹 Очистка $(OUT_DIR)..."
+	rm -rf $(OUT_DIR)/*.js
+
 YELLOW := \033[1;33m
 GREEN := \033[1;32m
 RESET := \033[0m

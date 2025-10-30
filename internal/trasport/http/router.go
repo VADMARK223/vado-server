@@ -64,6 +64,7 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 		auth.POST(route.Users, handler.AddUser(userSvc))
 		auth.GET(route.Roles, handler.ShowRoles(roleSvc))
 		auth.DELETE("/users/:id", handler.DeleteUser(ctx))
+		auth.GET("/grpc-test", handler.NewGrpcTestHandler().ShowTestPage)
 	}
 
 	return r

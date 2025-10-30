@@ -5,6 +5,11 @@
 ```shell
 protoc --go_out=./ --go-grpc_out=./ api/proto/hello.proto
 ```
+## gRPC-curl
+```shell
+grpcurl -plaintext -import-path ./api/proto -proto auth.proto -d '{"username": "1", "password": "1"}' localhost:50051 AuthService/Login
+grpcurl -plaintext -import-path ./api/proto -proto ping.proto localhost:50051 PingService/Ping
+````
 
 # Linux
 
