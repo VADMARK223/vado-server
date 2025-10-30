@@ -62,15 +62,15 @@ func main() {
 	// Kafka
 	consumer := kafka.NewConsumer(appCtx)
 	go func() {
-		consumerRun := consumer.Run(ctxWithCancel, func(key, value []byte) error {
+		runErr := consumer.Run(ctxWithCancel, func(key, value []byte) error {
 			user := string(key)
 			msg := string(value)
 			appCtx.Log.Infow("Processing message", "user", user, "msg", msg)
 			return nil
 		})
 
-		if consumerRun != nil {
-			appCtx.Log.Errorw("Consumer stopped", "error", consumerRun)
+		if runErr != nil {
+			appCtx.Log.Errorw("Consumer stopped", "error", runErr)
 		}
 	}()
 

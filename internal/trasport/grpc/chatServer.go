@@ -6,7 +6,10 @@ import (
 	"sync"
 	"time"
 	"vado_server/api/pb/chat"
+	chatDomain "vado_server/internal/domain/chat"
+	"vado_server/internal/infra/kafka"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -21,12 +24,18 @@ var clientIndex = 0
 
 type ChatServer struct {
 	chat.UnimplementedChatServiceServer
-	mu      sync.Mutex
-	clients map[uint64]*Client
+	mu       sync.Mutex
+	clients  map[uint64]*Client
+	log      *zap.SugaredLogger
+	producer *kafka.Producer
 }
 
-func New() *ChatServer {
-	return &ChatServer{clients: make(map[uint64]*Client)}
+func New(log *zap.SugaredLogger, producer *kafka.Producer) *ChatServer {
+	return &ChatServer{
+		clients:  make(map[uint64]*Client),
+		log:      log,
+		producer: producer,
+	}
 }
 
 func (s *ChatServer) ChatStream(req *chat.ChatStreamRequest, stream chat.ChatService_ChatStreamServer) error {
@@ -64,6 +73,8 @@ func (s *ChatServer) SendMessage(_ context.Context, msg *chat.ChatMessage) (*cha
 
 	senderUser := sender.user
 
+	s.sendInKafka(msg, false)
+
 	for id, client := range s.clients {
 		our := cloneMsgFor(senderUser, msg, id == senderUser.Id)
 
@@ -71,18 +82,41 @@ func (s *ChatServer) SendMessage(_ context.Context, msg *chat.ChatMessage) (*cha
 			st, _ := status.FromError(err)
 			switch st.Code() {
 			case codes.Canceled:
-				fmt.Println("Client canceled the stream.")
+				s.log.Debugw("Client canceled the stream", "client_id", id)
 				delete(s.clients, id)
 			case codes.Unavailable:
-				fmt.Println("Client unavailable.")
+				s.log.Debugw("Client unavailable", "client_id", id)
 				delete(s.clients, id)
 			default:
-				fmt.Println("Client error:", err)
+				s.log.Warnw("Client error", "client_id", id, "error", err)
 				delete(s.clients, id)
 			}
 		}
 	}
 	return &chat.Empty{}, nil
+}
+
+func (s *ChatServer) sendInKafka(msg *chat.ChatMessage, isSystem bool) {
+	producer := s.producer
+	if producer == nil {
+		s.log.Warnw("Kafka producer is nil, skipping message")
+		return
+	}
+	messageLog := &chatDomain.MessageLog{
+		UserID:    msg.User.Id,
+		Text:      msg.Text,
+		Timestamp: time.Now(),
+		IsSystem:  isSystem,
+	}
+
+	go func() {
+		if err := s.producer.SendChatMessage(messageLog); err != nil {
+			s.log.Errorw("Failed to send message to Kafka",
+				"user_id", messageLog.UserID,
+				"is_system", messageLog.IsSystem,
+				"error", err)
+		}
+	}()
 }
 
 func cloneMsgFor(sender *chat.User, in *chat.ChatMessage, isSelf bool) *chat.ChatMessage {
@@ -105,14 +139,18 @@ func cloneMsgFor(sender *chat.User, in *chat.ChatMessage, isSelf bool) *chat.Cha
 }
 
 func (s *ChatServer) broadcastSystemMessage(userId uint64, text string, usersCount int) {
+	out := &chat.ChatMessage{
+		User:       &chat.User{Id: userId, Username: "System", Color: "#888888"},
+		Text:       text,
+		Timestamp:  time.Now().Unix(),
+		Type:       chat.MessageType_MESSAGE_SYSTEM,
+		UsersCount: uint32(usersCount),
+	}
+
+	s.sendInKafka(out, true)
+
 	for id, c := range s.clients {
-		out := &chat.ChatMessage{
-			User:       &chat.User{Id: userId, Username: "System", Color: "#888888"},
-			Text:       text,
-			Timestamp:  time.Now().Unix(),
-			Type:       chat.MessageType_MESSAGE_SYSTEM,
-			UsersCount: uint32(usersCount),
-		}
+
 		if err := c.stream.Send(out); err != nil {
 			st, _ := status.FromError(err)
 			if st.Code() == codes.Canceled || st.Code() == codes.Unavailable {

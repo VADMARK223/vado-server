@@ -9,8 +9,10 @@ import (
 	pbHello "vado_server/api/pb/hello"
 	pbPing "vado_server/api/pb/ping"
 	"vado_server/internal/app"
+	"vado_server/internal/config/kafka/topic"
 	"vado_server/internal/config/token"
 	"vado_server/internal/domain/user"
+	"vado_server/internal/infra/kafka"
 	"vado_server/internal/infra/persistence/gorm"
 
 	"go.uber.org/zap"
@@ -40,7 +42,8 @@ func NewServer(ctx *app.Context, port string) (*Server, error) {
 
 	pbAuth.RegisterAuthServiceServer(s.grpcServer, NewAuthServer(userSvc))
 	pbHello.RegisterHelloServiceServer(s.grpcServer, &HelloServer{})
-	pbChat.RegisterChatServiceServer(s.grpcServer, New())
+	producer := kafka.NewProducer(topic.ChatLog, ctx.Log)
+	pbChat.RegisterChatServiceServer(s.grpcServer, New(ctx.Log, producer))
 	pbPing.RegisterPingServiceServer(s.grpcServer, &PingServer{})
 
 	return s, nil
