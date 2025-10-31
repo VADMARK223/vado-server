@@ -8,7 +8,7 @@
 // versions:
 // 	protoc-gen-grpc-web v1.5.0
 // 	protoc              v3.21.12
-// source: ping.proto
+// source: test.proto
 
 
 /* eslint-disable */
@@ -19,9 +19,7 @@
 const grpc = {};
 grpc.web = require('grpc-web');
 
-
-var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js')
-const proto = require('./ping_pb.js');
+const proto = require('./test_pb.js');
 
 /**
  * @param {string} hostname
@@ -31,7 +29,7 @@ const proto = require('./ping_pb.js');
  * @struct
  * @final
  */
-proto.PingServiceClient =
+proto.TestServiceClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
   options.format = 'text';
@@ -57,7 +55,7 @@ proto.PingServiceClient =
  * @struct
  * @final
  */
-proto.PingServicePromiseClient =
+proto.TestServicePromiseClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
   options.format = 'text';
@@ -78,61 +76,61 @@ proto.PingServicePromiseClient =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.google.protobuf.Empty,
- *   !proto.PingResponse>}
+ *   !proto.TestRequest,
+ *   !proto.TestResponse>}
  */
-const methodDescriptor_PingService_Ping = new grpc.web.MethodDescriptor(
-  '/PingService/Ping',
+const methodDescriptor_TestService_SayTest = new grpc.web.MethodDescriptor(
+  '/TestService/SayTest',
   grpc.web.MethodType.UNARY,
-  google_protobuf_empty_pb.Empty,
-  proto.PingResponse,
+  proto.TestRequest,
+  proto.TestResponse,
   /**
-   * @param {!proto.google.protobuf.Empty} request
+   * @param {!proto.TestRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  proto.PingResponse.deserializeBinary
+  proto.TestResponse.deserializeBinary
 );
 
 
 /**
- * @param {!proto.google.protobuf.Empty} request The
+ * @param {!proto.TestRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.RpcError, ?proto.PingResponse)}
+ * @param {function(?grpc.web.RpcError, ?proto.TestResponse)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.PingResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.TestResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.PingServiceClient.prototype.ping =
+proto.TestServiceClient.prototype.sayTest =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/PingService/Ping',
+      '/TestService/SayTest',
       request,
       metadata || {},
-      methodDescriptor_PingService_Ping,
+      methodDescriptor_TestService_SayTest,
       callback);
 };
 
 
 /**
- * @param {!proto.google.protobuf.Empty} request The
+ * @param {!proto.TestRequest} request The
  *     request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.PingResponse>}
+ * @return {!Promise<!proto.TestResponse>}
  *     Promise that resolves to the response
  */
-proto.PingServicePromiseClient.prototype.ping =
+proto.TestServicePromiseClient.prototype.sayTest =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/PingService/Ping',
+      '/TestService/SayTest',
       request,
       metadata || {},
-      methodDescriptor_PingService_Ping);
+      methodDescriptor_TestService_SayTest);
 };
 
 
