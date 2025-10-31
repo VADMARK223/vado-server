@@ -39,17 +39,22 @@ psql:
 clean:
 	docker system prune -af --volumes
 
-go-proto:
-	protoc --go_out=./ --go-grpc_out=./ api/proto/test.proto
-
-
 PROTO_DIR = api/proto
-PB_WEB_OUT_DIR = web/static/js/pb
-
-PROTOC = protoc
-GRPC_WEB_PLUGIN = $(shell which protoc-gen-grpc-web)
-
 PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
+PROTOC = protoc
+
+go-proto:
+	@echo "Generating Go gRPC files..."
+	@for file in $(PROTO_FILES); do \
+		echo "  -> Compilation $$file"; \
+		$(PROTOC) -I=$(PROTO_DIR) $$file \
+			--go_out=. \
+			--go-grpc_out=. ; \
+	done
+	@echo "Generation complete."
+
+PB_WEB_OUT_DIR = web/static/js/pb
+GRPC_WEB_PLUGIN = $(shell which protoc-gen-grpc-web)
 
 .PHONY: all web-proto clean
 
@@ -61,6 +66,7 @@ web-proto:
 	@for file in $(PROTO_FILES); do \
 		echo "  -> Compilation $$file"; \
 		$(PROTOC) -I=$(PROTO_DIR) $$file \
+			--js_out=import_style=commonjs:$(PB_WEB_OUT_DIR) \
 			--plugin=protoc-gen-grpc-web=$(GRPC_WEB_PLUGIN) \
 			--grpc-web_out=import_style=commonjs,mode=grpcwebtext:$(PB_WEB_OUT_DIR); \
 	done
@@ -84,5 +90,5 @@ help:
 	@echo "  $(GREEN)make psql$(RESET)            - open psql shell"
 	@echo "  $(GREEN)make clean$(RESET)           - clean Docker cache"
 	@echo "  $(GREEN)make web-proto$(RESET)       - generating gRPC-Web JS files"
-	@echo "  $(GREEN)make go-proto$(RESET)       - generating gRPC files"
+	@echo "  $(GREEN)make go-proto$(RESET)        - generating gRPC files"
 .DEFAULT_GOAL := help

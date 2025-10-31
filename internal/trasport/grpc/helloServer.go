@@ -10,7 +10,7 @@ type HelloServer struct {
 	hello.UnimplementedHelloServiceServer
 }
 
-func (s *HelloServer) SeyHello(_ context.Context, req *hello.HelloRequest) (*hello.HelloResponse, error) {
+func (s *HelloServer) SayHello(_ context.Context, req *hello.HelloRequest) (*hello.HelloResponse, error) {
 	return &hello.HelloResponse{
 		Message: fmt.Sprintf("Привет, %s! Твой ID в =)", req.Name),
 	}, nil

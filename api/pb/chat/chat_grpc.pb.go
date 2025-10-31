@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.21.12
-// source: api/proto/chat.proto
+// source: chat.proto
 
 package chat
 
@@ -68,7 +68,7 @@ func (c *chatServiceClient) ChatStream(ctx context.Context, in *ChatStreamReques
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ChatService_ChatStreamClient = grpc.ServerStreamingClient[ChatMessage]
 
-// ChatServiceServer is the ping API for ChatService service.
+// ChatServiceServer is the server API for ChatService service.
 // All implementations must embed UnimplementedChatServiceServer
 // for forward compatibility.
 type ChatServiceServer interface {
@@ -159,5 +159,5 @@ var ChatService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "api/proto/chat.proto",
+	Metadata: "chat.proto",
 }
