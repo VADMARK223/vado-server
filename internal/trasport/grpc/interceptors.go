@@ -29,6 +29,12 @@ func AuthInterceptor(
 		return handler(ctx, req)
 	}
 
+	println("111111")
+	if strings.Contains(info.FullMethod, "HelloService") {
+		println("22222")
+		return handler(ctx, req)
+	}
+
 	_, _ = pp.Println(info.FullMethod)
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {

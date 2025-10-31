@@ -2,6 +2,8 @@ syntax = "proto3";
 
 option go_package = "api/pb/chat;chat";
 
+package chat;
+
 service ChatService {
   rpc SendMessage (ChatMessage) returns (Empty);
   rpc ChatStream (ChatStreamRequest) returns (stream ChatMessage);

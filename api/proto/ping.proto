@@ -4,6 +4,8 @@ import "google/protobuf/empty.proto";
 
 option go_package = "api/pb/ping;ping";
 
+package ping;
+
 service PingService {
   rpc Ping(google.protobuf.Empty) returns (PingResponse);
 }

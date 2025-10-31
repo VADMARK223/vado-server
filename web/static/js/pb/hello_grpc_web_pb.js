@@ -1,5 +1,5 @@
 /**
- * @fileoverview gRPC-Web generated client stub for 
+ * @fileoverview gRPC-Web generated client stub for hello
  * @enhanceable
  * @public
  */
@@ -15,8 +15,8 @@
 // @ts-nocheck
 
 
-goog.provide('proto.HelloServiceClient');
-goog.provide('proto.HelloServicePromiseClient');
+goog.provide('proto.hello.HelloServiceClient');
+goog.provide('proto.hello.HelloServicePromiseClient');
 
 goog.require('grpc.web.MethodDescriptor');
 goog.require('grpc.web.MethodType');
@@ -24,8 +24,8 @@ goog.require('grpc.web.GrpcWebClientBase');
 goog.require('grpc.web.AbstractClientBase');
 goog.require('grpc.web.ClientReadableStream');
 goog.require('grpc.web.RpcError');
-goog.require('proto.HelloRequest');
-goog.require('proto.HelloResponse');
+goog.require('proto.hello.HelloRequest');
+goog.require('proto.hello.HelloResponse');
 
 goog.requireType('grpc.web.ClientOptions');
 
@@ -41,10 +41,10 @@ goog.scope(function() {
  * @struct
  * @final
  */
-proto.HelloServiceClient =
+proto.hello.HelloServiceClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'text';
+  options.format = 'binary';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client
@@ -67,10 +67,10 @@ proto.HelloServiceClient =
  * @struct
  * @final
  */
-proto.HelloServicePromiseClient =
+proto.hello.HelloServicePromiseClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'text';
+  options.format = 'binary';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client
@@ -88,39 +88,39 @@ proto.HelloServicePromiseClient =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.HelloRequest,
- *   !proto.HelloResponse>}
+ *   !proto.hello.HelloRequest,
+ *   !proto.hello.HelloResponse>}
  */
 const methodDescriptor_HelloService_SayHello = new grpc.web.MethodDescriptor(
-  '/HelloService/SayHello',
+  '/hello.HelloService/SayHello',
   grpc.web.MethodType.UNARY,
-  proto.HelloRequest,
-  proto.HelloResponse,
+  proto.hello.HelloRequest,
+  proto.hello.HelloResponse,
   /**
-   * @param {!proto.HelloRequest} request
+   * @param {!proto.hello.HelloRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  proto.HelloResponse.deserializeBinary
+  proto.hello.HelloResponse.deserializeBinary
 );
 
 
 /**
- * @param {!proto.HelloRequest} request The
+ * @param {!proto.hello.HelloRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.RpcError, ?proto.HelloResponse)}
+ * @param {function(?grpc.web.RpcError, ?proto.hello.HelloResponse)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.HelloResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.hello.HelloResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.HelloServiceClient.prototype.sayHello =
+proto.hello.HelloServiceClient.prototype.sayHello =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/HelloService/SayHello',
+      '/hello.HelloService/SayHello',
       request,
       metadata || {},
       methodDescriptor_HelloService_SayHello,
@@ -129,17 +129,17 @@ proto.HelloServiceClient.prototype.sayHello =
 
 
 /**
- * @param {!proto.HelloRequest} request The
+ * @param {!proto.hello.HelloRequest} request The
  *     request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.HelloResponse>}
+ * @return {!Promise<!proto.hello.HelloResponse>}
  *     Promise that resolves to the response
  */
-proto.HelloServicePromiseClient.prototype.sayHello =
+proto.hello.HelloServicePromiseClient.prototype.sayHello =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/HelloService/SayHello',
+      '/hello.HelloService/SayHello',
       request,
       metadata || {},
       methodDescriptor_HelloService_SayHello);

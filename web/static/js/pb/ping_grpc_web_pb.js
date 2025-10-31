@@ -1,5 +1,5 @@
 /**
- * @fileoverview gRPC-Web generated client stub for 
+ * @fileoverview gRPC-Web generated client stub for ping
  * @enhanceable
  * @public
  */
@@ -15,8 +15,8 @@
 // @ts-nocheck
 
 
-goog.provide('proto.PingServiceClient');
-goog.provide('proto.PingServicePromiseClient');
+goog.provide('proto.ping.PingServiceClient');
+goog.provide('proto.ping.PingServicePromiseClient');
 
 goog.require('grpc.web.MethodDescriptor');
 goog.require('grpc.web.MethodType');
@@ -24,8 +24,8 @@ goog.require('grpc.web.GrpcWebClientBase');
 goog.require('grpc.web.AbstractClientBase');
 goog.require('grpc.web.ClientReadableStream');
 goog.require('grpc.web.RpcError');
-goog.require('proto.PingResponse');
 goog.require('proto.google.protobuf.Empty');
+goog.require('proto.ping.PingResponse');
 
 goog.requireType('grpc.web.ClientOptions');
 
@@ -41,10 +41,10 @@ goog.scope(function() {
  * @struct
  * @final
  */
-proto.PingServiceClient =
+proto.ping.PingServiceClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'text';
+  options.format = 'binary';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client
@@ -67,10 +67,10 @@ proto.PingServiceClient =
  * @struct
  * @final
  */
-proto.PingServicePromiseClient =
+proto.ping.PingServicePromiseClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'text';
+  options.format = 'binary';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client
@@ -89,13 +89,13 @@ proto.PingServicePromiseClient =
  * @const
  * @type {!grpc.web.MethodDescriptor<
  *   !proto.google.protobuf.Empty,
- *   !proto.PingResponse>}
+ *   !proto.ping.PingResponse>}
  */
 const methodDescriptor_PingService_Ping = new grpc.web.MethodDescriptor(
-  '/PingService/Ping',
+  '/ping.PingService/Ping',
   grpc.web.MethodType.UNARY,
   proto.google.protobuf.Empty,
-  proto.PingResponse,
+  proto.ping.PingResponse,
   /**
    * @param {!proto.google.protobuf.Empty} request
    * @return {!Uint8Array}
@@ -103,7 +103,7 @@ const methodDescriptor_PingService_Ping = new grpc.web.MethodDescriptor(
   function(request) {
     return request.serializeBinary();
   },
-  proto.PingResponse.deserializeBinary
+  proto.ping.PingResponse.deserializeBinary
 );
 
 
@@ -112,15 +112,15 @@ const methodDescriptor_PingService_Ping = new grpc.web.MethodDescriptor(
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.RpcError, ?proto.PingResponse)}
+ * @param {function(?grpc.web.RpcError, ?proto.ping.PingResponse)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.PingResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.ping.PingResponse>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.PingServiceClient.prototype.ping =
+proto.ping.PingServiceClient.prototype.ping =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/PingService/Ping',
+      '/ping.PingService/Ping',
       request,
       metadata || {},
       methodDescriptor_PingService_Ping,
@@ -133,13 +133,13 @@ proto.PingServiceClient.prototype.ping =
  *     request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.PingResponse>}
+ * @return {!Promise<!proto.ping.PingResponse>}
  *     Promise that resolves to the response
  */
-proto.PingServicePromiseClient.prototype.ping =
+proto.ping.PingServicePromiseClient.prototype.ping =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/PingService/Ping',
+      '/ping.PingService/Ping',
       request,
       metadata || {},
       methodDescriptor_PingService_Ping);

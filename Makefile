@@ -68,7 +68,7 @@ web-proto:
 		$(PROTOC) -I=$(PROTO_DIR) $$file \
 			--js_out=import_style=closure,binary:$(PB_WEB_OUT_DIR) \
 			--plugin=protoc-gen-grpc-web=$(GRPC_WEB_PLUGIN) \
-			--grpc-web_out=import_style=closure,mode=grpcwebtext:$(PB_WEB_OUT_DIR); \
+			--grpc-web_out=import_style=closure,mode=grpcweb:$(PB_WEB_OUT_DIR); \
 	done
 	@echo "Generation complete. Files in $(PB_WEB_OUT_DIR)"
 

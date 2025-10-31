@@ -79,7 +79,7 @@ type ChatMessage struct {
 	User          *User                  `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
 	Text          string                 `protobuf:"bytes,3,opt,name=text,proto3" json:"text,omitempty"`
 	Timestamp     int64                  `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                     // время отправки (Unix time, в миллисекундах или секундах)
-	Type          MessageType            `protobuf:"varint,5,opt,name=type,proto3,enum=MessageType" json:"type,omitempty"`              // тип сообщения
+	Type          MessageType            `protobuf:"varint,5,opt,name=type,proto3,enum=chat.MessageType" json:"type,omitempty"`         // тип сообщения
 	UsersCount    uint32                 `protobuf:"varint,6,opt,name=users_count,json=usersCount,proto3" json:"users_count,omitempty"` // Кол-во участников чата
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -302,31 +302,33 @@ var File_chat_proto protoreflect.FileDescriptor
 const file_chat_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"chat.proto\"\xad\x01\n" +
+	"chat.proto\x12\x04chat\"\xb7\x01\n" +
 	"\vChatMessage\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
-	"\x04user\x18\x02 \x01(\v2\x05.UserR\x04user\x12\x12\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
+	"\x04user\x18\x02 \x01(\v2\n" +
+	".chat.UserR\x04user\x12\x12\n" +
 	"\x04text\x18\x03 \x01(\tR\x04text\x12\x1c\n" +
-	"\ttimestamp\x18\x04 \x01(\x03R\ttimestamp\x12 \n" +
-	"\x04type\x18\x05 \x01(\x0e2\f.MessageTypeR\x04type\x12\x1f\n" +
+	"\ttimestamp\x18\x04 \x01(\x03R\ttimestamp\x12%\n" +
+	"\x04type\x18\x05 \x01(\x0e2\x11.chat.MessageTypeR\x04type\x12\x1f\n" +
 	"\vusers_count\x18\x06 \x01(\rR\n" +
 	"usersCount\"H\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
-	"\x05color\x18\x03 \x01(\tR\x05color\".\n" +
-	"\x11ChatStreamRequest\x12\x19\n" +
-	"\x04user\x18\x01 \x01(\v2\x05.UserR\x04user\"\a\n" +
+	"\x05color\x18\x03 \x01(\tR\x05color\"3\n" +
+	"\x11ChatStreamRequest\x12\x1e\n" +
+	"\x04user\x18\x01 \x01(\v2\n" +
+	".chat.UserR\x04user\"\a\n" +
 	"\x05Empty*Z\n" +
 	"\vMessageType\x12\x13\n" +
 	"\x0fMESSAGE_UNKNOWN\x10\x00\x12\x10\n" +
 	"\fMESSAGE_USER\x10\x01\x12\x12\n" +
 	"\x0eMESSAGE_SYSTEM\x10\x02\x12\x10\n" +
-	"\fMESSAGE_SELF\x10\x032d\n" +
-	"\vChatService\x12#\n" +
-	"\vSendMessage\x12\f.ChatMessage\x1a\x06.Empty\x120\n" +
+	"\fMESSAGE_SELF\x10\x032x\n" +
+	"\vChatService\x12-\n" +
+	"\vSendMessage\x12\x11.chat.ChatMessage\x1a\v.chat.Empty\x12:\n" +
 	"\n" +
-	"ChatStream\x12\x12.ChatStreamRequest\x1a\f.ChatMessage0\x01B\x12Z\x10api/pb/chat;chatb\x06proto3"
+	"ChatStream\x12\x17.chat.ChatStreamRequest\x1a\x11.chat.ChatMessage0\x01B\x12Z\x10api/pb/chat;chatb\x06proto3"
 
 var (
 	file_chat_proto_rawDescOnce sync.Once
@@ -343,20 +345,20 @@ func file_chat_proto_rawDescGZIP() []byte {
 var file_chat_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_chat_proto_goTypes = []any{
-	(MessageType)(0),          // 0: MessageType
-	(*ChatMessage)(nil),       // 1: ChatMessage
-	(*User)(nil),              // 2: User
-	(*ChatStreamRequest)(nil), // 3: ChatStreamRequest
-	(*Empty)(nil),             // 4: Empty
+	(MessageType)(0),          // 0: chat.MessageType
+	(*ChatMessage)(nil),       // 1: chat.ChatMessage
+	(*User)(nil),              // 2: chat.User
+	(*ChatStreamRequest)(nil), // 3: chat.ChatStreamRequest
+	(*Empty)(nil),             // 4: chat.Empty
 }
 var file_chat_proto_depIdxs = []int32{
-	2, // 0: ChatMessage.user:type_name -> User
-	0, // 1: ChatMessage.type:type_name -> MessageType
-	2, // 2: ChatStreamRequest.user:type_name -> User
-	1, // 3: ChatService.SendMessage:input_type -> ChatMessage
-	3, // 4: ChatService.ChatStream:input_type -> ChatStreamRequest
-	4, // 5: ChatService.SendMessage:output_type -> Empty
-	1, // 6: ChatService.ChatStream:output_type -> ChatMessage
+	2, // 0: chat.ChatMessage.user:type_name -> chat.User
+	0, // 1: chat.ChatMessage.type:type_name -> chat.MessageType
+	2, // 2: chat.ChatStreamRequest.user:type_name -> chat.User
+	1, // 3: chat.ChatService.SendMessage:input_type -> chat.ChatMessage
+	3, // 4: chat.ChatService.ChatStream:input_type -> chat.ChatStreamRequest
+	4, // 5: chat.ChatService.SendMessage:output_type -> chat.Empty
+	1, // 6: chat.ChatService.ChatStream:output_type -> chat.ChatMessage
 	5, // [5:7] is the sub-list for method output_type
 	3, // [3:5] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name

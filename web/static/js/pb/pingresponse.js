@@ -11,7 +11,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-goog.provide('proto.PingResponse');
+goog.provide('proto.ping.PingResponse');
 
 goog.require('jspb.BinaryReader');
 goog.require('jspb.BinaryWriter');
@@ -27,16 +27,16 @@ goog.require('jspb.Message');
  * @extends {jspb.Message}
  * @constructor
  */
-proto.PingResponse = function(opt_data) {
+proto.ping.PingResponse = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.PingResponse, jspb.Message);
+goog.inherits(proto.ping.PingResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.PingResponse.displayName = 'proto.PingResponse';
+  proto.ping.PingResponse.displayName = 'proto.ping.PingResponse';
 }
 
 
@@ -54,8 +54,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.PingResponse.prototype.toObject = function(opt_includeInstance) {
-  return proto.PingResponse.toObject(opt_includeInstance, this);
+proto.ping.PingResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.ping.PingResponse.toObject(opt_includeInstance, this);
 };
 
 
@@ -64,11 +64,11 @@ proto.PingResponse.prototype.toObject = function(opt_includeInstance) {
  * @param {boolean|undefined} includeInstance Deprecated. Whether to include
  *     the JSPB instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.PingResponse} msg The msg instance to transform.
+ * @param {!proto.ping.PingResponse} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.PingResponse.toObject = function(includeInstance, msg) {
+proto.ping.PingResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
 run: jspb.Message.getBooleanFieldWithDefault(msg, 1, false)
   };
@@ -84,23 +84,23 @@ run: jspb.Message.getBooleanFieldWithDefault(msg, 1, false)
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.PingResponse}
+ * @return {!proto.ping.PingResponse}
  */
-proto.PingResponse.deserializeBinary = function(bytes) {
+proto.ping.PingResponse.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.PingResponse;
-  return proto.PingResponse.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.ping.PingResponse;
+  return proto.ping.PingResponse.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.PingResponse} msg The message object to deserialize into.
+ * @param {!proto.ping.PingResponse} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.PingResponse}
+ * @return {!proto.ping.PingResponse}
  */
-proto.PingResponse.deserializeBinaryFromReader = function(msg, reader) {
+proto.ping.PingResponse.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -124,9 +124,9 @@ proto.PingResponse.deserializeBinaryFromReader = function(msg, reader) {
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.PingResponse.prototype.serializeBinary = function() {
+proto.ping.PingResponse.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.PingResponse.serializeBinaryToWriter(this, writer);
+  proto.ping.PingResponse.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -134,11 +134,11 @@ proto.PingResponse.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.PingResponse} message
+ * @param {!proto.ping.PingResponse} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.PingResponse.serializeBinaryToWriter = function(message, writer) {
+proto.ping.PingResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getRun();
   if (f) {
@@ -154,16 +154,16 @@ proto.PingResponse.serializeBinaryToWriter = function(message, writer) {
  * optional bool run = 1;
  * @return {boolean}
  */
-proto.PingResponse.prototype.getRun = function() {
+proto.ping.PingResponse.prototype.getRun = function() {
   return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 1, false));
 };
 
 
 /**
  * @param {boolean} value
- * @return {!proto.PingResponse} returns this
+ * @return {!proto.ping.PingResponse} returns this
  */
-proto.PingResponse.prototype.setRun = function(value) {
+proto.ping.PingResponse.prototype.setRun = function(value) {
   return jspb.Message.setProto3BooleanField(this, 1, value);
 };
 

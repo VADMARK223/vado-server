@@ -11,7 +11,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-goog.provide('proto.Empty');
+goog.provide('proto.chat.Empty');
 
 goog.require('jspb.BinaryReader');
 goog.require('jspb.BinaryWriter');
@@ -27,16 +27,16 @@ goog.require('jspb.Message');
  * @extends {jspb.Message}
  * @constructor
  */
-proto.Empty = function(opt_data) {
+proto.chat.Empty = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.Empty, jspb.Message);
+goog.inherits(proto.chat.Empty, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.Empty.displayName = 'proto.Empty';
+  proto.chat.Empty.displayName = 'proto.chat.Empty';
 }
 
 
@@ -54,8 +54,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.Empty.prototype.toObject = function(opt_includeInstance) {
-  return proto.Empty.toObject(opt_includeInstance, this);
+proto.chat.Empty.prototype.toObject = function(opt_includeInstance) {
+  return proto.chat.Empty.toObject(opt_includeInstance, this);
 };
 
 
@@ -64,11 +64,11 @@ proto.Empty.prototype.toObject = function(opt_includeInstance) {
  * @param {boolean|undefined} includeInstance Deprecated. Whether to include
  *     the JSPB instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.Empty} msg The msg instance to transform.
+ * @param {!proto.chat.Empty} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.Empty.toObject = function(includeInstance, msg) {
+proto.chat.Empty.toObject = function(includeInstance, msg) {
   var f, obj = {
 
   };
@@ -84,23 +84,23 @@ proto.Empty.toObject = function(includeInstance, msg) {
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.Empty}
+ * @return {!proto.chat.Empty}
  */
-proto.Empty.deserializeBinary = function(bytes) {
+proto.chat.Empty.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.Empty;
-  return proto.Empty.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.chat.Empty;
+  return proto.chat.Empty.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.Empty} msg The message object to deserialize into.
+ * @param {!proto.chat.Empty} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.Empty}
+ * @return {!proto.chat.Empty}
  */
-proto.Empty.deserializeBinaryFromReader = function(msg, reader) {
+proto.chat.Empty.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -120,9 +120,9 @@ proto.Empty.deserializeBinaryFromReader = function(msg, reader) {
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.Empty.prototype.serializeBinary = function() {
+proto.chat.Empty.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.Empty.serializeBinaryToWriter(this, writer);
+  proto.chat.Empty.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -130,11 +130,11 @@ proto.Empty.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.Empty} message
+ * @param {!proto.chat.Empty} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.Empty.serializeBinaryToWriter = function(message, writer) {
+proto.chat.Empty.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
 };
 

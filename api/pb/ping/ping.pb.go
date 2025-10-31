@@ -71,11 +71,11 @@ var File_ping_proto protoreflect.FileDescriptor
 const file_ping_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"ping.proto\x1a\x1bgoogle/protobuf/empty.proto\" \n" +
+	"ping.proto\x12\x04ping\x1a\x1bgoogle/protobuf/empty.proto\" \n" +
 	"\fPingResponse\x12\x10\n" +
-	"\x03run\x18\x01 \x01(\bR\x03run2<\n" +
-	"\vPingService\x12-\n" +
-	"\x04Ping\x12\x16.google.protobuf.Empty\x1a\r.PingResponseB\x12Z\x10api/pb/ping;pingb\x06proto3"
+	"\x03run\x18\x01 \x01(\bR\x03run2A\n" +
+	"\vPingService\x122\n" +
+	"\x04Ping\x12\x16.google.protobuf.Empty\x1a\x12.ping.PingResponseB\x12Z\x10api/pb/ping;pingb\x06proto3"
 
 var (
 	file_ping_proto_rawDescOnce sync.Once
@@ -91,12 +91,12 @@ func file_ping_proto_rawDescGZIP() []byte {
 
 var file_ping_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_ping_proto_goTypes = []any{
-	(*PingResponse)(nil),  // 0: PingResponse
+	(*PingResponse)(nil),  // 0: ping.PingResponse
 	(*emptypb.Empty)(nil), // 1: google.protobuf.Empty
 }
 var file_ping_proto_depIdxs = []int32{
-	1, // 0: PingService.Ping:input_type -> google.protobuf.Empty
-	0, // 1: PingService.Ping:output_type -> PingResponse
+	1, // 0: ping.PingService.Ping:input_type -> google.protobuf.Empty
+	0, // 1: ping.PingService.Ping:output_type -> ping.PingResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

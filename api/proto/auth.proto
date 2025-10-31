@@ -2,6 +2,8 @@ syntax = "proto3";
 
 option go_package = "api/pb/auth;auth";
 
+package auth;
+
 service AuthService {
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc Refresh(RefreshRequest) returns (LoginResponse);

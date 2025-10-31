@@ -20,7 +20,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PingService_Ping_FullMethodName = "/PingService/Ping"
+	PingService_Ping_FullMethodName = "/ping.PingService/Ping"
 )
 
 // PingServiceClient is the client API for PingService service.
@@ -109,7 +109,7 @@ func _PingService_Ping_Handler(srv interface{}, ctx context.Context, dec func(in
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var PingService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "PingService",
+	ServiceName: "ping.PingService",
 	HandlerType: (*PingServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

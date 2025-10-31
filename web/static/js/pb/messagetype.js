@@ -11,12 +11,12 @@
 /* eslint-disable */
 // @ts-nocheck
 
-goog.provide('proto.MessageType');
+goog.provide('proto.chat.MessageType');
 
 /**
  * @enum {number}
  */
-proto.MessageType = {
+proto.chat.MessageType = {
   MESSAGE_UNKNOWN: 0,
   MESSAGE_USER: 1,
   MESSAGE_SYSTEM: 2,

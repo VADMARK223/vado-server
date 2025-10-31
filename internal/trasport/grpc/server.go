@@ -85,7 +85,7 @@ func NewServer(ctx *app.Context, port string) (*Server, error) {
 			if wrappedGrpc.IsGrpcWebRequest(r) ||
 				wrappedGrpc.IsAcceptableGrpcCorsRequest(r) ||
 				wrappedGrpc.IsGrpcWebSocketRequest(r) {
-				s.log.Debug("Passing to wrappedGrpc")
+				s.log.Debugw("gRPC-Web request", "content-type", r.Header.Get("content-type"))
 				wrappedGrpc.ServeHTTP(w, r)
 				return
 			}

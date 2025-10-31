@@ -190,7 +190,7 @@ var File_auth_proto protoreflect.FileDescriptor
 const file_auth_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"auth.proto\"F\n" +
+	"auth.proto\x12\x04auth\"F\n" +
 	"\fLoginRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"v\n" +
@@ -200,10 +200,10 @@ const file_auth_proto_rawDesc = "" +
 	"\x05token\x18\x03 \x01(\tR\x05token\x12#\n" +
 	"\rrefresh_token\x18\x04 \x01(\tR\frefreshToken\"5\n" +
 	"\x0eRefreshRequest\x12#\n" +
-	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken2a\n" +
-	"\vAuthService\x12&\n" +
-	"\x05Login\x12\r.LoginRequest\x1a\x0e.LoginResponse\x12*\n" +
-	"\aRefresh\x12\x0f.RefreshRequest\x1a\x0e.LoginResponseB\x12Z\x10api/pb/auth;authb\x06proto3"
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken2u\n" +
+	"\vAuthService\x120\n" +
+	"\x05Login\x12\x12.auth.LoginRequest\x1a\x13.auth.LoginResponse\x124\n" +
+	"\aRefresh\x12\x14.auth.RefreshRequest\x1a\x13.auth.LoginResponseB\x12Z\x10api/pb/auth;authb\x06proto3"
 
 var (
 	file_auth_proto_rawDescOnce sync.Once
@@ -219,15 +219,15 @@ func file_auth_proto_rawDescGZIP() []byte {
 
 var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_auth_proto_goTypes = []any{
-	(*LoginRequest)(nil),   // 0: LoginRequest
-	(*LoginResponse)(nil),  // 1: LoginResponse
-	(*RefreshRequest)(nil), // 2: RefreshRequest
+	(*LoginRequest)(nil),   // 0: auth.LoginRequest
+	(*LoginResponse)(nil),  // 1: auth.LoginResponse
+	(*RefreshRequest)(nil), // 2: auth.RefreshRequest
 }
 var file_auth_proto_depIdxs = []int32{
-	0, // 0: AuthService.Login:input_type -> LoginRequest
-	2, // 1: AuthService.Refresh:input_type -> RefreshRequest
-	1, // 2: AuthService.Login:output_type -> LoginResponse
-	1, // 3: AuthService.Refresh:output_type -> LoginResponse
+	0, // 0: auth.AuthService.Login:input_type -> auth.LoginRequest
+	2, // 1: auth.AuthService.Refresh:input_type -> auth.RefreshRequest
+	1, // 2: auth.AuthService.Login:output_type -> auth.LoginResponse
+	1, // 3: auth.AuthService.Refresh:output_type -> auth.LoginResponse
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

@@ -11,7 +11,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-goog.provide('proto.LoginRequest');
+goog.provide('proto.auth.LoginRequest');
 
 goog.require('jspb.BinaryReader');
 goog.require('jspb.BinaryWriter');
@@ -27,16 +27,16 @@ goog.require('jspb.Message');
  * @extends {jspb.Message}
  * @constructor
  */
-proto.LoginRequest = function(opt_data) {
+proto.auth.LoginRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.LoginRequest, jspb.Message);
+goog.inherits(proto.auth.LoginRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.LoginRequest.displayName = 'proto.LoginRequest';
+  proto.auth.LoginRequest.displayName = 'proto.auth.LoginRequest';
 }
 
 
@@ -54,8 +54,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.LoginRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.LoginRequest.toObject(opt_includeInstance, this);
+proto.auth.LoginRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.auth.LoginRequest.toObject(opt_includeInstance, this);
 };
 
 
@@ -64,11 +64,11 @@ proto.LoginRequest.prototype.toObject = function(opt_includeInstance) {
  * @param {boolean|undefined} includeInstance Deprecated. Whether to include
  *     the JSPB instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.LoginRequest} msg The msg instance to transform.
+ * @param {!proto.auth.LoginRequest} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.LoginRequest.toObject = function(includeInstance, msg) {
+proto.auth.LoginRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
 username: jspb.Message.getFieldWithDefault(msg, 1, ""),
 password: jspb.Message.getFieldWithDefault(msg, 2, "")
@@ -85,23 +85,23 @@ password: jspb.Message.getFieldWithDefault(msg, 2, "")
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.LoginRequest}
+ * @return {!proto.auth.LoginRequest}
  */
-proto.LoginRequest.deserializeBinary = function(bytes) {
+proto.auth.LoginRequest.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.LoginRequest;
-  return proto.LoginRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.auth.LoginRequest;
+  return proto.auth.LoginRequest.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.LoginRequest} msg The message object to deserialize into.
+ * @param {!proto.auth.LoginRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.LoginRequest}
+ * @return {!proto.auth.LoginRequest}
  */
-proto.LoginRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.auth.LoginRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -129,9 +129,9 @@ proto.LoginRequest.deserializeBinaryFromReader = function(msg, reader) {
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.LoginRequest.prototype.serializeBinary = function() {
+proto.auth.LoginRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.LoginRequest.serializeBinaryToWriter(this, writer);
+  proto.auth.LoginRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -139,11 +139,11 @@ proto.LoginRequest.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.LoginRequest} message
+ * @param {!proto.auth.LoginRequest} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.LoginRequest.serializeBinaryToWriter = function(message, writer) {
+proto.auth.LoginRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getUsername();
   if (f.length > 0) {
@@ -166,16 +166,16 @@ proto.LoginRequest.serializeBinaryToWriter = function(message, writer) {
  * optional string username = 1;
  * @return {string}
  */
-proto.LoginRequest.prototype.getUsername = function() {
+proto.auth.LoginRequest.prototype.getUsername = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /**
  * @param {string} value
- * @return {!proto.LoginRequest} returns this
+ * @return {!proto.auth.LoginRequest} returns this
  */
-proto.LoginRequest.prototype.setUsername = function(value) {
+proto.auth.LoginRequest.prototype.setUsername = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
 
@@ -184,16 +184,16 @@ proto.LoginRequest.prototype.setUsername = function(value) {
  * optional string password = 2;
  * @return {string}
  */
-proto.LoginRequest.prototype.getPassword = function() {
+proto.auth.LoginRequest.prototype.getPassword = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /**
  * @param {string} value
- * @return {!proto.LoginRequest} returns this
+ * @return {!proto.auth.LoginRequest} returns this
  */
-proto.LoginRequest.prototype.setPassword = function(value) {
+proto.auth.LoginRequest.prototype.setPassword = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
 };
 

@@ -113,13 +113,13 @@ var File_hello_proto protoreflect.FileDescriptor
 
 const file_hello_proto_rawDesc = "" +
 	"\n" +
-	"\vhello.proto\"\"\n" +
+	"\vhello.proto\x12\x05hello\"\"\n" +
 	"\fHelloRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\")\n" +
 	"\rHelloResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage29\n" +
-	"\fHelloService\x12)\n" +
-	"\bSayHello\x12\r.HelloRequest\x1a\x0e.HelloResponseB\x14Z\x12api/pb/hello;hellob\x06proto3"
+	"\amessage\x18\x01 \x01(\tR\amessage2E\n" +
+	"\fHelloService\x125\n" +
+	"\bSayHello\x12\x13.hello.HelloRequest\x1a\x14.hello.HelloResponseB\x14Z\x12api/pb/hello;hellob\x06proto3"
 
 var (
 	file_hello_proto_rawDescOnce sync.Once
@@ -135,12 +135,12 @@ func file_hello_proto_rawDescGZIP() []byte {
 
 var file_hello_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_hello_proto_goTypes = []any{
-	(*HelloRequest)(nil),  // 0: HelloRequest
-	(*HelloResponse)(nil), // 1: HelloResponse
+	(*HelloRequest)(nil),  // 0: hello.HelloRequest
+	(*HelloResponse)(nil), // 1: hello.HelloResponse
 }
 var file_hello_proto_depIdxs = []int32{
-	0, // 0: HelloService.SayHello:input_type -> HelloRequest
-	1, // 1: HelloService.SayHello:output_type -> HelloResponse
+	0, // 0: hello.HelloService.SayHello:input_type -> hello.HelloRequest
+	1, // 1: hello.HelloService.SayHello:output_type -> hello.HelloResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

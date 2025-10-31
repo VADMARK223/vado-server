@@ -11,7 +11,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-goog.provide('proto.HelloResponse');
+goog.provide('proto.hello.HelloResponse');
 
 goog.require('jspb.BinaryReader');
 goog.require('jspb.BinaryWriter');
@@ -27,16 +27,16 @@ goog.require('jspb.Message');
  * @extends {jspb.Message}
  * @constructor
  */
-proto.HelloResponse = function(opt_data) {
+proto.hello.HelloResponse = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.HelloResponse, jspb.Message);
+goog.inherits(proto.hello.HelloResponse, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.HelloResponse.displayName = 'proto.HelloResponse';
+  proto.hello.HelloResponse.displayName = 'proto.hello.HelloResponse';
 }
 
 
@@ -54,8 +54,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.HelloResponse.prototype.toObject = function(opt_includeInstance) {
-  return proto.HelloResponse.toObject(opt_includeInstance, this);
+proto.hello.HelloResponse.prototype.toObject = function(opt_includeInstance) {
+  return proto.hello.HelloResponse.toObject(opt_includeInstance, this);
 };
 
 
@@ -64,11 +64,11 @@ proto.HelloResponse.prototype.toObject = function(opt_includeInstance) {
  * @param {boolean|undefined} includeInstance Deprecated. Whether to include
  *     the JSPB instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.HelloResponse} msg The msg instance to transform.
+ * @param {!proto.hello.HelloResponse} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.HelloResponse.toObject = function(includeInstance, msg) {
+proto.hello.HelloResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
 message: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
@@ -84,23 +84,23 @@ message: jspb.Message.getFieldWithDefault(msg, 1, "")
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.HelloResponse}
+ * @return {!proto.hello.HelloResponse}
  */
-proto.HelloResponse.deserializeBinary = function(bytes) {
+proto.hello.HelloResponse.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.HelloResponse;
-  return proto.HelloResponse.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.hello.HelloResponse;
+  return proto.hello.HelloResponse.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.HelloResponse} msg The message object to deserialize into.
+ * @param {!proto.hello.HelloResponse} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.HelloResponse}
+ * @return {!proto.hello.HelloResponse}
  */
-proto.HelloResponse.deserializeBinaryFromReader = function(msg, reader) {
+proto.hello.HelloResponse.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -124,9 +124,9 @@ proto.HelloResponse.deserializeBinaryFromReader = function(msg, reader) {
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.HelloResponse.prototype.serializeBinary = function() {
+proto.hello.HelloResponse.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.HelloResponse.serializeBinaryToWriter(this, writer);
+  proto.hello.HelloResponse.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -134,11 +134,11 @@ proto.HelloResponse.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.HelloResponse} message
+ * @param {!proto.hello.HelloResponse} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.HelloResponse.serializeBinaryToWriter = function(message, writer) {
+proto.hello.HelloResponse.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getMessage();
   if (f.length > 0) {
@@ -154,16 +154,16 @@ proto.HelloResponse.serializeBinaryToWriter = function(message, writer) {
  * optional string message = 1;
  * @return {string}
  */
-proto.HelloResponse.prototype.getMessage = function() {
+proto.hello.HelloResponse.prototype.getMessage = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /**
  * @param {string} value
- * @return {!proto.HelloResponse} returns this
+ * @return {!proto.hello.HelloResponse} returns this
  */
-proto.HelloResponse.prototype.setMessage = function(value) {
+proto.hello.HelloResponse.prototype.setMessage = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
 

@@ -11,7 +11,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-goog.provide('proto.RefreshRequest');
+goog.provide('proto.auth.RefreshRequest');
 
 goog.require('jspb.BinaryReader');
 goog.require('jspb.BinaryWriter');
@@ -27,16 +27,16 @@ goog.require('jspb.Message');
  * @extends {jspb.Message}
  * @constructor
  */
-proto.RefreshRequest = function(opt_data) {
+proto.auth.RefreshRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.RefreshRequest, jspb.Message);
+goog.inherits(proto.auth.RefreshRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.RefreshRequest.displayName = 'proto.RefreshRequest';
+  proto.auth.RefreshRequest.displayName = 'proto.auth.RefreshRequest';
 }
 
 
@@ -54,8 +54,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.RefreshRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.RefreshRequest.toObject(opt_includeInstance, this);
+proto.auth.RefreshRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.auth.RefreshRequest.toObject(opt_includeInstance, this);
 };
 
 
@@ -64,11 +64,11 @@ proto.RefreshRequest.prototype.toObject = function(opt_includeInstance) {
  * @param {boolean|undefined} includeInstance Deprecated. Whether to include
  *     the JSPB instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.RefreshRequest} msg The msg instance to transform.
+ * @param {!proto.auth.RefreshRequest} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.RefreshRequest.toObject = function(includeInstance, msg) {
+proto.auth.RefreshRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
 refreshToken: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
@@ -84,23 +84,23 @@ refreshToken: jspb.Message.getFieldWithDefault(msg, 1, "")
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.RefreshRequest}
+ * @return {!proto.auth.RefreshRequest}
  */
-proto.RefreshRequest.deserializeBinary = function(bytes) {
+proto.auth.RefreshRequest.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.RefreshRequest;
-  return proto.RefreshRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.auth.RefreshRequest;
+  return proto.auth.RefreshRequest.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.RefreshRequest} msg The message object to deserialize into.
+ * @param {!proto.auth.RefreshRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.RefreshRequest}
+ * @return {!proto.auth.RefreshRequest}
  */
-proto.RefreshRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.auth.RefreshRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -124,9 +124,9 @@ proto.RefreshRequest.deserializeBinaryFromReader = function(msg, reader) {
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.RefreshRequest.prototype.serializeBinary = function() {
+proto.auth.RefreshRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.RefreshRequest.serializeBinaryToWriter(this, writer);
+  proto.auth.RefreshRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -134,11 +134,11 @@ proto.RefreshRequest.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.RefreshRequest} message
+ * @param {!proto.auth.RefreshRequest} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.RefreshRequest.serializeBinaryToWriter = function(message, writer) {
+proto.auth.RefreshRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getRefreshToken();
   if (f.length > 0) {
@@ -154,16 +154,16 @@ proto.RefreshRequest.serializeBinaryToWriter = function(message, writer) {
  * optional string refresh_token = 1;
  * @return {string}
  */
-proto.RefreshRequest.prototype.getRefreshToken = function() {
+proto.auth.RefreshRequest.prototype.getRefreshToken = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /**
  * @param {string} value
- * @return {!proto.RefreshRequest} returns this
+ * @return {!proto.auth.RefreshRequest} returns this
  */
-proto.RefreshRequest.prototype.setRefreshToken = function(value) {
+proto.auth.RefreshRequest.prototype.setRefreshToken = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
 

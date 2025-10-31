@@ -11,7 +11,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-goog.provide('proto.HelloRequest');
+goog.provide('proto.hello.HelloRequest');
 
 goog.require('jspb.BinaryReader');
 goog.require('jspb.BinaryWriter');
@@ -27,16 +27,16 @@ goog.require('jspb.Message');
  * @extends {jspb.Message}
  * @constructor
  */
-proto.HelloRequest = function(opt_data) {
+proto.hello.HelloRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
-goog.inherits(proto.HelloRequest, jspb.Message);
+goog.inherits(proto.hello.HelloRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
   /**
    * @public
    * @override
    */
-  proto.HelloRequest.displayName = 'proto.HelloRequest';
+  proto.hello.HelloRequest.displayName = 'proto.hello.HelloRequest';
 }
 
 
@@ -54,8 +54,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
  *     http://goto/soy-param-migration
  * @return {!Object}
  */
-proto.HelloRequest.prototype.toObject = function(opt_includeInstance) {
-  return proto.HelloRequest.toObject(opt_includeInstance, this);
+proto.hello.HelloRequest.prototype.toObject = function(opt_includeInstance) {
+  return proto.hello.HelloRequest.toObject(opt_includeInstance, this);
 };
 
 
@@ -64,11 +64,11 @@ proto.HelloRequest.prototype.toObject = function(opt_includeInstance) {
  * @param {boolean|undefined} includeInstance Deprecated. Whether to include
  *     the JSPB instance for transitional soy proto support:
  *     http://goto/soy-param-migration
- * @param {!proto.HelloRequest} msg The msg instance to transform.
+ * @param {!proto.hello.HelloRequest} msg The msg instance to transform.
  * @return {!Object}
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.HelloRequest.toObject = function(includeInstance, msg) {
+proto.hello.HelloRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
 name: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
@@ -84,23 +84,23 @@ name: jspb.Message.getFieldWithDefault(msg, 1, "")
 /**
  * Deserializes binary data (in protobuf wire format).
  * @param {jspb.ByteSource} bytes The bytes to deserialize.
- * @return {!proto.HelloRequest}
+ * @return {!proto.hello.HelloRequest}
  */
-proto.HelloRequest.deserializeBinary = function(bytes) {
+proto.hello.HelloRequest.deserializeBinary = function(bytes) {
   var reader = new jspb.BinaryReader(bytes);
-  var msg = new proto.HelloRequest;
-  return proto.HelloRequest.deserializeBinaryFromReader(msg, reader);
+  var msg = new proto.hello.HelloRequest;
+  return proto.hello.HelloRequest.deserializeBinaryFromReader(msg, reader);
 };
 
 
 /**
  * Deserializes binary data (in protobuf wire format) from the
  * given reader into the given message object.
- * @param {!proto.HelloRequest} msg The message object to deserialize into.
+ * @param {!proto.hello.HelloRequest} msg The message object to deserialize into.
  * @param {!jspb.BinaryReader} reader The BinaryReader to use.
- * @return {!proto.HelloRequest}
+ * @return {!proto.hello.HelloRequest}
  */
-proto.HelloRequest.deserializeBinaryFromReader = function(msg, reader) {
+proto.hello.HelloRequest.deserializeBinaryFromReader = function(msg, reader) {
   while (reader.nextField()) {
     if (reader.isEndGroup()) {
       break;
@@ -124,9 +124,9 @@ proto.HelloRequest.deserializeBinaryFromReader = function(msg, reader) {
  * Serializes the message to binary data (in protobuf wire format).
  * @return {!Uint8Array}
  */
-proto.HelloRequest.prototype.serializeBinary = function() {
+proto.hello.HelloRequest.prototype.serializeBinary = function() {
   var writer = new jspb.BinaryWriter();
-  proto.HelloRequest.serializeBinaryToWriter(this, writer);
+  proto.hello.HelloRequest.serializeBinaryToWriter(this, writer);
   return writer.getResultBuffer();
 };
 
@@ -134,11 +134,11 @@ proto.HelloRequest.prototype.serializeBinary = function() {
 /**
  * Serializes the given message to binary data (in protobuf wire
  * format), writing to the given BinaryWriter.
- * @param {!proto.HelloRequest} message
+ * @param {!proto.hello.HelloRequest} message
  * @param {!jspb.BinaryWriter} writer
  * @suppress {unusedLocalVariables} f is only used for nested messages
  */
-proto.HelloRequest.serializeBinaryToWriter = function(message, writer) {
+proto.hello.HelloRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getName();
   if (f.length > 0) {
@@ -154,16 +154,16 @@ proto.HelloRequest.serializeBinaryToWriter = function(message, writer) {
  * optional string name = 1;
  * @return {string}
  */
-proto.HelloRequest.prototype.getName = function() {
+proto.hello.HelloRequest.prototype.getName = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /**
  * @param {string} value
- * @return {!proto.HelloRequest} returns this
+ * @return {!proto.hello.HelloRequest} returns this
  */
-proto.HelloRequest.prototype.setName = function(value) {
+proto.hello.HelloRequest.prototype.setName = function(value) {
   return jspb.Message.setProto3StringField(this, 1, value);
 };
 

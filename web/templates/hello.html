@@ -54,10 +54,10 @@
 
 <script>
     function sayHello() {
-        const client = new proto.HelloServiceClient('http://localhost:8090', null, {
+        const client = new proto.hello.HelloServiceClient('http://localhost:8090', null, {
             'debug': true
         });
-        const req = new proto.HelloRequest();
+        const req = new proto.hello.HelloRequest();
         req.setName(document.getElementById('name').value);
 
         client.sayHello(req, {}, (err, res) => {

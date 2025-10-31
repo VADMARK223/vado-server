@@ -1,5 +1,5 @@
 /**
- * @fileoverview gRPC-Web generated client stub for 
+ * @fileoverview gRPC-Web generated client stub for chat
  * @enhanceable
  * @public
  */
@@ -15,8 +15,8 @@
 // @ts-nocheck
 
 
-goog.provide('proto.ChatServiceClient');
-goog.provide('proto.ChatServicePromiseClient');
+goog.provide('proto.chat.ChatServiceClient');
+goog.provide('proto.chat.ChatServicePromiseClient');
 
 goog.require('grpc.web.MethodDescriptor');
 goog.require('grpc.web.MethodType');
@@ -24,9 +24,9 @@ goog.require('grpc.web.GrpcWebClientBase');
 goog.require('grpc.web.AbstractClientBase');
 goog.require('grpc.web.ClientReadableStream');
 goog.require('grpc.web.RpcError');
-goog.require('proto.ChatMessage');
-goog.require('proto.ChatStreamRequest');
-goog.require('proto.Empty');
+goog.require('proto.chat.ChatMessage');
+goog.require('proto.chat.ChatStreamRequest');
+goog.require('proto.chat.Empty');
 
 goog.requireType('grpc.web.ClientOptions');
 
@@ -42,10 +42,10 @@ goog.scope(function() {
  * @struct
  * @final
  */
-proto.ChatServiceClient =
+proto.chat.ChatServiceClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'text';
+  options.format = 'binary';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client
@@ -68,10 +68,10 @@ proto.ChatServiceClient =
  * @struct
  * @final
  */
-proto.ChatServicePromiseClient =
+proto.chat.ChatServicePromiseClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'text';
+  options.format = 'binary';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client
@@ -89,39 +89,39 @@ proto.ChatServicePromiseClient =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.ChatMessage,
- *   !proto.Empty>}
+ *   !proto.chat.ChatMessage,
+ *   !proto.chat.Empty>}
  */
 const methodDescriptor_ChatService_SendMessage = new grpc.web.MethodDescriptor(
-  '/ChatService/SendMessage',
+  '/chat.ChatService/SendMessage',
   grpc.web.MethodType.UNARY,
-  proto.ChatMessage,
-  proto.Empty,
+  proto.chat.ChatMessage,
+  proto.chat.Empty,
   /**
-   * @param {!proto.ChatMessage} request
+   * @param {!proto.chat.ChatMessage} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  proto.Empty.deserializeBinary
+  proto.chat.Empty.deserializeBinary
 );
 
 
 /**
- * @param {!proto.ChatMessage} request The
+ * @param {!proto.chat.ChatMessage} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.RpcError, ?proto.Empty)}
+ * @param {function(?grpc.web.RpcError, ?proto.chat.Empty)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.Empty>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.chat.Empty>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.ChatServiceClient.prototype.sendMessage =
+proto.chat.ChatServiceClient.prototype.sendMessage =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/ChatService/SendMessage',
+      '/chat.ChatService/SendMessage',
       request,
       metadata || {},
       methodDescriptor_ChatService_SendMessage,
@@ -130,17 +130,17 @@ proto.ChatServiceClient.prototype.sendMessage =
 
 
 /**
- * @param {!proto.ChatMessage} request The
+ * @param {!proto.chat.ChatMessage} request The
  *     request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.Empty>}
+ * @return {!Promise<!proto.chat.Empty>}
  *     Promise that resolves to the response
  */
-proto.ChatServicePromiseClient.prototype.sendMessage =
+proto.chat.ChatServicePromiseClient.prototype.sendMessage =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/ChatService/SendMessage',
+      '/chat.ChatService/SendMessage',
       request,
       metadata || {},
       methodDescriptor_ChatService_SendMessage);
@@ -150,36 +150,36 @@ proto.ChatServicePromiseClient.prototype.sendMessage =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.ChatStreamRequest,
- *   !proto.ChatMessage>}
+ *   !proto.chat.ChatStreamRequest,
+ *   !proto.chat.ChatMessage>}
  */
 const methodDescriptor_ChatService_ChatStream = new grpc.web.MethodDescriptor(
-  '/ChatService/ChatStream',
+  '/chat.ChatService/ChatStream',
   grpc.web.MethodType.SERVER_STREAMING,
-  proto.ChatStreamRequest,
-  proto.ChatMessage,
+  proto.chat.ChatStreamRequest,
+  proto.chat.ChatMessage,
   /**
-   * @param {!proto.ChatStreamRequest} request
+   * @param {!proto.chat.ChatStreamRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
     return request.serializeBinary();
   },
-  proto.ChatMessage.deserializeBinary
+  proto.chat.ChatMessage.deserializeBinary
 );
 
 
 /**
- * @param {!proto.ChatStreamRequest} request The request proto
+ * @param {!proto.chat.ChatStreamRequest} request The request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @return {!grpc.web.ClientReadableStream<!proto.ChatMessage>}
+ * @return {!grpc.web.ClientReadableStream<!proto.chat.ChatMessage>}
  *     The XHR Node Readable Stream
  */
-proto.ChatServiceClient.prototype.chatStream =
+proto.chat.ChatServiceClient.prototype.chatStream =
     function(request, metadata) {
   return this.client_.serverStreaming(this.hostname_ +
-      '/ChatService/ChatStream',
+      '/chat.ChatService/ChatStream',
       request,
       metadata || {},
       methodDescriptor_ChatService_ChatStream);
@@ -187,16 +187,16 @@ proto.ChatServiceClient.prototype.chatStream =
 
 
 /**
- * @param {!proto.ChatStreamRequest} request The request proto
+ * @param {!proto.chat.ChatStreamRequest} request The request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @return {!grpc.web.ClientReadableStream<!proto.ChatMessage>}
+ * @return {!grpc.web.ClientReadableStream<!proto.chat.ChatMessage>}
  *     The XHR Node Readable Stream
  */
-proto.ChatServicePromiseClient.prototype.chatStream =
+proto.chat.ChatServicePromiseClient.prototype.chatStream =
     function(request, metadata) {
   return this.client_.serverStreaming(this.hostname_ +
-      '/ChatService/ChatStream',
+      '/chat.ChatService/ChatStream',
       request,
       metadata || {},
       methodDescriptor_ChatService_ChatStream);

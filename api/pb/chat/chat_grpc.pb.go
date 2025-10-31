@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ChatService_SendMessage_FullMethodName = "/ChatService/SendMessage"
-	ChatService_ChatStream_FullMethodName  = "/ChatService/ChatStream"
+	ChatService_SendMessage_FullMethodName = "/chat.ChatService/SendMessage"
+	ChatService_ChatStream_FullMethodName  = "/chat.ChatService/ChatStream"
 )
 
 // ChatServiceClient is the client API for ChatService service.
@@ -144,7 +144,7 @@ type ChatService_ChatStreamServer = grpc.ServerStreamingServer[ChatMessage]
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ChatService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ChatService",
+	ServiceName: "chat.ChatService",
 	HandlerType: (*ChatServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
