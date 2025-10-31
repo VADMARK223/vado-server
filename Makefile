@@ -1,22 +1,22 @@
 PROJECT_NAME = vado-app
 
-up-all:
+all-up:
 	docker compose -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.kafka.yml up -d
 
-down-all:
+all-down:
 	docker compose -p $(PROJECT_NAME) down
+
+kafka-up:
+	docker compose -f docker-compose.kafka.yml up -d
+
+kafka-down:
+	docker compose -f docker-compose.kafka.yml down
 
 up-main:
 	docker compose -f docker-compose.yml up -d
 
 down-main:
 	docker compose -f docker-compose.yml down
-
-up-kafka:
-	docker compose -f docker-compose.kafka.yml up -d
-
-down-kafka:
-	docker compose -f docker-compose.kafka.yml down
 
 ps:
 	docker compose -p $(PROJECT_NAME) ps vado-server
@@ -41,7 +41,7 @@ clean:
 
 
 PROTO_DIR = api/proto
-OUT_DIR = web/static
+OUT_DIR = web/static/js/pb
 
 PROTOC = protoc
 GRPC_WEB_PLUGIN = $(shell which protoc-gen-grpc-web)
@@ -52,21 +52,20 @@ PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
 
 all: web-proto
 
-# Генерация JS-клиентов для всех .proto файлов
 web-proto:
-	@echo "🚀 Генерация gRPC-Web JS файлов..."
+	@echo "Generating gRPC-Web JS files.."
 	@mkdir -p $(OUT_DIR)
 	@for file in $(PROTO_FILES); do \
-		echo "  -> Компиляция $$file"; \
+		echo "  -> Compilation $$file"; \
 		$(PROTOC) -I=$(PROTO_DIR) $$file \
 			--plugin=protoc-gen-grpc-web=$(GRPC_WEB_PLUGIN) \
 			--grpc-web_out=import_style=commonjs,mode=grpcwebtext:$(OUT_DIR); \
 	done
-	@echo "✅ Генерация завершена. Файлы в $(OUT_DIR)"
+	@echo "Generation complete. Files in $(OUT_DIR)"
 
 # Очистка сгенерированных файлов
 clean:
-	@echo "🧹 Очистка $(OUT_DIR)..."
+	@echo "Clear $(OUT_DIR)..."
 	rm -rf $(OUT_DIR)/*.js
 
 YELLOW := \033[1;33m
@@ -75,15 +74,16 @@ RESET := \033[0m
 
 help:
 	@echo "$(YELLOW)Available command:$(RESET)"
-	@echo "  $(GREEN)make up-all$(RESET)          - start all containers"
-	@echo "  $(GREEN)make down-all$(RESET)        - stop all containers"
-	@echo "  $(GREEN)make up-main$(RESET)         - start server and postgres containers"
+	@echo "  $(GREEN)make all-ud$(RESET)          - start all containers"
+	@echo "  $(GREEN)make all-down$(RESET)        - stop all containers"
+	@echo "  $(GREEN)make kafka-up$(RESET)        - start kafka and kafka UI containers"
+	@echo "  $(GREEN)make kafka-down$(RESET)      - stop kafka and kafka UI containers"
 	@echo "  $(GREEN)make down-main$(RESET)       - stop server and postgres containers"
-	@echo "  $(GREEN)make up-kafka$(RESET)        - start kafka and kafka UI containers"
-	@echo "  $(GREEN)make down-kafka$(RESET)      - stop kafka and kafka UI containers"
+	@echo "  $(GREEN)make up-main$(RESET)         - start server and postgres containers"
 	@echo "  $(GREEN)make logs$(RESET)            - show logs"
 	@echo "  $(GREEN)make rebuild$(RESET)         - rebuild everything (fresh DB)"
 	@echo "  $(GREEN)make rebuild-server$(RESET)  - rebuild only Go server"
 	@echo "  $(GREEN)make psql$(RESET)            - open psql shell"
 	@echo "  $(GREEN)make clean$(RESET)           - clean Docker cache"
+	@echo "  $(GREEN)make web-proto$(RESET)       - generating gRPC-Web JS files"
 .DEFAULT_GOAL := help
