@@ -15,23 +15,14 @@
 // @ts-nocheck
 
 
-goog.provide('proto.ping.PingServiceClient');
-goog.provide('proto.ping.PingServicePromiseClient');
 
-goog.require('grpc.web.MethodDescriptor');
-goog.require('grpc.web.MethodType');
-goog.require('grpc.web.GrpcWebClientBase');
-goog.require('grpc.web.AbstractClientBase');
-goog.require('grpc.web.ClientReadableStream');
-goog.require('grpc.web.RpcError');
-goog.require('proto.google.protobuf.Empty');
-goog.require('proto.ping.PingResponse');
-
-goog.requireType('grpc.web.ClientOptions');
+const grpc = {};
+grpc.web = require('grpc-web');
 
 
-
-goog.scope(function() {
+var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js')
+const proto = {};
+proto.ping = require('./ping_pb.js');
 
 /**
  * @param {string} hostname
@@ -94,7 +85,7 @@ proto.ping.PingServicePromiseClient =
 const methodDescriptor_PingService_Ping = new grpc.web.MethodDescriptor(
   '/ping.PingService/Ping',
   grpc.web.MethodType.UNARY,
-  proto.google.protobuf.Empty,
+  google_protobuf_empty_pb.Empty,
   proto.ping.PingResponse,
   /**
    * @param {!proto.google.protobuf.Empty} request
@@ -146,5 +137,5 @@ proto.ping.PingServicePromiseClient.prototype.ping =
 };
 
 
-}); // goog.scope
+module.exports = proto.ping;
 

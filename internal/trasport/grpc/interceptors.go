@@ -28,10 +28,7 @@ func AuthInterceptor(
 	if strings.Contains(info.FullMethod, "Refresh") {
 		return handler(ctx, req)
 	}
-
-	println("111111")
 	if strings.Contains(info.FullMethod, "HelloService") {
-		println("22222")
 		return handler(ctx, req)
 	}
 

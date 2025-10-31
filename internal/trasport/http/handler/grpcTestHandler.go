@@ -32,8 +32,7 @@ func (h *GrpcTestHandler) ShowTestPage(c *gin.Context) {
 		})
 	}
 
-	//c.HTML(http.StatusOK, "grpc-test.html", gin.H{
-	c.HTML(http.StatusOK, "hello.html", gin.H{
+	c.HTML(http.StatusOK, "grpc-test.html", gin.H{
 		code.IsAuth: isAuth,
 		code.UserId: userID,
 	})

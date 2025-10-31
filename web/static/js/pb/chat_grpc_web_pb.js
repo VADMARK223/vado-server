@@ -15,24 +15,12 @@
 // @ts-nocheck
 
 
-goog.provide('proto.chat.ChatServiceClient');
-goog.provide('proto.chat.ChatServicePromiseClient');
 
-goog.require('grpc.web.MethodDescriptor');
-goog.require('grpc.web.MethodType');
-goog.require('grpc.web.GrpcWebClientBase');
-goog.require('grpc.web.AbstractClientBase');
-goog.require('grpc.web.ClientReadableStream');
-goog.require('grpc.web.RpcError');
-goog.require('proto.chat.ChatMessage');
-goog.require('proto.chat.ChatStreamRequest');
-goog.require('proto.chat.Empty');
+const grpc = {};
+grpc.web = require('grpc-web');
 
-goog.requireType('grpc.web.ClientOptions');
-
-
-
-goog.scope(function() {
+const proto = {};
+proto.chat = require('./chat_pb.js');
 
 /**
  * @param {string} hostname
@@ -203,5 +191,5 @@ proto.chat.ChatServicePromiseClient.prototype.chatStream =
 };
 
 
-}); // goog.scope
+module.exports = proto.chat;
 

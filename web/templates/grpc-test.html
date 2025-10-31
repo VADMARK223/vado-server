@@ -16,38 +16,53 @@
         <div>
             <button class="btn" onclick="testHealth()">Test Health</button>
             <button class="btn" onclick="testPing()">Test Ping (gRPC-Web)</button>
-            <button class="btn" onclick="testSayHello()">Say hello</button>
+            <button class="btn" onclick="testSayHelloRaw()">Say hello</button>
         </div>
 
         <pre id="result"></pre>
     </div>
 
-    <!-- Google Protobuf library -->
-    <script src="https://cdn.jsdelivr.net/npm/google-protobuf@3.21.2/google-protobuf.js"></script>
-
-    <!-- CommonJS wrapper with gRPC-Web implementation -->
-    <script src="/static/js/grpc-client.js"></script>
-
-    <!-- Generated proto files -->
-    <script src="/static/js/pb/hello_pb.js"></script>
-    <script>
-        // Регистрируем загруженный модуль hello_pb
-        if (window.module && window.module.exports) {
-            window.registerProtoModule('hello_pb.js', window.module.exports);
-        }
-        // Сбрасываем currentModule для следующего файла
-        window.exports = {};
-    </script>
-    <script src="/static/js/pb/hello_grpc_web_pb.js"></script>
-    <script>
-        // Регистрируем загруженный модуль hello_grpc_web_pb
-        if (window.module && window.module.exports) {
-            window.registerProtoModule('hello_grpc_web_pb.js', window.module.exports);
-        }
-    </script>
-
-    <!-- Your app logic -->
     <script src="/static/js/grpc.js"></script>
+
+<!--    <script src="/static/js/pb/hello_pb.js"></script>-->
+    <script>
+        async function testSayHelloRaw() {
+            const result = document.getElementById('result');
+            result.textContent = 'Calling say hello...\n';
+
+            try {
+                const body = new Uint8Array([0, 0, 0, 0, 0]);
+
+                const response = await fetch(GRPC_WEB_URL + '/hello.HelloService/SayHello', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/grpc-web+proto',
+                        'X-Grpc-Web': '1',
+                        'X-User-Agent': 'grpc-web-javascript/0.1'
+                    },
+                    body: body
+                });
+
+                result.textContent = `✅ Hello Response\n`;
+                result.textContent += `Status: ${response.status}\n`;
+                result.textContent += `Content-Type: ${response.headers.get('content-type')}\n\n`;
+
+                const arrayBuffer = await response.arrayBuffer();
+                const bytes = new Uint8Array(arrayBuffer);
+
+                result.textContent += `Response bytes (${bytes.length}): ${Array.from(bytes).join(', ')}\n\n`;
+
+                const text = new TextDecoder().decode(bytes);
+                result.textContent += `As text: ${text}`;
+
+                if (response.ok) {
+                    result.textContent += '\n\n✅ Server responded successfully!';
+                }
+            } catch (e) {
+                result.textContent = '❌ Error: ' + e.message + '\n' + e.stack;
+            }
+        }
+    </script>
 </main>
 
 <footer>

@@ -15,23 +15,12 @@
 // @ts-nocheck
 
 
-goog.provide('proto.hello.HelloServiceClient');
-goog.provide('proto.hello.HelloServicePromiseClient');
 
-goog.require('grpc.web.MethodDescriptor');
-goog.require('grpc.web.MethodType');
-goog.require('grpc.web.GrpcWebClientBase');
-goog.require('grpc.web.AbstractClientBase');
-goog.require('grpc.web.ClientReadableStream');
-goog.require('grpc.web.RpcError');
-goog.require('proto.hello.HelloRequest');
-goog.require('proto.hello.HelloResponse');
+const grpc = {};
+grpc.web = require('grpc-web');
 
-goog.requireType('grpc.web.ClientOptions');
-
-
-
-goog.scope(function() {
+const proto = {};
+proto.hello = require('./hello_pb.js');
 
 /**
  * @param {string} hostname
@@ -146,5 +135,5 @@ proto.hello.HelloServicePromiseClient.prototype.sayHello =
 };
 
 
-}); // goog.scope
+module.exports = proto.hello;
 
