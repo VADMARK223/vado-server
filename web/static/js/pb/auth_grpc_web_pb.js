@@ -15,11 +15,24 @@
 // @ts-nocheck
 
 
+goog.provide('proto.AuthServiceClient');
+goog.provide('proto.AuthServicePromiseClient');
 
-const grpc = {};
-grpc.web = require('grpc-web');
+goog.require('grpc.web.MethodDescriptor');
+goog.require('grpc.web.MethodType');
+goog.require('grpc.web.GrpcWebClientBase');
+goog.require('grpc.web.AbstractClientBase');
+goog.require('grpc.web.ClientReadableStream');
+goog.require('grpc.web.RpcError');
+goog.require('proto.LoginRequest');
+goog.require('proto.LoginResponse');
+goog.require('proto.RefreshRequest');
 
-const proto = require('./auth_pb.js');
+goog.requireType('grpc.web.ClientOptions');
+
+
+
+goog.scope(function() {
 
 /**
  * @param {string} hostname
@@ -195,5 +208,5 @@ proto.AuthServicePromiseClient.prototype.refresh =
 };
 
 
-module.exports = proto;
+}); // goog.scope
 

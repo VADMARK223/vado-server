@@ -16,11 +16,37 @@
         <div>
             <button class="btn" onclick="testHealth()">Test Health</button>
             <button class="btn" onclick="testPing()">Test Ping (gRPC-Web)</button>
+            <button class="btn" onclick="testSayHello()">Say hello</button>
         </div>
 
         <pre id="result"></pre>
     </div>
 
+    <!-- Google Protobuf library -->
+    <script src="https://cdn.jsdelivr.net/npm/google-protobuf@3.21.2/google-protobuf.js"></script>
+
+    <!-- CommonJS wrapper with gRPC-Web implementation -->
+    <script src="/static/js/grpc-client.js"></script>
+
+    <!-- Generated proto files -->
+    <script src="/static/js/pb/hello_pb.js"></script>
+    <script>
+        // Регистрируем загруженный модуль hello_pb
+        if (window.module && window.module.exports) {
+            window.registerProtoModule('hello_pb.js', window.module.exports);
+        }
+        // Сбрасываем currentModule для следующего файла
+        window.exports = {};
+    </script>
+    <script src="/static/js/pb/hello_grpc_web_pb.js"></script>
+    <script>
+        // Регистрируем загруженный модуль hello_grpc_web_pb
+        if (window.module && window.module.exports) {
+            window.registerProtoModule('hello_grpc_web_pb.js', window.module.exports);
+        }
+    </script>
+
+    <!-- Your app logic -->
     <script src="/static/js/grpc.js"></script>
 </main>
 

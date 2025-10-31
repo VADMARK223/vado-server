@@ -44,7 +44,7 @@ func NewServer(ctx *app.Context, port string) (*Server, error) {
 	userSvc := user.NewService(gorm.NewUserRepo(ctx), token.AccessAliveMinutes*time.Minute)
 
 	pbAuth.RegisterAuthServiceServer(s.grpcServer, NewAuthServer(userSvc))
-	pbHello.RegisterHelloServiceServer(s.grpcServer, &HelloServer{})
+	pbHello.RegisterHelloServiceServer(s.grpcServer, NewHelloServer(ctx.Log))
 	pbPing.RegisterPingServiceServer(s.grpcServer, &PingServer{})
 	producer := kafka.NewProducer(topic.ChatLog, ctx.Log)
 	pbChat.RegisterChatServiceServer(s.grpcServer, New(ctx.Log, producer))
@@ -55,18 +55,23 @@ func NewServer(ctx *app.Context, port string) (*Server, error) {
 			ctx.Log.Debugw("origin", "origin", origin)
 			return true
 		}),
+		grpcweb.WithAllowedRequestHeaders([]string{
+			"x-grpc-web", "content-type", "x-user-agent", "authorization",
+		}),
 	)
 	portHttp := "8090"
 	httpServer := &http.Server{
 		Addr: ":" + portHttp,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			s.log.Debugw("HTTP request", "method", r.Method, "path", r.URL.Path, "headers", r.Header)
 			// CORS заголовки
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-User-Agent, X-Grpc-Web")
+			w.Header().Set("Access-Control-Allow-Headers",
+				"x-grpc-web, content-type, x-user-agent, authorization, accept, x-requested-with")
 			w.Header().Set("Access-Control-Expose-Headers", "Grpc-Status, Grpc-Message, Grpc-Encoding, Grpc-Accept-Encoding")
 
-			if r.Method == "OPTIONS" {
+			if r.Method == http.MethodOptions {
 				w.WriteHeader(http.StatusOK)
 				return
 			}
@@ -77,7 +82,10 @@ func NewServer(ctx *app.Context, port string) (*Server, error) {
 				return
 			}
 
-			if wrappedGrpc.IsGrpcWebRequest(r) || wrappedGrpc.IsAcceptableGrpcCorsRequest(r) || wrappedGrpc.IsGrpcWebSocketRequest(r) {
+			if wrappedGrpc.IsGrpcWebRequest(r) ||
+				wrappedGrpc.IsAcceptableGrpcCorsRequest(r) ||
+				wrappedGrpc.IsGrpcWebSocketRequest(r) {
+				s.log.Debug("Passing to wrappedGrpc")
 				wrappedGrpc.ServeHTTP(w, r)
 				return
 			}

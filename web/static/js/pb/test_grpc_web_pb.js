@@ -15,11 +15,23 @@
 // @ts-nocheck
 
 
+goog.provide('proto.TestServiceClient');
+goog.provide('proto.TestServicePromiseClient');
 
-const grpc = {};
-grpc.web = require('grpc-web');
+goog.require('grpc.web.MethodDescriptor');
+goog.require('grpc.web.MethodType');
+goog.require('grpc.web.GrpcWebClientBase');
+goog.require('grpc.web.AbstractClientBase');
+goog.require('grpc.web.ClientReadableStream');
+goog.require('grpc.web.RpcError');
+goog.require('proto.TestRequest');
+goog.require('proto.TestResponse');
 
-const proto = require('./test_pb.js');
+goog.requireType('grpc.web.ClientOptions');
+
+
+
+goog.scope(function() {
 
 /**
  * @param {string} hostname
@@ -134,5 +146,5 @@ proto.TestServicePromiseClient.prototype.sayTest =
 };
 
 
-module.exports = proto;
+}); // goog.scope
 

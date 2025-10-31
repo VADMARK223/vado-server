@@ -66,11 +66,16 @@ web-proto:
 	@for file in $(PROTO_FILES); do \
 		echo "  -> Compilation $$file"; \
 		$(PROTOC) -I=$(PROTO_DIR) $$file \
-			--js_out=import_style=commonjs:$(PB_WEB_OUT_DIR) \
+			--js_out=import_style=closure,binary:$(PB_WEB_OUT_DIR) \
 			--plugin=protoc-gen-grpc-web=$(GRPC_WEB_PLUGIN) \
-			--grpc-web_out=import_style=commonjs,mode=grpcwebtext:$(PB_WEB_OUT_DIR); \
+			--grpc-web_out=import_style=closure,mode=grpcwebtext:$(PB_WEB_OUT_DIR); \
 	done
 	@echo "Generation complete. Files in $(PB_WEB_OUT_DIR)"
+
+web-proto-clean:
+	@echo "Clear $(PB_WEB_OUT_DIR)..."
+	rm -rf $(PB_WEB_OUT_DIR)/*.js
+
 
 YELLOW := \033[1;33m
 GREEN := \033[1;32m
@@ -90,5 +95,6 @@ help:
 	@echo "  $(GREEN)make psql$(RESET)            - open psql shell"
 	@echo "  $(GREEN)make clean$(RESET)           - clean Docker cache"
 	@echo "  $(GREEN)make web-proto$(RESET)       - generating gRPC-Web JS files"
+	@echo "  $(GREEN)make web-proto-clean$(RESET) - remove gRPC-Web JS files"
 	@echo "  $(GREEN)make go-proto$(RESET)        - generating gRPC files"
 .DEFAULT_GOAL := help

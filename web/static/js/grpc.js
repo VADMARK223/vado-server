@@ -1,3 +1,4 @@
+
 const GRPC_WEB_URL = 'http://localhost:8090';
 
 // Простая проверка health endpoint
@@ -20,7 +21,6 @@ async function testPing() {
     result.textContent = 'Calling Ping...\n';
 
     try {
-        // Empty message для Ping (размер 0)
         const body = new Uint8Array([0, 0, 0, 0, 0]);
 
         const response = await fetch(GRPC_WEB_URL + '/ping.PingService/Ping', {
@@ -37,13 +37,11 @@ async function testPing() {
         result.textContent += `Status: ${response.status}\n`;
         result.textContent += `Content-Type: ${response.headers.get('content-type')}\n\n`;
 
-        // Читаем бинарный ответ
         const arrayBuffer = await response.arrayBuffer();
         const bytes = new Uint8Array(arrayBuffer);
 
         result.textContent += `Response bytes (${bytes.length}): ${Array.from(bytes).join(', ')}\n\n`;
 
-        // Пытаемся распарсить как text (для отладки)
         const text = new TextDecoder().decode(bytes);
         result.textContent += `As text: ${text}`;
 
@@ -52,5 +50,55 @@ async function testPing() {
         }
     } catch (e) {
         result.textContent = '❌ Error: ' + e.message + '\n' + e.stack;
+    }
+}
+
+// Вызов gRPC метода SayHello
+function testSayHello() {
+    const result = document.getElementById('result');
+    result.textContent = 'Calling SayHello...\n';
+
+    try {
+        // Отладочный вывод
+        console.log('proto object:', proto);
+        console.log('Available keys:', Object.keys(proto));
+
+        // Проверяем наличие классов
+        if (!proto.HelloRequest) {
+            result.textContent = '❌ HelloRequest not found in proto object\n';
+            result.textContent += 'Available: ' + Object.keys(proto).join(', ');
+            return;
+        }
+
+        if (!proto.HelloServiceClient) {
+            result.textContent = '❌ HelloServiceClient not found in proto object\n';
+            result.textContent += 'Available: ' + Object.keys(proto).join(', ');
+            return;
+        }
+
+        // Создаём клиент
+        const client = new proto.HelloServiceClient(GRPC_WEB_URL, null, null);
+
+        // Создаём request
+        const request = new proto.HelloRequest();
+        request.setName('Мир');
+
+        // Вызываем метод
+        client.sayHello(request, {}, (err, response) => {
+            if (err) {
+                result.textContent = '❌ Error: ' + err.code + ' - ' + err.message;
+                console.error(err);
+                return;
+            }
+
+            // Получаем ответ
+            const message = response.getMessage();
+            result.textContent = `✅ SayHello Response\n`;
+            result.textContent += `Message: ${message}\n`;
+        });
+
+    } catch (e) {
+        result.textContent = '❌ Error: ' + e.message + '\n' + e.stack;
+        console.error(e);
     }
 }
