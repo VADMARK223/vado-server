@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Вход</title>
+    <title>Log in</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 <header>
-    <h1>Вход</h1>
+    <h1>Log in</h1>
     {{ template "menu" . }}
 </header>
 
@@ -15,14 +15,14 @@
     <div class="container">
         <form method="POST" action="/login" class="add-form">
             <label>
-                <input name="username" placeholder="Имя пользователя" required>
+                <input name="username" placeholder="Username" required>
             </label>
             <label>
-                <input name="password" type="password" placeholder="Пароль" required>
+                <input name="password" type="password" placeholder="Password" required>
             </label>
             {{if .Error}}<p class="error">{{.Error}}</p>{{end}}
-            <button class="btn" type="submit">Войти</button>
-            <p><a href="/register">Регистрация</a></p>
+            <button class="btn" type="submit">Log in</button>
+            <p><a href="/register">Sign up</a></p>
         </form>
     </div>
 </main>

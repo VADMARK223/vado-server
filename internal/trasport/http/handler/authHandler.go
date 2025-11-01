@@ -53,18 +53,6 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	c.Redirect(http.StatusFound, redirectTo.(string))
 }
 
-func ShowLoginPage() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.HTML(http.StatusOK, "login.html", nil)
-	}
-}
-
-func ShowRegisterPage() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.HTML(http.StatusOK, "register.html", nil)
-	}
-}
-
 func PerformRegister(service *user.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		username := c.PostForm("username")
@@ -81,23 +69,5 @@ func PerformRegister(service *user.Service) gin.HandlerFunc {
 		}
 
 		c.Redirect(http.StatusFound, "/login")
-	}
-}
-
-func Logout() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.SetCookie(
-			code.JwtVado, // имя cookie
-			"",           // пустое значение
-			-1,           // MaxAge < 0 = удалить
-			"/",          // путь
-			"",           // домен
-			false,        // secure (поставь true если HTTPS)
-			true,         // httpOnly
-		)
-
-		c.Set(code.IsAuth, false)
-
-		c.Redirect(http.StatusFound, "/")
 	}
 }

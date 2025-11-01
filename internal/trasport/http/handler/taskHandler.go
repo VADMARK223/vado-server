@@ -9,25 +9,15 @@ import (
 	"vado_server/internal/infra/persistence/gorm"
 
 	"github.com/gin-gonic/gin"
+	"github.com/k0kubun/pp"
 )
 
-func ShowTasksPage(service *task.Service) gin.HandlerFunc {
+func Tasks(service *task.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userID, ok := c.Get(code.UserId)
-		if !ok {
-			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
-				"Message": "Нет ключа в session",
-				"Error":   fmt.Sprintf("Значение ключа: %v", userID),
-			})
-		}
+		td, _ := c.Get(code.TemplateData)
+		data := td.(gin.H)
 
-		if userID == nil {
-			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
-				"Message": "user_id is nil",
-			})
-		}
-
-		tasks, err := service.GetAllByUser(userID.(uint))
+		tasks, err := service.GetAllByUser(data[code.UserId].(uint))
 		if err != nil {
 			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
 				"Message": "Не удалось загрузить задачи",
@@ -35,12 +25,10 @@ func ShowTasksPage(service *task.Service) gin.HandlerFunc {
 			return
 		}
 
-		isAuth, _ := c.Get(code.IsAuth)
-		c.HTML(http.StatusOK, "tasks.html", gin.H{
-			code.IsAuth: isAuth,
-			code.UserId: userID,
-			"Tasks":     tasks,
-		})
+		_, _ = pp.Println("Tasks", "tasks", tasks)
+
+		data["Tasks"] = tasks
+		c.HTML(http.StatusOK, "tasks.html", data)
 	}
 }
 
@@ -73,7 +61,7 @@ func AddTask(appCtx *app.Context) gin.HandlerFunc {
 
 		if err := appCtx.DB.Create(&t).Error; err != nil {
 			appCtx.Log.Errorw("failed to create task", "error", err)
-			ShowError(c, "Ошибка добавления задачи", err.Error())
+			ShowError(c, "Error adding task", err.Error())
 			return
 		}
 
@@ -87,7 +75,7 @@ func DeleteTask(appCtx *app.Context) gin.HandlerFunc {
 
 		if err := appCtx.DB.Delete(&task.Task{}, id).Error; err != nil {
 			appCtx.Log.Errorw("failed to delete task", "error", err)
-			c.String(http.StatusInternalServerError, "Ошибка удаления задачи")
+			c.String(http.StatusInternalServerError, "Error deleting task")
 			return
 		}
 

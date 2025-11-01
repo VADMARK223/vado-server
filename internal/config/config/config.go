@@ -36,7 +36,7 @@ func Load() *Config {
 		PostgresDsn: getEnv("POSTGRES_DSN", "DNS"),
 	}
 
-	log.Printf("Loaded config: PORT=%s, GRPC_PORT=%s, GRPC_WEB_PORT=%s, %s=%s,", cfg.Port, cfg.GrpcPort, cfg.GrpcWebPort, kafkaPort, cfg.KafkaPort)
+	log.Printf("Loaded config: PORT=%s, GRPC_PORT=%s, GRPC_WEB_PORT=%s, %s=%s, TOKEN_TTL=%s", cfg.Port, cfg.GrpcPort, cfg.GrpcWebPort, kafkaPort, cfg.KafkaPort, cfg.TokenTTL)
 
 	return cfg
 }

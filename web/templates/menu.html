@@ -1,24 +1,25 @@
 {{ define "menu" }}
 <div class="vado-menu">
     <div>
-        <a href="/tasks" class="btn">Задачи</a>
-        <a href="/users" class="btn">Пользователи</a>
-        <a href="/roles" class="btn">Роли</a>
-        <a href="/grpc-test" class="btn">gRPC-Web Тест</a>
+        <a href="/" class="btn">Main</a>
+        <a href="/tasks" class="btn">Tasks</a>
+        <a href="/users" class="btn">Users</a>
+        <a href="/roles" class="btn">Roles</a>
+        <a href="/grpc-test" class="btn">gRPC-Web</a>
     </div>
 
     <div class="vado-user-info">
-        <p>Привет, {{if .user_id}}{{.user_id}}{{else}}Гость{{end}}!</p>
+        <p>Hello, {{.user_id}}!</p>
         {{if .is_auth}}
         <form action="/logout" method="POST" style="display:inline;">
             <button class="btn">
-                <i class="fa-solid fa-right-from-bracket"></i> Выйти
+                <i class="fa-solid fa-right-from-bracket"></i> Log out
             </button>
         </form>
         {{else}}
         <form action="/login" method="GET" style="display:inline;">
             <button class="btn">
-                <i class="fa-solid fa-right-to-bracket"></i> Войти
+                <i class="fa-solid fa-right-to-bracket"></i> Log in
             </button>
         </form>
         {{end}}

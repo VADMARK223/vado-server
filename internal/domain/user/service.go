@@ -35,24 +35,28 @@ func (s *Service) CreateUser(dto DTO) error {
 	return s.repo.CreateUser(user)
 }
 
+func (s *Service) DeleteUser(id uint) error {
+	return s.repo.DeleteUser(id)
+}
+
 func (s *Service) Login(username, password, secret string) (*User, string, string, error) {
 	u, errGetUser := s.repo.GetByUsername(username)
 	if errGetUser != nil {
-		return nil, "", "", errors.New("пользователь не найден")
+		return nil, "", "", errors.New("user not found")
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)) != nil {
-		return u, "", "", errors.New("неверный пароль")
+		return u, "", "", errors.New("incorrect password")
 	}
 
 	accessToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.tokenTTL, secret)
 	if errToken != nil {
-		return u, "", "", errors.New(fmt.Sprintf("Ошибка создания токена (access): %s", errToken.Error()))
+		return u, "", "", errors.New(fmt.Sprintf("Error creating token (access): %s", errToken.Error()))
 	}
 
 	refreshToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.refreshTTL, secret)
 	if errToken != nil {
-		return u, "", "", errors.New(fmt.Sprintf("Ошибка создания токена (refresh): %s", errToken.Error()))
+		return u, "", "", errors.New(fmt.Sprintf("Error creating token (refresh): %s", errToken.Error()))
 	}
 
 	return u, accessToken, refreshToken, nil
@@ -61,16 +65,16 @@ func (s *Service) Login(username, password, secret string) (*User, string, strin
 func (s *Service) Refresh(token string, secret string) (*User, string, error) {
 	claims, errParseToken := auth.ParseToken(token, secret)
 	if errParseToken != nil {
-		return nil, "", status.Error(codes.Unauthenticated, "ошибка чтения токена")
+		return nil, "", status.Error(codes.Unauthenticated, "token read error")
 	}
 	u, errGetUser := s.repo.GetByID(claims.UserID)
 	if errGetUser != nil {
-		return nil, "", errors.New("пользователь не найден")
+		return nil, "", errors.New("user not found")
 	}
 
 	newToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.tokenTTL, secret)
 	if errToken != nil {
-		return nil, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Ошибка создания нового токена: %s", errToken.Error()))
+		return nil, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Error creating new token: %s", errToken.Error()))
 	}
 
 	return u, newToken, nil

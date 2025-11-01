@@ -8,13 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type GrpcTestHandler struct{}
-
-func NewGrpcTestHandler() *GrpcTestHandler {
-	return &GrpcTestHandler{}
-}
-
-func (h *GrpcTestHandler) ShowTestPage(c *gin.Context) {
+func Grpc(c *gin.Context) {
 	isAuth, ok := c.Get(code.IsAuth)
 	if !ok {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{

@@ -2,29 +2,41 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Задачи</title>
+    <title>Tasks</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 <header>
-    <h1>Задачи</h1>
+    <h1>Tasks</h1>
     {{ template "menu" . }}
+    <script>
+        async function deleteTask(id) {
+            if (!confirm('Delete task?')) return;
+
+            const res = await fetch(`/tasks/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                document.getElementById(`task-${id}`).remove();
+            } else {
+                alert('Error deleting task');
+            }
+        }
+    </script>
 </header>
 
 <main>
     <div class="container">
         <form class="add-form" action="/tasks" method="POST">
             <label>
-                <input type="text" name="name" placeholder="Название задачи" required>
+                <input type="text" name="name" placeholder="Task name" required>
             </label>
             <label>
-                <textarea name="description" placeholder="Описание"></textarea>
+                <textarea name="description" placeholder="Description"></textarea>
             </label>
             <label>
-                <input type="checkbox" name="completed"> Выполнено
+                <input type="checkbox" name="completed"> Completed
             </label>
             <br>
-            <button type="submit" class="btn">Добавить задачу</button>
+            <button type="submit" class="btn">Add task</button>
         </form>
 
         <ul class="vado-list">
@@ -33,24 +45,23 @@
                 <div>
                     <h3>{{.Name}}</h3>
                     <p>{{.Description}}</p>
-                    <small>Создано: {{.CreatedAt.Format "02.01.2006 15:04"}}</small>
+                    <small>Created: {{.CreatedAt.Format "02.01.2006 15:04"}}</small>
                 </div>
 
                 <div>
                     <label>
                         <input type="checkbox" name="completed" {{if .Completed}}checked{{end}}>
-                        Завершено
+                        Completed
                     </label>
 
-                    <button class="btn-small btn-danger" onclick="deleteTask('{{.ID}}')">Удалить</button>
+                    <button class="btn-small btn-danger" onclick="deleteTask('{{.ID}}')">Delete</button>
                 </div>
             </li>
             {{else}}
-            <p class="empty">Пока нет задач</p>
+            <p class="empty">No tasks</p>
             {{end}}
         </ul>
     </div>
-    <script src="/static/js/main.js"></script>
 </main>
 
 <footer>

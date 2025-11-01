@@ -2,24 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Вход</title>
+    <title>Sign Up</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 <header>
-    <h1>Вход</h1>
+    <h1>Sign Up</h1>
     {{ template "menu" . }}
 </header>
 
 <main>
     <div class="container">
         <form method="POST" action="/register" class="add-form">
-            <h2>Регистрация</h2>
-            <label><input name="username" placeholder="Имя пользователя" required></label>
-            <label><input name="password" type="password" placeholder="Пароль" required></label>
-            <label><input name="email" type="email" placeholder="Почта" required></label>
+            <label><input name="username" placeholder="Username" required></label>
+            <label><input name="password" type="password" placeholder="Password" required></label>
+            <label><input name="email" type="email" placeholder="E-mail" required></label>
             {{if .Error}}<p class="error">{{.Error}}</p>{{end}}
-            <button class="btn" type="submit">Создать аккаунт</button>
+            <button class="btn" type="submit">Create account</button>
         </form>
     </div>
 </main>

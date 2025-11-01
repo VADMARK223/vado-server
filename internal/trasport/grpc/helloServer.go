@@ -22,6 +22,6 @@ func NewHelloServer(log *zap.SugaredLogger) *HelloServer {
 func (s *HelloServer) SayHello(_ context.Context, req *hello.HelloRequest) (*hello.HelloResponse, error) {
 	s.log.Debugw("SayHello", "name", req.Name)
 	return &hello.HelloResponse{
-		Message: fmt.Sprintf("Привет, %s!!!", req.Name),
+		Message: fmt.Sprintf("Hello, %s!!!", req.Name),
 	}, nil
 }

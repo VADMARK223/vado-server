@@ -2,40 +2,30 @@ package handler
 
 import (
 	"net/http"
-	"vado_server/internal/app"
+	"strconv"
 	"vado_server/internal/config/code"
 	"vado_server/internal/config/route"
 	"vado_server/internal/domain/user"
-	user2 "vado_server/internal/infra/persistence/gorm"
 
 	"github.com/gin-gonic/gin"
 )
 
-type UserHandler struct {
-	service *user.Service
-}
+func ShowUsers(service *user.Service) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var users, err = service.GetAllUsersWithRoles()
+		if err != nil {
+			ShowError(c, "Failed to load users", err.Error())
+			return
+		}
 
-func (h *UserHandler) ShowUsers(c *gin.Context) {
-	var users, err = h.service.GetAllUsersWithRoles()
-	if err != nil {
-		ShowError(c, "Не удалось загрузить пользователей", err.Error())
-		return
+		td, _ := c.Get(code.TemplateData)
+		data := td.(gin.H)
+		data["Users"] = users
+		c.HTML(http.StatusOK, "users.html", data)
 	}
-
-	isAuth, _ := c.Get(code.IsAuth)
-	userId, _ := c.Get(code.UserId)
-	c.HTML(http.StatusOK, "users.html", gin.H{
-		code.IsAuth: isAuth,
-		code.UserId: userId,
-		"Users":     users,
-	})
 }
 
-func NewUserHandler(service *user.Service) *UserHandler {
-	return &UserHandler{service: service}
-}
-
-func AddUser(service *user.Service) func(c *gin.Context) {
+func PostUser(service *user.Service) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		username := c.PostForm("username")
 		password := c.PostForm("password")
@@ -70,13 +60,16 @@ func AddUser(service *user.Service) func(c *gin.Context) {
 	}
 }
 
-func DeleteUser(appCtx *app.Context) gin.HandlerFunc {
+func DeleteUser(service *user.Service) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		id := c.Param("id")
+		parseUint, parseUintErr := strconv.ParseUint(c.Param("id"), 10, 32)
+		if parseUintErr != nil {
+			return
+		}
 
-		if err := appCtx.DB.Delete(&user2.UserEntity{}, id).Error; err != nil {
-			appCtx.Log.Errorw("failed to delete user", "error", err)
-			c.String(http.StatusInternalServerError, "Ошибка удаления пользователя")
+		err := service.DeleteUser(uint(parseUint))
+		if err != nil {
+			ShowError(c, "Failed to delete user", err.Error())
 			return
 		}
 

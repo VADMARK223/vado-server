@@ -1,50 +1,32 @@
 package middleware
 
 import (
-	"net/http"
 	"time"
 	"vado_server/internal/config/code"
 	"vado_server/internal/domain/auth"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
-
-func CheckAuth() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		isAuth, ok := c.Get(code.IsAuth)
-		if !ok || isAuth == false {
-			session := sessions.Default(c)
-			session.Set(code.RedirectTo, c.Request.URL.Path)
-			_ = session.Save()
-			c.Redirect(http.StatusFound, "/login")
-			c.Abort()
-			return
-		}
-
-		c.Next()
-	}
-}
 
 func CheckJWT(secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr, err := c.Cookie(code.JwtVado)
 		if err != nil || tokenStr == "" {
-			c.Set(code.IsAuth, false)
+			setNotAuth(c)
 			c.Next()
 			return
 		}
 
 		claims, err := auth.ParseToken(tokenStr, secret)
 		if err != nil {
-			c.Set(code.IsAuth, false)
+			setNotAuth(c)
 			c.Next()
 			return
 		}
 
 		// Проверка срока действия токена
 		if claims.ExpiresAt != nil && claims.ExpiresAt.Time.Before(time.Now()) {
-			c.Set(code.IsAuth, false)
+			setNotAuth(c)
 			c.Next()
 			return
 		}
@@ -56,4 +38,9 @@ func CheckJWT(secret string) gin.HandlerFunc {
 
 		c.Next()
 	}
+}
+
+func setNotAuth(c *gin.Context) {
+	c.Set(code.IsAuth, false)
+	c.Set(code.UserId, "Guest")
 }

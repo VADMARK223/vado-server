@@ -36,6 +36,15 @@ func (r *UserRepository) CreateUser(u user.User) error {
 	return nil
 }
 
+func (r *UserRepository) DeleteUser(id uint) error {
+	if err := r.db.Delete(&UserEntity{}, id).Error; err != nil {
+		r.log.Errorw("failed to delete user", "error", err)
+		return err
+	}
+
+	return nil
+}
+
 func (r *UserRepository) GetByUsername(username string) (*user.User, error) {
 	var entity UserEntity
 	if err := r.db.Where("username = ?", username).First(&entity).Error; err != nil {

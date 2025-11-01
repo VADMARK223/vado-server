@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ShowIndex(c *gin.Context) {
+func ShowLogin(c *gin.Context) {
 	td, _ := c.Get(code.TemplateData)
 	data := td.(gin.H)
-	c.HTML(http.StatusOK, "index.html", data)
+	c.HTML(http.StatusOK, "login.html", data)
 }

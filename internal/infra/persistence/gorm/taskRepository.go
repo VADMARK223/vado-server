@@ -36,8 +36,11 @@ func (r TaskRepo) GetAllByUserID(ID uint) ([]task.Task, error) {
 	result := make([]task.Task, 0, len(entities))
 	for _, entity := range entities {
 		result = append(result, task.Task{
-			ID:   entity.ID,
-			Name: entity.Name,
+			ID:          entity.ID,
+			Name:        entity.Name,
+			Description: entity.Description,
+			Completed:   entity.Completed,
+			CreatedAt:   entity.CreatedAt,
 		})
 	}
 

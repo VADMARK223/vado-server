@@ -27,7 +27,6 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	userSvc := user.NewService(gorm.NewUserRepo(ctx), time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
 	// Хендлеры
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret)
-	userH := handler.NewUserHandler(userSvc)
 
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
@@ -42,29 +41,28 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	store := cookie.NewStore([]byte("super-secret-key"))
 	r.Use(sessions.Sessions("vado-session", store))
 	r.Use(middleware.CheckJWT(ctx.Cfg.JwtSecret))
+	r.Use(middleware.TemplateContext)
 
 	// Публичные маршруты
-
 	r.GET(route.Index, handler.ShowIndex)
-	r.GET(route.Login, handler.ShowLoginPage())
+	r.GET(route.Login, handler.ShowLogin)
 	r.POST(route.Login, authH.Login)
-	r.GET(route.Register, handler.ShowRegisterPage())
+	r.GET(route.Register, handler.ShowSignup)
 	r.POST(route.Register, handler.PerformRegister(userSvc))
-
-	r.POST(route.Logout, handler.Logout())
+	r.POST(route.Logout, handler.Logout)
 
 	// Защищенные маршруты
 	auth := r.Group("/")
-	auth.Use(middleware.CheckAuth())
+	auth.Use(middleware.CheckAuthAndRedirect())
 	{
-		auth.GET(route.Tasks, handler.ShowTasksPage(taskSvc))
+		auth.GET(route.Tasks, handler.Tasks(taskSvc))
 		auth.POST(route.Tasks, handler.AddTask(ctx))
 		auth.DELETE("/tasks/:id", handler.DeleteTask(ctx))
-		auth.GET(route.Users, userH.ShowUsers)
-		auth.POST(route.Users, handler.AddUser(userSvc))
-		auth.GET(route.Roles, handler.ShowRoles(roleSvc))
-		auth.DELETE("/users/:id", handler.DeleteUser(ctx))
-		auth.GET("/grpc-test", handler.NewGrpcTestHandler().ShowTestPage)
+		auth.GET(route.Users, handler.ShowUsers(userSvc))
+		auth.POST(route.Users, handler.PostUser(userSvc))
+		auth.DELETE("/users/:id", handler.DeleteUser(userSvc))
+		auth.GET(route.Roles, handler.Roles(roleSvc))
+		auth.GET("/grpc-test", handler.Grpc)
 	}
 
 	return r

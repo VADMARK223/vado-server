@@ -24,18 +24,12 @@ services:
       dockerfile: Dockerfile
     container_name: vado-server
     ports:
-      - "5556:5556" # HTTP (Gin)
-      - "50051:50051" # gRPC
-      - "8090:8090" # gRPC-Web
+      - "${PORT}:${PORT}" # HTTP (Gin)
+      - "${GRPC_PORT}:${GRPC_PORT}" # gRPC
+      - "${HTTP_PORT}:${HTTP_PORT}" # gRPC-Web
     restart: unless-stopped
-    environment:
-      PORT: 5556
-      GRPC_PORT: 50051
-      GRPC_WEB_PORT: 8090
-      POSTGRES_DSN: postgres://vadmark:5125341@postgres:5432/vadodb?sslmode=disable
-      GIN_MODE: release
-      JWT_SECRET: asdnc9sadc8n23
-      KAFKA_BROKERS: kafka:9092
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy # app ждет healthcheck БД

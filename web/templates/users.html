@@ -2,13 +2,25 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Пользователи</title>
+    <title>Users</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 <header>
-    <h1>Пользователи</h1>
+    <h1>Users</h1>
     {{ template "menu" . }}
+    <script>
+        async function deleteUser(id) {
+            if (!confirm('Delete user?')) return;
+
+            const res = await fetch(`/users/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                document.getElementById(`user-${id}`).remove();
+            } else {
+                alert('Error deleting user');
+            }
+        }
+    </script>
 </header>
 
 <main>
@@ -20,40 +32,38 @@
                     <h3>{{.Username}} (ID {{.ID}})</h3>
                     {{if .Roles}}
                     <p class="roles">
-                        Роли:
+                        Roles:
                         {{range .Roles}}
                         <span class="role">{{.Name}}</span>
                         {{end}}
                     </p>
                     {{else}}
-                    <p class="roles">Без роли</p>
+                    <p class="roles">No role</p>
                     {{end}}
 
-                    <p>Почта: {{.Email}}</p>
+                    <p>E-mail: {{.Email}}</p>
                 </div>
 
-                <button class="btn-small btn-danger" onclick="deleteUser('{{.ID}}')">Удалить</button>
+                <button class="btn-small btn-danger" onclick="deleteUser('{{.ID}}')">Delete</button>
             </li>
             {{else}}
-            <p class="empty">Пока нет пользователей</p>
+            <p class="empty">No users</p>
             {{end}}
         </ul>
 
         <form class="add-form" action="/users" method="POST">
             <label>
-                <input type="text" name="username" placeholder="Имя пользователя" required>
+                <input type="text" name="username" placeholder="Username" required>
             </label>
             <label>
-                <input type="text" name="password" placeholder="Пароль пользователя" required>
+                <input type="password" name="password" placeholder="Password" required>
             </label>
             <label>
-                <input type="email" name="email" placeholder="Почта пользователя" required>
+                <input type="email" name="email" placeholder="Email" required>
             </label>
-            <button type="submit" class="btn">Добавить пользователя</button>
+            <button type="submit" class="btn">Add user</button>
         </form>
     </div>
-
-    <script src="/static/js/main.js"></script>
 </main>
 
 <footer>
