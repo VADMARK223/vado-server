@@ -1,24 +1,25 @@
-# Этап сборки
+# Этап 1: Сборка (builder)
 FROM golang:1.25 AS builder
 
+# Рабочая директория
 WORKDIR /app
 
-# Копируем go.mod и go.sum (Кэшируем зависиомсти)
+# Копируем go.mod и go.sum - чтобы кэшировался слой зависимостей
 COPY go.mod go.sum ./
-
 # Качаем зависимости
 RUN go mod download
 
-# Копируем исходики
+# Копируем остальной код
 COPY . .
 
-# Собираем бинарник
-# * CGO_ENABLED=0 компилято выключает исользование С, и Go собирает чистый статический бинарник. Если чистое CLI, для GUI может все сломать
-# * -o указывает название выходного бинарника
-RUN CGO_ENABLED=0 go build -o vado-ping ./cmd/server
+# Сборка бинарника (статическая, без CGO)
+# CGO_ENABLED=0 компилято выключает исользование С, и Go собирает чистый статический бинарник. Если чистое CLI, для GUI может все сломать
+# -trimpath убирает пути из бинаря (безопасность + меньше размер)
+# -o указывает название выходного бинарника
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -trimpath -o vado-server ./cmd/server
 
-# Запуск этапа (минимальный финальный образ)
-FROM debian:bookworm-slim
+# Этап 2: рантайм (минимальный финальный образ)
+FROM debian:bookworm-slim AS runtime
 
 WORKDIR /app
 
@@ -28,8 +29,8 @@ COPY --from=builder /app/vado-server .
 COPY --from=builder /app/web/templates ./web/templates
 COPY --from=builder /app/web/static ./web/static
 
-# Пробрасываем порт
-EXPOSE 5556
+# Порт для gRPC и HTTP
+EXPOSE 50051 5556 8090
 
 # Задаём переменные окружения по умолчанию
 ENV PORT=5556 \

@@ -24,12 +24,10 @@ ps:
 logs:
 	docker compose -p $(PROJECT_NAME) logs vado-server
 
-# Полный rebuild (удаляет все контейнеры и тома, пересоздаёт базу и запускает init-скрипты)
 rebuild:
-	docker compose down -v
-	docker compose up -d --build
+	docker compose -p $(PROJECT_NAME) down --rmi all --volumes
+	docker compose -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.kafka.yml up -d --build
 
-# Пересобрать сервер, не трогая базу
 rebuild-server:
 	docker compose up -d --build --no-deps vado-server
 
