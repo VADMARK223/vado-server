@@ -16,7 +16,7 @@ async function testHealth() {
 }
 
 // Вызов gRPC метода Ping
-async function testPing() {
+/*async function testPing() {
     const result = document.getElementById('result');
     result.textContent = 'Calling Ping...\n';
 
@@ -51,7 +51,7 @@ async function testPing() {
     } catch (e) {
         result.textContent = '❌ Error: ' + e.message + '\n' + e.stack;
     }
-}
+}*/
 
 // Вызов gRPC метода SayHello
 async function testSayHello() {

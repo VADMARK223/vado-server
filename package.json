@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "esbuild": "^0.25.11"
+  },
+  "dependencies": {
+    "google-protobuf": "^4.0.0",
+    "grpc-web": "^2.0.2"
+  }
+}

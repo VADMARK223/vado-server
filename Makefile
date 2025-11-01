@@ -68,13 +68,16 @@ web-proto:
 		$(PROTOC) -I=$(PROTO_DIR) $$file \
 			--js_out=import_style=commonjs,binary:$(PB_WEB_OUT_DIR) \
 			--plugin=protoc-gen-grpc-web=$(GRPC_WEB_PLUGIN) \
-			--grpc-web_out=import_style=commonjs,mode=grpcweb:$(PB_WEB_OUT_DIR); \
+			--grpc-web_out=import_style=commonjs,mode=grpcwebtext:$(PB_WEB_OUT_DIR); \
 	done
 	@echo "Generation complete. Files in $(PB_WEB_OUT_DIR)"
 
 web-proto-clean:
 	@echo "Clear $(PB_WEB_OUT_DIR)..."
 	rm -rf $(PB_WEB_OUT_DIR)/*.js
+
+bundle:
+	npx esbuild web/static/js/main.js --bundle --outfile=web/static/js/bundle.js
 
 
 YELLOW := \033[1;33m
@@ -97,4 +100,5 @@ help:
 	@echo "  $(GREEN)make web-proto$(RESET)       - generating gRPC-Web JS files"
 	@echo "  $(GREEN)make web-proto-clean$(RESET) - remove gRPC-Web JS files"
 	@echo "  $(GREEN)make go-proto$(RESET)        - generating gRPC files"
+	@echo "  $(GREEN)make bundle$(RESET)          - create bundle.js"
 .DEFAULT_GOAL := help

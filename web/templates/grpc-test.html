@@ -14,55 +14,16 @@
 <main>
     <div class="container">
         <div>
-            <button class="btn" onclick="testHealth()">Test Health</button>
-            <button class="btn" onclick="testPing()">Test Ping (gRPC-Web)</button>
-            <button class="btn" onclick="testSayHelloRaw()">Say hello</button>
+<!--            <button class="btn" onclick="testHealth()">Test Health</button>-->
+            <button id="pingButton" class="btn">Test Ping (gRPC-Web)</button>
+<!--            <button class="btn" onclick="testSayHelloRaw()">Say hello</button>-->
         </div>
 
         <pre id="result"></pre>
     </div>
 
-    <script src="/static/js/grpc.js"></script>
-
-<!--    <script src="/static/js/pb/hello_pb.js"></script>-->
-    <script>
-        async function testSayHelloRaw() {
-            const result = document.getElementById('result');
-            result.textContent = 'Calling say hello...\n';
-
-            try {
-                const body = new Uint8Array([0, 0, 0, 0, 0]);
-
-                const response = await fetch(GRPC_WEB_URL + '/hello.HelloService/SayHello', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/grpc-web+proto',
-                        'X-Grpc-Web': '1',
-                        'X-User-Agent': 'grpc-web-javascript/0.1'
-                    },
-                    body: body
-                });
-
-                result.textContent = `✅ Hello Response\n`;
-                result.textContent += `Status: ${response.status}\n`;
-                result.textContent += `Content-Type: ${response.headers.get('content-type')}\n\n`;
-
-                const arrayBuffer = await response.arrayBuffer();
-                const bytes = new Uint8Array(arrayBuffer);
-
-                result.textContent += `Response bytes (${bytes.length}): ${Array.from(bytes).join(', ')}\n\n`;
-
-                const text = new TextDecoder().decode(bytes);
-                result.textContent += `As text: ${text}`;
-
-                if (response.ok) {
-                    result.textContent += '\n\n✅ Server responded successfully!';
-                }
-            } catch (e) {
-                result.textContent = '❌ Error: ' + e.message + '\n' + e.stack;
-            }
-        }
-    </script>
+    <script src="/static/js/bundle.js"></script>
+<!--    <script src="/static/js/grpc.js"></script>-->
 </main>
 
 <footer>

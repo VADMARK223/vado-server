@@ -33,7 +33,7 @@ proto.auth = require('./auth_pb.js');
 proto.auth.AuthServiceClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'binary';
+  options.format = 'text';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client
@@ -59,7 +59,7 @@ proto.auth.AuthServiceClient =
 proto.auth.AuthServicePromiseClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'binary';
+  options.format = 'text';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client

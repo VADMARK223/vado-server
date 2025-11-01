@@ -33,7 +33,7 @@ proto.hello = require('./hello_pb.js');
 proto.hello.HelloServiceClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'binary';
+  options.format = 'text';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client
@@ -59,7 +59,7 @@ proto.hello.HelloServiceClient =
 proto.hello.HelloServicePromiseClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'binary';
+  options.format = 'text';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client

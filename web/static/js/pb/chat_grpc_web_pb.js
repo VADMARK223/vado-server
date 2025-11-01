@@ -33,7 +33,7 @@ proto.chat = require('./chat_pb.js');
 proto.chat.ChatServiceClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'binary';
+  options.format = 'text';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client
@@ -59,7 +59,7 @@ proto.chat.ChatServiceClient =
 proto.chat.ChatServicePromiseClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
-  options.format = 'binary';
+  options.format = 'text';
 
   /**
    * @private @const {!grpc.web.GrpcWebClientBase} The client
