@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"strconv"
 	"time"
 	pbAuth "vado_server/api/pb/auth"
 	pbChat "vado_server/api/pb/chat"
@@ -12,7 +13,6 @@ import (
 	pbPing "vado_server/api/pb/ping"
 	"vado_server/internal/app"
 	"vado_server/internal/config/kafka/topic"
-	"vado_server/internal/config/token"
 	"vado_server/internal/domain/user"
 	"vado_server/internal/infra/kafka"
 	"vado_server/internal/infra/persistence/gorm"
@@ -36,17 +36,19 @@ func NewServer(ctx *app.Context, port string) (*Server, error) {
 
 	s := &Server{
 		grpcServer: grpc.NewServer(
-			grpc.UnaryInterceptor(AuthInterceptor),
+			grpc.UnaryInterceptor(NewAuthInterceptor(ctx.Cfg.JwtSecret)),
 		),
 		listener: lis,
 		log:      ctx.Log,
 	}
-	userSvc := user.NewService(gorm.NewUserRepo(ctx), token.AccessAliveMinutes*time.Minute)
+	tokenTTL, _ := strconv.Atoi(ctx.Cfg.TokenTTL)
+	refreshTTL, _ := strconv.Atoi(ctx.Cfg.RefreshTTL)
+	userSvc := user.NewService(gorm.NewUserRepo(ctx), time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
 
-	pbAuth.RegisterAuthServiceServer(s.grpcServer, NewAuthServer(userSvc))
+	pbAuth.RegisterAuthServiceServer(s.grpcServer, NewAuthServer(userSvc, ctx.Cfg.JwtSecret))
 	pbHello.RegisterHelloServiceServer(s.grpcServer, NewHelloServer(ctx.Log))
 	pbPing.RegisterPingServiceServer(s.grpcServer, &PingServer{})
-	producer := kafka.NewProducer(topic.ChatLog, ctx.Log)
+	producer := kafka.NewProducer(topic.ChatLog, ctx.Log, ctx.Cfg)
 	pbChat.RegisterChatServiceServer(s.grpcServer, New(ctx.Log, producer))
 
 	wrappedGrpc := grpcweb.WrapServer(

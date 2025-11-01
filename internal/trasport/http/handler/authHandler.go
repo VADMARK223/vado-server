@@ -13,17 +13,21 @@ import (
 
 type AuthHandler struct {
 	service *user.Service
+	secret  string
 }
 
-func NewAuthHandler(service *user.Service) *AuthHandler {
-	return &AuthHandler{service: service}
+func NewAuthHandler(service *user.Service, secret string) *AuthHandler {
+	return &AuthHandler{
+		service: service,
+		secret:  secret,
+	}
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 
-	_, token, _, err := h.service.Login(username, password)
+	_, token, _, err := h.service.Login(username, password, h.secret)
 	if err != nil {
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": err.Error()})
 	}

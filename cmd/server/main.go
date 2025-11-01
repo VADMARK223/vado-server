@@ -6,15 +6,13 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 	ctx "vado_server/internal/app"
 	"vado_server/internal/infra/db"
 	"vado_server/internal/infra/kafka"
 	"vado_server/internal/infra/logger"
 	"vado_server/internal/trasport/grpc"
 	"vado_server/internal/trasport/http"
-	"vado_server/internal/util"
-
-	"time"
 
 	"gorm.io/gorm"
 
@@ -44,10 +42,10 @@ func main() {
 	var wg sync.WaitGroup
 	// HTTP сервер
 	wg.Add(1)
-	go startHTTPServer(ctxWithCancel, appCtx, &wg, util.GetEnv("PORT"))
+	go startHTTPServer(ctxWithCancel, appCtx, &wg, appCtx.Cfg.Port)
 
 	// gRPC сервер
-	grpcServer, err := grpc.NewServer(appCtx, util.GetEnv("GRPC_PORT"))
+	grpcServer, err := grpc.NewServer(appCtx, appCtx.Cfg.GrpcPort)
 	if err != nil {
 		appCtx.Log.Fatalw("failed to start grpc ping", "error", err)
 	}
@@ -108,7 +106,7 @@ func main() {
 }
 
 func initDB(appCtx *ctx.Context) *gorm.DB {
-	dsn := util.GetEnv("POSTGRES_DSN")
+	dsn := appCtx.Cfg.PostgresDsn
 	database, err := db.Connect(dsn)
 	if err != nil {
 		appCtx.Log.Fatalw("Failed to connect database", "error", err)

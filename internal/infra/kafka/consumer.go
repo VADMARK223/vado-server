@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 	"vado_server/internal/app"
-	port "vado_server/internal/config/port"
 
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
@@ -18,7 +17,7 @@ type Consumer struct {
 
 func NewConsumer(ctx *app.Context) *Consumer {
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:        []string{fmt.Sprintf("localhost:%s", port.Kafka)},
+		Brokers:        []string{fmt.Sprintf("localhost:%s", ctx.Cfg.KafkaPort)},
 		Topic:          "chat",
 		GroupID:        "chat-group",
 		StartOffset:    kafka.FirstOffset,

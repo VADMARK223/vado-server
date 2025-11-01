@@ -12,14 +12,16 @@ import (
 )
 
 type Service struct {
-	repo                Repository
-	accessTokenDuration time.Duration
+	repo       Repository
+	tokenTTL   time.Duration
+	refreshTTL time.Duration
 }
 
-func NewService(repo Repository, accessTokenDuration time.Duration) *Service {
+func NewService(repo Repository, tokenTTL time.Duration, refreshTTL time.Duration) *Service {
 	return &Service{
-		repo:                repo,
-		accessTokenDuration: accessTokenDuration,
+		repo:       repo,
+		tokenTTL:   tokenTTL,
+		refreshTTL: refreshTTL,
 	}
 }
 
@@ -33,7 +35,7 @@ func (s *Service) CreateUser(dto DTO) error {
 	return s.repo.CreateUser(user)
 }
 
-func (s *Service) Login(username string, password string) (*User, string, string, error) {
+func (s *Service) Login(username, password, secret string) (*User, string, string, error) {
 	u, errGetUser := s.repo.GetByUsername(username)
 	if errGetUser != nil {
 		return nil, "", "", errors.New("пользователь не найден")
@@ -43,12 +45,12 @@ func (s *Service) Login(username string, password string) (*User, string, string
 		return u, "", "", errors.New("неверный пароль")
 	}
 
-	accessToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.accessTokenDuration)
+	accessToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.tokenTTL, secret)
 	if errToken != nil {
 		return u, "", "", errors.New(fmt.Sprintf("Ошибка создания токена (access): %s", errToken.Error()))
 	}
 
-	refreshToken, errToken := auth.CreateToken(u.ID, []string{"user"}, 7*24*time.Hour)
+	refreshToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.refreshTTL, secret)
 	if errToken != nil {
 		return u, "", "", errors.New(fmt.Sprintf("Ошибка создания токена (refresh): %s", errToken.Error()))
 	}
@@ -56,8 +58,8 @@ func (s *Service) Login(username string, password string) (*User, string, string
 	return u, accessToken, refreshToken, nil
 }
 
-func (s *Service) Refresh(token string) (*User, string, error) {
-	claims, errParseToken := auth.ParseToken(token)
+func (s *Service) Refresh(token string, secret string) (*User, string, error) {
+	claims, errParseToken := auth.ParseToken(token, secret)
 	if errParseToken != nil {
 		return nil, "", status.Error(codes.Unauthenticated, "ошибка чтения токена")
 	}
@@ -66,7 +68,7 @@ func (s *Service) Refresh(token string) (*User, string, error) {
 		return nil, "", errors.New("пользователь не найден")
 	}
 
-	newToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.accessTokenDuration)
+	newToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.tokenTTL, secret)
 	if errToken != nil {
 		return nil, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Ошибка создания нового токена: %s", errToken.Error()))
 	}

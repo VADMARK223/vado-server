@@ -26,7 +26,7 @@ func CheckAuth() gin.HandlerFunc {
 	}
 }
 
-func CheckJWT() gin.HandlerFunc {
+func CheckJWT(secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr, err := c.Cookie(code.JwtVado)
 		if err != nil || tokenStr == "" {
@@ -35,7 +35,7 @@ func CheckJWT() gin.HandlerFunc {
 			return
 		}
 
-		claims, err := auth.ParseToken(tokenStr)
+		claims, err := auth.ParseToken(tokenStr, secret)
 		if err != nil {
 			c.Set(code.IsAuth, false)
 			c.Next()

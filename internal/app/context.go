@@ -1,6 +1,8 @@
 package app
 
 import (
+	"vado_server/internal/config/config"
+
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -9,8 +11,13 @@ import (
 type Context struct {
 	Log *zap.SugaredLogger
 	DB  *gorm.DB
+	Cfg *config.Config
 }
 
 func NewAppContext(log *zap.SugaredLogger) *Context {
-	return &Context{Log: log}
+	cfg := config.Load()
+	return &Context{
+		Log: log,
+		Cfg: cfg,
+	}
 }

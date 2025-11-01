@@ -2,18 +2,16 @@ package http
 
 import (
 	"html/template"
+	"strconv"
 	"time"
 	"vado_server/internal/app"
 	"vado_server/internal/config/route"
-	"vado_server/internal/config/token"
 	"vado_server/internal/domain/role"
 	"vado_server/internal/domain/task"
 	"vado_server/internal/domain/user"
 	"vado_server/internal/infra/persistence/gorm"
 	"vado_server/internal/trasport/http/handler"
 	"vado_server/internal/trasport/http/middleware"
-
-	"vado_server/internal/util"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -24,12 +22,14 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	// Сервисы
 	taskSvc := task.NewService(gorm.NewTaskRepo(ctx.DB))
 	roleSvc := role.NewService(gorm.NewRoleRepo(ctx))
-	userSvc := user.NewService(gorm.NewUserRepo(ctx), token.AccessAliveMinutes*time.Minute)
+	tokenTTL, _ := strconv.Atoi(ctx.Cfg.TokenTTL)
+	refreshTTL, _ := strconv.Atoi(ctx.Cfg.RefreshTTL)
+	userSvc := user.NewService(gorm.NewUserRepo(ctx), time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
 	// Хендлеры
-	authH := handler.NewAuthHandler(userSvc)
+	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret)
 	userH := handler.NewUserHandler(userSvc)
 
-	gin.SetMode(util.GetEnv("GIN_MODE"))
+	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
 	tmpl := template.Must(template.ParseGlob("web/templates/*.html"))
 	r.SetHTMLTemplate(tmpl)
@@ -41,7 +41,7 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	// Настраиваем cookie-сессии
 	store := cookie.NewStore([]byte("super-secret-key"))
 	r.Use(sessions.Sessions("vado-session", store))
-	r.Use(middleware.CheckJWT())
+	r.Use(middleware.CheckJWT(ctx.Cfg.JwtSecret))
 
 	// Публичные маршруты
 

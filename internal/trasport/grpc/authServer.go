@@ -12,11 +12,13 @@ import (
 type AuthServer struct {
 	pb.UnimplementedAuthServiceServer
 	service *user.Service
+	secret  string
 }
 
-func NewAuthServer(service *user.Service) *AuthServer {
+func NewAuthServer(service *user.Service, secret string) *AuthServer {
 	return &AuthServer{
 		service: service,
+		secret:  secret,
 	}
 }
 
@@ -24,7 +26,7 @@ func (s *AuthServer) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRe
 	username := req.Username
 	password := req.Password
 
-	u, accessToken, refreshToken, err := s.service.Login(username, password)
+	u, accessToken, refreshToken, err := s.service.Login(username, password, s.secret)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
@@ -38,7 +40,7 @@ func (s *AuthServer) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRe
 }
 
 func (s *AuthServer) Refresh(_ context.Context, req *pb.RefreshRequest) (*pb.LoginResponse, error) {
-	u, newToken, err := s.service.Refresh(req.RefreshToken)
+	u, newToken, err := s.service.Refresh(req.RefreshToken, s.secret)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}

@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"time"
-	"vado_server/internal/config/env"
-	"vado_server/internal/util"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -16,7 +14,7 @@ type CustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-func CreateToken(userID uint, roles []string, ttl time.Duration) (string, error) {
+func CreateToken(userID uint, roles []string, ttl time.Duration, secret string) (string, error) {
 	claims := CustomClaims{
 		UserID: userID,
 		Roles:  roles,
@@ -29,10 +27,10 @@ func CreateToken(userID uint, roles []string, ttl time.Duration) (string, error)
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(util.GetEnv(env.JwtSecret)))
+	return token.SignedString([]byte(secret))
 }
 
-func ParseToken(tokenStr string) (*CustomClaims, error) {
+func ParseToken(tokenStr string, secret string) (*CustomClaims, error) {
 	if tokenStr == "" {
 		return nil, errors.New("token is empty")
 	}
@@ -41,7 +39,7 @@ func ParseToken(tokenStr string) (*CustomClaims, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, jwt.ErrSignatureInvalid
 		}
-		return []byte(util.GetEnv(env.JwtSecret)), nil
+		return []byte(secret), nil
 	})
 	if err != nil {
 		return nil, fmt.Errorf("parse error: %w", err)
