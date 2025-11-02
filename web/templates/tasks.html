@@ -36,7 +36,7 @@
                 <input type="checkbox" name="completed"> Completed
             </label>
             <br>
-            <button type="submit" class="btn">Add task</button>
+            <button type="submit" class="btn"><i class="fa-solid fa-plus"></i></button>
         </form>
 
         <ul class="vado-list">
@@ -54,7 +54,7 @@
                         Completed
                     </label>
 
-                    <button class="btn-small btn-danger" onclick="deleteTask('{{.ID}}')">Delete</button>
+                    <button class="btn-small btn-danger" onclick="deleteTask('{{.ID}}')"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </li>
             {{else}}

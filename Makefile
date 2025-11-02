@@ -1,5 +1,6 @@
 PROJECT_NAME = vado-app
-COMPOSE = docker compose -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.kafka.yml
+COMPOSE = docker compose -p $(PROJECT_NAME)
+COMPOSE_FULL = $(COMPOSE) -f docker-compose.yml -f docker-compose.kafka.yml
 
 all-up:
 	docker compose -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.kafka.yml up -d
@@ -8,10 +9,10 @@ all-down:
 	docker compose -p $(PROJECT_NAME) down
 
 kafka-up:
-	docker compose -f docker-compose.kafka.yml up -d
+	$(COMPOSE) -f docker-compose.kafka.yml up -d
 
 kafka-down:
-	docker compose -f docker-compose.kafka.yml down
+	$(COMPOSE) -f docker-compose.kafka.yml down
 
 up-main:
 	docker compose -f docker-compose.yml up -d
@@ -20,14 +21,14 @@ down-main:
 	docker compose -f docker-compose.yml down
 
 ps:
-	docker compose -p $(PROJECT_NAME) ps vado-server
+	$(COMPOSE) ps --format 'table {{.Name}}\t{{.Ports}}'
 
 logs:
 	docker compose -p $(PROJECT_NAME) logs vado-server
 
 rebuild:
-	$(COMPOSE) down --volumes
-	$(COMPOSE) up -d --build --remove-orphans
+	$(COMPOSE_FULL) down --volumes
+	$(COMPOSE_FULL) up -d --build --remove-orphans
 
 rebuild-full:
 	docker compose -p $(PROJECT_NAME) down --rmi all --volumes

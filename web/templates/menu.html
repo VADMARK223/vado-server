@@ -1,10 +1,10 @@
 {{ define "menu" }}
 <div class="vado-menu">
     <div>
-        <a href="/" class="btn">Main</a>
-        <a href="/tasks" class="btn">Tasks</a>
-        <a href="/users" class="btn">Users</a>
-        <a href="/roles" class="btn">Roles</a>
+        <a href="/" class="btn"><i class="fa-solid fa-house"></i></a>
+        <a href="/tasks" class="btn"><i class="fa-solid fa-list-check"></i></a>
+        <a href="/users" class="btn"><i class="fa-solid fa-users"></i></a>
+        <a href="/roles" class="btn"><i class="fa-solid fa-user-tie"></i></a>
         <a href="/grpc-test" class="btn">gRPC-Web</a>
     </div>
 
@@ -13,13 +13,14 @@
         {{if .is_auth}}
         <form action="/logout" method="POST" style="display:inline;">
             <button class="btn">
-                <i class="fa-solid fa-right-from-bracket"></i> Log out
+<!--                <i class="fa-solid fa-right-from-bracket"></i>-->
+                <i class="fa-solid fa-person-walking-dashed-line-arrow-right"></i>
             </button>
         </form>
         {{else}}
         <form action="/login" method="GET" style="display:inline;">
             <button class="btn">
-                <i class="fa-solid fa-right-to-bracket"></i> Log in
+                <i class="fa-solid fa-person-walking-arrow-right"></i>
             </button>
         </form>
         {{end}}

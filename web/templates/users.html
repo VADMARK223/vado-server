@@ -44,7 +44,7 @@
                     <p>E-mail: {{.Email}}</p>
                 </div>
 
-                <button class="btn-small btn-danger" onclick="deleteUser('{{.ID}}')">Delete</button>
+                <button class="btn-small btn-danger" onclick="deleteUser('{{.ID}}')"><i class="fa-solid fa-trash"></i></button>
             </li>
             {{else}}
             <p class="empty">No users</p>
@@ -61,7 +61,7 @@
             <label>
                 <input type="email" name="email" placeholder="Email" required>
             </label>
-            <button type="submit" class="btn">Add user</button>
+            <button type="submit" class="btn"><i class="fa-solid fa-plus"></i></button>
         </form>
     </div>
 </main>
