@@ -47,7 +47,7 @@ PROTO_DIR = api/proto
 PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
 PROTOC = protoc
 
-go-proto:
+proto-go:
 	@echo "Generating Go gRPC files..."
 	@for file in $(PROTO_FILES); do \
 		echo "  -> Compilation $$file"; \
@@ -60,11 +60,11 @@ go-proto:
 PB_WEB_OUT_DIR = web/static/js/pb
 GRPC_WEB_PLUGIN = $(shell which protoc-gen-grpc-web)
 
-.PHONY: all web-proto clean
+.PHONY: all proto-js clean
 
-all: web-proto
+all: proto-js
 
-web-proto:
+proto-js:
 	@echo "Generating gRPC-Web JS files..."
 	@mkdir -p $(PB_WEB_OUT_DIR)
 	@for file in $(PROTO_FILES); do \
@@ -76,7 +76,7 @@ web-proto:
 	done
 	@echo "Generation complete. Files in $(PB_WEB_OUT_DIR)"
 
-web-proto-clean:
+proto-js-clean:
 	@echo "Clear $(PB_WEB_OUT_DIR)..."
 	rm -rf $(PB_WEB_OUT_DIR)/*.js
 
@@ -84,12 +84,14 @@ bundle:
 	npx esbuild web/static/js/grpc.js --bundle --format=esm --outfile=web/static/js/bundle.js
 
 
-YELLOW := \033[1;33m
+YELLOW:= \033[1;33m
 GREEN := \033[1;32m
+BLUE  := \033[1;34m
+CYAN  := \033[1;36m
 RESET := \033[0m
 
 help:
-	@echo "$(YELLOW)Available command:$(RESET)"
+	@echo "$(YELLOW)Available commands:$(RESET)"
 	@echo "  $(GREEN)make all-ud$(RESET)          - start all containers"
 	@echo "  $(GREEN)make all-down$(RESET)        - stop all containers"
 	@echo "  $(GREEN)make kafka-up$(RESET)        - start kafka and kafka UI containers"
@@ -102,8 +104,9 @@ help:
 	@echo "  $(GREEN)make rebuild-server$(RESET)  - rebuild only Go server"
 	@echo "  $(GREEN)make psql$(RESET)            - open psql shell"
 	@echo "  $(GREEN)make clean$(RESET)           - clean Docker cache"
-	@echo "  $(GREEN)make web-proto$(RESET)       - generating gRPC-Web JS files"
-	@echo "  $(GREEN)make web-proto-clean$(RESET) - remove gRPC-Web JS files"
-	@echo "  $(GREEN)make go-proto$(RESET)        - generating gRPC files"
+	@echo "  $(GREEN)make proto-go$(RESET)        - generating gRPC Go files"
+	@echo "$(CYAN)Web commands:$(RESET)"
 	@echo "  $(GREEN)make bundle$(RESET)          - create bundle.js"
+	@echo "  $(GREEN)make proto-js$(RESET)        - generating gRPC-Web JS files"
+	@echo "  $(GREEN)make proto-js-clean$(RESET)  - remove gRPC-Web JS files"
 .DEFAULT_GOAL := help
