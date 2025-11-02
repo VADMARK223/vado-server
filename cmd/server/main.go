@@ -20,7 +20,7 @@ import (
 )
 
 func main() {
-	_ = godotenv.Load(".env")
+	_ = godotenv.Load(".env.local")
 
 	zapLogger := logger.Init(true)
 	defer func() { _ = zapLogger.Sync() }()

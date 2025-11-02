@@ -29,7 +29,7 @@ services:
       - "8090:8090" # gRPC-web
     restart: unless-stopped
     env_file:
-      - .env
+      - .env.prod
     depends_on:
       postgres:
         condition: service_healthy # app ждет healthcheck БД

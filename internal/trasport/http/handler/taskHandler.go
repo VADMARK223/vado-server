@@ -9,7 +9,6 @@ import (
 	"vado_server/internal/infra/persistence/gorm"
 
 	"github.com/gin-gonic/gin"
-	"github.com/k0kubun/pp"
 )
 
 func Tasks(service *task.Service) gin.HandlerFunc {
@@ -24,8 +23,6 @@ func Tasks(service *task.Service) gin.HandlerFunc {
 			})
 			return
 		}
-
-		_, _ = pp.Println("Tasks", "tasks", tasks)
 
 		data["Tasks"] = tasks
 		c.HTML(http.StatusOK, "tasks.html", data)
