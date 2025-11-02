@@ -14,19 +14,35 @@
 <main>
     <div class="container">
         <div>
-<!--            <button class="btn" onclick="testHealth()">Test Health</button>-->
             <button id="pingButton" class="btn">Test Ping (gRPC-Web)</button>
-<!--            <button class="btn" onclick="testSayHelloRaw()">Say hello</button>-->
         </div>
 
         <pre id="result"></pre>
     </div>
-
-    <script src="/static/js/bundle.js"></script>
-<!--    <script src="/static/js/grpc.js"></script>-->
 </main>
 
 {{ template "footer" . }}
+
+<script type="module">
+    import { pingServer } from '/static/js/bundle.js';
+
+    const resultBox = document.getElementById('result');
+    const pingButton = document.getElementById('pingButton');
+
+    function setStatus(message, isError = false) {
+        resultBox.textContent = (isError ? '❌ ' : '✅ ') + message + '\n';
+    }
+
+    pingButton.addEventListener('click', async () => {
+        setStatus('Выполняется Ping...');
+        try {
+            const resp = await pingServer();
+            setStatus('Ответ: run=' + resp.getRun());
+        } catch (err) {
+            setStatus(err.message, true);
+        }
+    });
+</script>
 
 </body>
 </html>

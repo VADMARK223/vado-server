@@ -81,7 +81,7 @@ web-proto-clean:
 	rm -rf $(PB_WEB_OUT_DIR)/*.js
 
 bundle:
-	npx esbuild web/static/js/main.js --bundle --outfile=web/static/js/bundle.js
+	npx esbuild web/static/js/grpc.js --bundle --format=esm --outfile=web/static/js/bundle.js
 
 
 YELLOW := \033[1;33m
