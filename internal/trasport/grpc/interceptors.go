@@ -19,8 +19,6 @@ func NewAuthInterceptor(secret string) grpc.UnaryServerInterceptor {
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
-		_, _ = pp.Println(info.FullMethod)
-
 		publicMethods := map[string]bool{
 			"/ping.PingService/Ping":    true,
 			"/auth.AuthService/Login":   true,
