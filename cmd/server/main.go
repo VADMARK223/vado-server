@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"os"
 	"os/signal"
 	"sync"
@@ -20,7 +21,21 @@ import (
 )
 
 func main() {
-	_ = godotenv.Load(".env.local")
+	env := os.Getenv("APP_ENV")
+	if env == "" {
+		env = "local" // по умолчанию, если не задано
+	}
+
+	switch env {
+	case "local":
+		if err := godotenv.Load(".env.local"); err != nil {
+			log.Println("⚠️  .env.local not found — using system env")
+		} else {
+			log.Println("✅ Loaded .env.local")
+		}
+	default:
+		log.Println("ℹ️  Running in", env, "mode — skipping local env")
+	}
 
 	zapLogger := logger.Init(true)
 	defer func() { _ = zapLogger.Sync() }()

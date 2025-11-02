@@ -19,21 +19,18 @@ func NewAuthInterceptor(secret string) grpc.UnaryServerInterceptor {
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
-		// Не проверяем токен для публичных методов
-		if strings.Contains(info.FullMethod, "Ping") {
-			return handler(ctx, req)
+		_, _ = pp.Println(info.FullMethod)
+
+		publicMethods := map[string]bool{
+			"/ping.PingService/Ping":    true,
+			"/auth.AuthService/Login":   true,
+			"/auth.AuthService/Refresh": true,
 		}
-		if strings.Contains(info.FullMethod, "Login") {
-			return handler(ctx, req)
-		}
-		if strings.Contains(info.FullMethod, "Refresh") {
-			return handler(ctx, req)
-		}
-		if strings.Contains(info.FullMethod, "HelloService") {
+
+		if publicMethods[info.FullMethod] {
 			return handler(ctx, req)
 		}
 
-		_, _ = pp.Println(info.FullMethod)
 		md, ok := metadata.FromIncomingContext(ctx)
 		if !ok {
 			return nil, status.Error(codes.Unauthenticated, "metadata отсутствует")

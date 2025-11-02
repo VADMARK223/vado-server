@@ -1,4 +1,5 @@
 PROJECT_NAME = vado-app
+COMPOSE = docker compose -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.kafka.yml
 
 all-up:
 	docker compose -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.kafka.yml up -d
@@ -25,6 +26,10 @@ logs:
 	docker compose -p $(PROJECT_NAME) logs vado-server
 
 rebuild:
+	$(COMPOSE) down --volumes
+	$(COMPOSE) up -d --build --remove-orphans
+
+rebuild-full:
 	docker compose -p $(PROJECT_NAME) down --rmi all --volumes
 	docker compose -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.kafka.yml up -d --build
 
@@ -91,7 +96,8 @@ help:
 	@echo "  $(GREEN)make down-main$(RESET)       - stop server and postgres containers"
 	@echo "  $(GREEN)make up-main$(RESET)         - start server and postgres containers"
 	@echo "  $(GREEN)make logs$(RESET)            - show logs"
-	@echo "  $(GREEN)make rebuild$(RESET)         - rebuild everything (fresh DB)"
+	@echo "  $(GREEN)make rebuild$(RESET)         - rebuild"
+	@echo "  $(GREEN)make rebuild-full$(RESET)    - rebuild everything (fresh DB)"
 	@echo "  $(GREEN)make rebuild-server$(RESET)  - rebuild only Go server"
 	@echo "  $(GREEN)make psql$(RESET)            - open psql shell"
 	@echo "  $(GREEN)make clean$(RESET)           - clean Docker cache"

@@ -29,12 +29,14 @@ COPY --from=builder /app/vado-server .
 COPY --from=builder /app/web/templates ./web/templates
 COPY --from=builder /app/web/static ./web/static
 
+## Копируем только .env.prod (а не .env.local!)
+#COPY .env.prod .env
+
 # Порт для gRPC и HTTP
 EXPOSE 50051 5556 8090
 
-# Задаём переменные окружения по умолчанию
-ENV PORT=5556 \
-    GRPC_PORT=50051 \
+# Устанавливаем базовые env (не мешают docker-compose)
+ENV APP_ENV=production \
     GIN_MODE=release
 
 # Запускаем сервер

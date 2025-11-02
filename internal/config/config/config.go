@@ -25,15 +25,15 @@ type Config struct {
 
 func Load() *Config {
 	cfg := &Config{
-		Port:        getEnv("PORT", "5555"),
-		GrpcPort:    getEnv("GRPC_PORT", "50051"),
-		GrpcWebPort: getEnv("GRPC_WEB_PORT", "8090"),
-		KafkaPort:   getEnv(string(kafkaPort), "9094"),
-		JwtSecret:   getEnv("JWT_SECRET", "asdfkjh"),
-		TokenTTL:    getEnv("TOKEN_TTL", "900"),
-		RefreshTTL:  getEnv("REFRESH_TTL", "604800"),
-		GinMode:     getEnv("GIN_MODE", "debug"),
-		PostgresDsn: getEnv("POSTGRES_DSN", "DNS"),
+		Port:        getEnv("PORT"),
+		GrpcPort:    getEnv("GRPC_PORT"),
+		GrpcWebPort: getEnv("GRPC_WEB_PORT"),
+		KafkaPort:   getEnv(string(kafkaPort)),
+		JwtSecret:   getEnv("JWT_SECRET"),
+		TokenTTL:    getEnv("TOKEN_TTL"),
+		RefreshTTL:  getEnv("REFRESH_TTL"),
+		GinMode:     getEnv("GIN_MODE"),
+		PostgresDsn: getEnv("POSTGRES_DSN"),
 	}
 
 	log.Printf("Loaded config: PORT=%s, GRPC_PORT=%s, GRPC_WEB_PORT=%s, %s=%s, TOKEN_TTL=%s", cfg.Port, cfg.GrpcPort, cfg.GrpcWebPort, kafkaPort, cfg.KafkaPort, cfg.TokenTTL)
@@ -41,10 +41,10 @@ func Load() *Config {
 	return cfg
 }
 
-func getEnv(key, def string) string {
+func getEnv(key string) string {
 	if val := os.Getenv(key); val != "" {
 		return val
 	}
 
-	return def
+	panic("missing env var: " + key)
 }
