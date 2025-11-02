@@ -24,9 +24,9 @@ services:
       dockerfile: Dockerfile
     container_name: vado-server
     ports:
-      - "${PORT}:${PORT}" # HTTP (Gin)
-      - "${GRPC_PORT}:${GRPC_PORT}" # gRPC
-      - "${HTTP_PORT}:${HTTP_PORT}" # gRPC-Web
+      - "5556:5556"
+      - "50051:50051" # gRPC
+      - "8090:8090" # gRPC-web
     restart: unless-stopped
     env_file:
       - .env
