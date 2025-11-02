@@ -1,3 +1,10 @@
+YELLOW:= \033[1;33m
+GREEN := \033[1;32m
+BLUE  := \033[1;34m
+CYAN  := \033[1;36m
+ORANGE := \033[38;5;208m
+RESET := \033[0m
+
 PROJECT_NAME = vado-app
 COMPOSE = docker compose -p $(PROJECT_NAME)
 COMPOSE_FULL = $(COMPOSE) -f docker-compose.yml -f docker-compose.kafka.yml
@@ -55,7 +62,7 @@ proto-go:
 			--go_out=. \
 			--go-grpc_out=. ; \
 	done
-	@echo "Generation complete."
+	@echo "✅ Generation complete."
 
 PB_WEB_OUT_DIR = web/static/js/pb
 GRPC_WEB_PLUGIN = $(shell which protoc-gen-grpc-web)
@@ -65,30 +72,24 @@ GRPC_WEB_PLUGIN = $(shell which protoc-gen-grpc-web)
 all: proto-js
 
 proto-js:
-	@echo "Generating gRPC-Web JS files..."
+	@echo "🔧 Generating gRPC-Web JS files..."
 	@mkdir -p $(PB_WEB_OUT_DIR)
 	@for file in $(PROTO_FILES); do \
-		echo "  -> Compilation $$file"; \
+		echo "  🔵 Compilation $$file"; \
 		$(PROTOC) -I=$(PROTO_DIR) $$file \
 			--js_out=import_style=commonjs,binary:$(PB_WEB_OUT_DIR) \
 			--plugin=protoc-gen-grpc-web=$(GRPC_WEB_PLUGIN) \
 			--grpc-web_out=import_style=commonjs,mode=grpcwebtext:$(PB_WEB_OUT_DIR); \
 	done
-	@echo "Generation complete. Files in $(PB_WEB_OUT_DIR)"
+	@echo "$(GREEN)✅ Generation complete. Files in $(PB_WEB_OUT_DIR)$(RESET)"
 
 proto-js-clean:
-	@echo "Clear $(PB_WEB_OUT_DIR)..."
+	@echo "$(ORANGE)⚠️ Clear $(PB_WEB_OUT_DIR)...$(RESET)"
 	rm -rf $(PB_WEB_OUT_DIR)/*.js
+	@echo "$(GREEN)✅️ Cleaning is complete$(RESET)"
 
 bundle:
 	npx esbuild web/static/js/grpc.js --bundle --format=esm --outfile=web/static/js/bundle.js
-
-
-YELLOW:= \033[1;33m
-GREEN := \033[1;32m
-BLUE  := \033[1;34m
-CYAN  := \033[1;36m
-RESET := \033[0m
 
 help:
 	@echo "$(YELLOW)Available commands:$(RESET)"

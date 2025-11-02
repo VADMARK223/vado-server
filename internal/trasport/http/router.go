@@ -30,12 +30,18 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
+	// Логгер и защита от паники
+	r.Use(gin.Logger(), gin.Recovery())
+	// Шаблоны
 	tmpl := template.Must(template.ParseGlob("web/templates/*.html"))
 	r.SetHTMLTemplate(tmpl)
-	r.Use(gin.Logger(), gin.Recovery())
 	_ = r.SetTrustedProxies(nil)
 	// Статика и шаблоны
 	r.Static("/static", "./web/static")
+	// Favicon: отдаём напрямую, чтобы не было 404
+	r.GET("/favicon.ico", func(c *gin.Context) {
+		c.File("web/static/favicon.ico")
+	})
 
 	// Настраиваем cookie-сессии
 	store := cookie.NewStore([]byte("super-secret-key"))
