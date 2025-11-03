@@ -17,6 +17,17 @@ PROTO_DIR = api/proto
 PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
 PROTOC = protoc
 
+# =========================
+# Read .env.prod
+# =========================
+ifneq (,$(wildcard .env.prod))
+    include .env.prod
+    export $(shell sed -n 's/^\([^#[:space:]]\+\)=.*/\1/p' .env.prod)
+endif
+
+test:
+	@echo "GRPC_WEB_PORT = $(GRPC_WEB_PORT)"
+
 all-up:
 	docker compose -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.kafka.yml up -d
 
@@ -92,7 +103,7 @@ proto-ts:
 
 bundle:
 	@echo "$(BLUE)📦 Bundling TypeScript client with esbuild...$(RESET)"
-	npx esbuild web/static/js/grpc.ts --bundle --format=esm --outfile=web/static/js/bundle.js --platform=browser
+	npx esbuild web/static/js/grpc.ts --bundle --format=esm --outfile=web/static/js/bundle.js --platform=browser --define:process.env.GRPC_WEB_PORT="'$(GRPC_WEB_PORT)'"
 	@echo "$(GREEN)✅ Bundle created → web/static/js/bundle.js$(RESET)"
 
 proto-ts-all: ## 🚀 Full pipeline: clean → generate → bundle
