@@ -1,6 +1,8 @@
 {
   "devDependencies": {
-    "esbuild": "^0.25.11"
+    "esbuild": "^0.25.12",
+    "ts-protoc-gen": "^0.15.0",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "google-protobuf": "^4.0.0",

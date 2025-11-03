@@ -1,3 +1,7 @@
+# =========================
+# 🎨 HELP SECTION
+# =========================
+MAKEFLAGS += --no-print-directory
 YELLOW:= \033[1;33m
 GREEN := \033[1;32m
 BLUE  := \033[1;34m
@@ -8,6 +12,10 @@ RESET := \033[0m
 PROJECT_NAME = vado-app
 COMPOSE = docker compose -p $(PROJECT_NAME)
 COMPOSE_FULL = $(COMPOSE) -f docker-compose.yml -f docker-compose.kafka.yml
+
+PROTO_DIR = api/proto
+PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
+PROTOC = protoc
 
 all-up:
 	docker compose -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.kafka.yml up -d
@@ -50,10 +58,6 @@ psql:
 clean:
 	docker system prune -af --volumes
 
-PROTO_DIR = api/proto
-PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
-PROTOC = protoc
-
 proto-go:
 	@echo "Generating Go gRPC files..."
 	@for file in $(PROTO_FILES); do \
@@ -66,33 +70,41 @@ proto-go:
 
 PB_WEB_OUT_DIR = web/static/js/pb
 GRPC_WEB_PLUGIN = $(shell which protoc-gen-grpc-web)
+TS_PLUGIN = ./node_modules/.bin/protoc-gen-ts
 
-.PHONY: all proto-js clean
+proto-ts-clean:
+	@echo "$(ORANGE)⚠️ Clear all *.ts$(PB_WEB_OUT_DIR)...$(RESET)"
+	@find $(PB_WEB_OUT_DIR) -type f \( -name "*.ts" -o -name "*.js" \) -delete
+	@echo "$(GREEN)✅️ Cleaning is complete$(RESET)"
 
-all: proto-js
-
-proto-js:
-	@echo "🔧 Generating gRPC-Web JS files..."
+proto-ts:
+	@echo "🔧 Generating gRPC-Web TypeScript files..."
 	@mkdir -p $(PB_WEB_OUT_DIR)
 	@for file in $(PROTO_FILES); do \
 		echo "  🔵 Compilation $$file"; \
 		$(PROTOC) -I=$(PROTO_DIR) $$file \
-			--js_out=import_style=commonjs,binary:$(PB_WEB_OUT_DIR) \
 			--plugin=protoc-gen-grpc-web=$(GRPC_WEB_PLUGIN) \
-			--grpc-web_out=import_style=commonjs,mode=grpcwebtext:$(PB_WEB_OUT_DIR); \
+			--plugin=protoc-gen-ts=$(TS_PLUGIN) \
+			--js_out=import_style=commonjs,binary:$(PB_WEB_OUT_DIR) \
+			--grpc-web_out=import_style=typescript,mode=grpcwebtext:$(PB_WEB_OUT_DIR); \
 	done
 	@echo "$(GREEN)✅ Generation complete. Files in $(PB_WEB_OUT_DIR)$(RESET)"
 
-proto-js-clean:
-	@echo "$(ORANGE)⚠️ Clear $(PB_WEB_OUT_DIR)...$(RESET)"
-	rm -rf $(PB_WEB_OUT_DIR)/*.js
-	@echo "$(GREEN)✅️ Cleaning is complete$(RESET)"
-
 bundle:
-	npx esbuild web/static/js/grpc.js --bundle --format=esm --outfile=web/static/js/bundle.js
+	@echo "$(BLUE)📦 Bundling TypeScript client with esbuild...$(RESET)"
+	npx esbuild web/static/js/grpc.ts --bundle --format=esm --outfile=web/static/js/bundle.js --platform=browser
+	@echo "$(GREEN)✅ Bundle created → web/static/js/bundle.js$(RESET)"
+
+proto-ts-all: ## 🚀 Full pipeline: clean → generate → bundle
+	@echo "$(BLUE)🚀 Starting full gRPC-Web TypeScript build pipeline...$(RESET)"
+	@$(MAKE) proto-ts-clean || { echo "$(ORANGE)❌ Stage failed: proto-ts-clean$(RESET)"; exit 1; }
+	@$(MAKE) proto-ts || { echo "$(ORANGE)❌ Stage failed: proto-ts$(RESET)"; exit 1; }
+	@$(MAKE) bundle || { echo "$(ORANGE)❌ Stage failed: bundle$(RESET)"; exit 1; }
+	@echo "$(GREEN)✅ All stages completed successfully!$(RESET)"
 
 help:
-	@echo "$(YELLOW)Available commands:$(RESET)"
+	@echo "$(YELLOW)🧩 Available Make targets:$(RESET)"
+	@echo ""
 	@echo "  $(GREEN)make all-ud$(RESET)          - start all containers"
 	@echo "  $(GREEN)make all-down$(RESET)        - stop all containers"
 	@echo "  $(GREEN)make kafka-up$(RESET)        - start kafka and kafka UI containers"
@@ -106,8 +118,10 @@ help:
 	@echo "  $(GREEN)make psql$(RESET)            - open psql shell"
 	@echo "  $(GREEN)make clean$(RESET)           - clean Docker cache"
 	@echo "  $(GREEN)make proto-go$(RESET)        - generating gRPC Go files"
-	@echo "$(CYAN)Web commands:$(RESET)"
-	@echo "  $(GREEN)make bundle$(RESET)          - create bundle.js"
-	@echo "  $(GREEN)make proto-js$(RESET)        - generating gRPC-Web JS files"
-	@echo "  $(GREEN)make proto-js-clean$(RESET)  - remove gRPC-Web JS files"
+	@echo ""
+	@echo "$(CYAN)Type script proto:$(RESET)"
+	@echo "  $(GREEN)make proto-ts-clean$(RESET)  - 🧹 Clean generated *.ts and *.js, files from $(PB_WEB_OUT_DIR)"
+	@echo "  $(GREEN)make proto-ts$(RESET)        - 🔧 Generate gRPC-Web client files (.js, .d.ts, .ts)"
+	@echo "  $(GREEN)make bundle$(RESET)          - 📦 Bundle TypeScript client into a single bundle.js using esbuild"
+	@echo "  $(GREEN)make proto-ts-all$(RESET)    - 🚀 Run the full pipeline: clean → generate → bundle"
 .DEFAULT_GOAL := help
