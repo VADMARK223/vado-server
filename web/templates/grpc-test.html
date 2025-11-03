@@ -25,7 +25,7 @@
 {{ template "footer" . }}
 
 <script type="module">
-    import {pingServer} from '/static/js/bundle.js';
+    import {pingServer, sayHello} from '/static/js/bundle.js';
 
     const resultBox = document.getElementById('result');
     const pingBtn = document.getElementById('pingBtn');
@@ -48,8 +48,8 @@
     sayHelloBtn.addEventListener('click', async () => {
         setStatus('Выполняется Say hello...')
         try {
-            const resp = await pingServer();
-                test('Ответ: run=' + resp.getRun());
+            const resp = await sayHello('asd');
+            setStatus('Ответ: message=' + resp.getMessage());
         } catch (err) {
             setStatus(err.message, true);
         }
