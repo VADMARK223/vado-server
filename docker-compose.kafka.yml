@@ -23,7 +23,7 @@ services:
     volumes:
       - kafka_data:/var/lib/kafka/data
     networks:
-      - kafka-net
+      - vado-net
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -37,10 +37,10 @@ services:
     depends_on:
       - kafka
     networks:
-      - kafka-net
-
-networks:
-  kafka-net:
+      - vado-net
 
 volumes:
   kafka_data:
+
+networks:
+  vado-net:

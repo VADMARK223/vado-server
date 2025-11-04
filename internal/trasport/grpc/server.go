@@ -48,7 +48,7 @@ func NewServer(ctx *app.Context, port string) (*Server, error) {
 	pbAuth.RegisterAuthServiceServer(s.grpcServer, NewAuthServer(userSvc, ctx.Cfg.JwtSecret))
 	pbHello.RegisterHelloServiceServer(s.grpcServer, NewHelloServer(ctx.Log))
 	pbPing.RegisterPingServiceServer(s.grpcServer, &PingServer{})
-	producer := kafka.NewProducer(topic.ChatLog, ctx.Log, ctx.Cfg)
+	producer := kafka.NewProducer(topic.ChatLog, ctx.Log, ctx)
 	pbChat.RegisterChatServiceServer(s.grpcServer, New(ctx.Log, producer))
 
 	wrappedGrpc := grpcweb.WrapServer(

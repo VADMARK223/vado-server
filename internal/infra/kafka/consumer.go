@@ -2,7 +2,6 @@ package kafka
 
 import (
 	"context"
-	"fmt"
 	"time"
 	"vado_server/internal/app"
 
@@ -16,8 +15,13 @@ type Consumer struct {
 }
 
 func NewConsumer(ctx *app.Context) *Consumer {
+	ctx.Log.Debug("Creating Kafka consumer...")
+	appEnv := ctx.Cfg.AppEnv
+	broker := getKafkaBroker(ctx.Cfg.KafkaBroker, appEnv == "local")
+	ctx.Log.Debugw("Kafka consumer broker", "broker", broker)
+
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:        []string{fmt.Sprintf("localhost:%s", ctx.Cfg.KafkaPort)},
+		Brokers:        []string{broker},
 		Topic:          "chat",
 		GroupID:        "chat-group",
 		StartOffset:    kafka.FirstOffset,

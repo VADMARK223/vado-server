@@ -17,6 +17,8 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data # том для сохранения БД
       - ./db:/docker-entrypoint-initdb.d # SQL-скрипты при старте
+    networks:
+      - vado-net
 
   vado-server:
     build:
@@ -27,12 +29,18 @@ services:
       - "5556:5556"
       - "50051:50051" # gRPC
       - "8090:8090" # gRPC-web
+#      - "9094:9094" # Kafka
     restart: unless-stopped
     env_file:
       - .env.prod
     depends_on:
       postgres:
         condition: service_healthy # app ждет healthcheck БД
+    networks:
+      - vado-net
 
 volumes:
   postgres-data:
+
+networks:
+  vado-net:

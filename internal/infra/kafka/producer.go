@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
-	"vado_server/internal/config/config"
+	"vado_server/internal/app"
 	"vado_server/internal/domain/chat"
 
 	"github.com/segmentio/kafka-go"
@@ -17,8 +17,13 @@ type Producer struct {
 	log    *zap.SugaredLogger
 }
 
-func NewProducer(topic string, log *zap.SugaredLogger, cfg *config.Config) *Producer {
-	brokers := []string{"localhost:" + cfg.KafkaPort}
+func NewProducer(topic string, log *zap.SugaredLogger, ctx *app.Context) *Producer {
+	ctx.Log.Debug("Creating Kafka producer...")
+	appEnv := ctx.Cfg.AppEnv
+	broker := getKafkaBroker(ctx.Cfg.KafkaBroker, appEnv == "local")
+	ctx.Log.Debugw("Kafka producer broker", "broker", broker)
+
+	brokers := []string{broker}
 	writer := &kafka.Writer{
 		Addr:                   kafka.TCP(brokers...),
 		Topic:                  topic,

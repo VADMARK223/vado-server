@@ -7,28 +7,26 @@ import (
 
 type Port string
 
-const (
-	kafkaPort Port = "KAFKA_PORT"
-)
-
 type Config struct {
+	AppEnv      string
 	Port        string
 	GrpcPort    string
 	GrpcWebPort string
-	KafkaPort   string
 	JwtSecret   string
 	TokenTTL    string
 	RefreshTTL  string
 	GinMode     string
 	PostgresDsn string
+	KafkaBroker string
 }
 
 func Load() *Config {
 	cfg := &Config{
+		AppEnv:      getEnv("APP_ENV"),
 		Port:        getEnv("PORT"),
 		GrpcPort:    getEnv("GRPC_PORT"),
 		GrpcWebPort: getEnv("GRPC_WEB_PORT"),
-		KafkaPort:   getEnv(string(kafkaPort)),
+		KafkaBroker: getEnv("KAFKA_BROKER"),
 		JwtSecret:   getEnv("JWT_SECRET"),
 		TokenTTL:    getEnv("TOKEN_TTL"),
 		RefreshTTL:  getEnv("REFRESH_TTL"),
@@ -36,7 +34,7 @@ func Load() *Config {
 		PostgresDsn: getEnv("POSTGRES_DSN"),
 	}
 
-	log.Printf("Loaded config: PORT=%s, GRPC_PORT=%s, GRPC_WEB_PORT=%s, %s=%s, TOKEN_TTL=%s", cfg.Port, cfg.GrpcPort, cfg.GrpcWebPort, kafkaPort, cfg.KafkaPort, cfg.TokenTTL)
+	log.Printf("Loaded config: PORT=%s, GRPC_PORT=%s, GRPC_WEB_PORT=%s, TOKEN_TTL=%s", cfg.Port, cfg.GrpcPort, cfg.GrpcWebPort, cfg.TokenTTL)
 
 	return cfg
 }
