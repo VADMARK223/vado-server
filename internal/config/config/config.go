@@ -13,7 +13,7 @@ type Config struct {
 	GrpcPort    string
 	GrpcWebPort string
 	JwtSecret   string
-	TokenTTL    string
+	TokenTTL    string // Время жизни токена в секунда
 	RefreshTTL  string
 	GinMode     string
 	PostgresDsn string

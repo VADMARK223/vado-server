@@ -58,7 +58,7 @@ func main() {
 	//------------------------------------------------------------
 	// gRPC сервер
 	//------------------------------------------------------------
-	grpcSrv, err := grpc.NewServer(appCtx, appCtx.Cfg.GrpcPort)
+	grpcSrv, err := grpc.NewServer(appCtx, appCtx.Cfg.GrpcPort, appCtx.Cfg.GrpcWebPort, appCtx.Cfg.Port)
 	if err != nil {
 		appCtx.Log.Fatalw("failed to start gRPC server", "error", err)
 	}

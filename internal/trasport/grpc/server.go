@@ -28,10 +28,10 @@ type Server struct {
 	log        *zap.SugaredLogger
 }
 
-func NewServer(ctx *app.Context, port string) (*Server, error) {
-	lis, err := net.Listen("tcp", ":"+port)
+func NewServer(ctx *app.Context, grpcPort, grpcWebPort, port string) (*Server, error) {
+	lis, err := net.Listen("tcp", ":"+grpcPort)
 	if err != nil {
-		return nil, fmt.Errorf("failed to listen on port %s: %w", port, err)
+		return nil, fmt.Errorf("failed to listen on port %s: %w", grpcPort, err)
 	}
 
 	s := &Server{
@@ -63,15 +63,13 @@ func NewServer(ctx *app.Context, port string) (*Server, error) {
 		grpcweb.WithWebsockets(true),
 		grpcweb.WithCorsForRegisteredEndpointsOnly(false),
 	)
-	portHttp := "8090"
+
 	httpServer := &http.Server{
-		Addr: ":" + portHttp,
+		Addr: ":" + grpcWebPort,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			s.log.Debugw("HTTP request", "method", r.Method, "path", r.URL.Path, "headers", r.Header)
-			// CORS заголовки
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
-			//w.Header().Set("Access-Control-Allow-Origin", "*")
-			w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5555")
+			w.Header().Set("Access-Control-Allow-Origin", "http://localhost:"+port)
 			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 			w.Header().Set("Access-Control-Allow-Headers",
 				"x-grpc-web, content-type, x-user-agent, authorization, Authorization, accept, x-requested-with")
@@ -101,7 +99,7 @@ func NewServer(ctx *app.Context, port string) (*Server, error) {
 
 	// Запускаем HTTP сервер в отдельной горутине
 	go func() {
-		s.log.Infow("gRPC-Web starting", "port", portHttp)
+		s.log.Infow("gRPC-Web starting", "port", grpcWebPort)
 		if errServer := httpServer.ListenAndServe(); errServer != nil && !errors.Is(errServer, http.ErrServerClosed) {
 			s.log.Errorw("gRPC-Web stopped with error", "error", errServer)
 		}

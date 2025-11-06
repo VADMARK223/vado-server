@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"vado_server/internal/config/code"
 	"vado_server/internal/config/route"
 	"vado_server/internal/domain/user"
@@ -12,14 +13,18 @@ import (
 )
 
 type AuthHandler struct {
-	service *user.Service
-	secret  string
+	service      *user.Service
+	secret       string
+	tokenTTLSecs int
 }
 
-func NewAuthHandler(service *user.Service, secret string) *AuthHandler {
+func NewAuthHandler(service *user.Service, secret string, tokenTTL string) *AuthHandler {
+	tokenTTLSecs, _ := strconv.Atoi(tokenTTL)
+
 	return &AuthHandler{
-		service: service,
-		secret:  secret,
+		service:      service,
+		secret:       secret,
+		tokenTTLSecs: tokenTTLSecs,
 	}
 }
 
@@ -32,24 +37,16 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": err.Error()})
 	}
 
-	/*cookie := &http.Cookie{
+	cookie := &http.Cookie{
 		Name:     code.JwtVado,
 		Value:    token,
 		Path:     "/",
-		HttpOnly: true,
-		Secure:   true, // только https
-		SameSite: http.SameSiteLaxMode, c.SetSameSite(http.SameSiteStrictMode)
-		MaxAge:   3600 * 15, // 15 минут
+		HttpOnly: true,  // Нельзя прочитать из JS (document.cookie)
+		Secure:   false, // Cookie отправляется даже по HTTP (Надо поменять в production)
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   h.tokenTTLSecs,
 	}
-	http.SetCookie(c.Writer, cookie)*/
-
-	c.SetCookie(code.JwtVado,
-		token,
-		3600*24, // Срок жизни (1 день)
-		"/",
-		"",
-		false, // Cookie отправляется даже по HTTP (Надо поменять в production)
-		true)  // Нельзя прочитать из JS (document.cookie)
+	c.SetCookieData(cookie)
 	session := sessions.Default(c)
 
 	redirectTo := session.Get(code.RedirectTo)
