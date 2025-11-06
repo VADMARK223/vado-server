@@ -39,7 +39,7 @@
         setStatus('Выполняется Ping...');
         try {
             const resp = await pingServer();
-            setStatus('Ответ: run=' + resp.getRun());
+            setStatus('Response: run=' + resp.getRun());
         } catch (err) {
             setStatus(err.message, true);
         }

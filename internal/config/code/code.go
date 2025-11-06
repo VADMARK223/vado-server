@@ -7,4 +7,7 @@ const (
 	JwtVado      = "jwt_vado"
 	Mode         = "mode"
 	TemplateData = "template_data"
+	Local        = "local"
+	Port         = "port"
+	Error        = "error"
 )
