@@ -17,9 +17,9 @@ ifneq (,$(wildcard .env.prod))
     export $(shell sed -n 's/^\([^#[:space:]]\+\)=.*/\1/p' .env.prod)
 endif
 ifeq ($(KAFKA_ENABLE), true)
-    KAFKA_FILE = -f docker-compose.kafka.yml
+	KAFKA_YML = -f docker-compose.kafka.yml
 else
-    KAFKA_FILE =
+    KAFKA_YML =
 endif
 
 PROJECT_NAME = vado-app
