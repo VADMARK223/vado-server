@@ -38,7 +38,7 @@
     sayHelloBtn.addEventListener('click', async () => {
         sayHello("Вадим")
             .then((resp) => {
-                setStatus("Response: " + resp.message);
+                setStatus("Response: " + resp.getMessage());
             })
             .catch((err) => {
                 setStatus("Error, " + err, true);
@@ -48,7 +48,7 @@
     pingBtn.addEventListener('click', async () => {
         ping()
             .then((resp) => {
-                setStatus("Response: " + resp.message);
+                setStatus("Response: " + resp.getRun());
             })
             .catch((err) => {
                 setStatus("Error, " + err, true);

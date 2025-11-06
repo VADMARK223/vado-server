@@ -49,7 +49,7 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	r.Use(middleware.TemplateContext)
 
 	// Публичные маршруты
-	r.GET(route.Index, handler.ShowIndex)
+	r.GET(route.Index, handler.ShowIndex(ctx.Cfg.JwtSecret))
 	r.GET(route.Login, handler.ShowLogin)
 	r.POST(route.Login, authH.Login)
 	r.GET(route.Register, handler.ShowSignup)

@@ -12,7 +12,14 @@
 </header>
 
 <main>
-
+    <div class="container">
+        {{if .is_auth}}
+        <h3>Debugging</h3>
+        <p>JWT token expires: {{.token_expire_at}} (via {{.token_remaining}})</p>
+        {{else}}
+        <p>You must log in...</p>
+        {{end}}
+    </div>
 </main>
 
 <footer>
