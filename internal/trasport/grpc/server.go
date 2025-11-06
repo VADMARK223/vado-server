@@ -69,7 +69,9 @@ func NewServer(ctx *app.Context, port string) (*Server, error) {
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			s.log.Debugw("HTTP request", "method", r.Method, "path", r.URL.Path, "headers", r.Header)
 			// CORS заголовки
-			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			//w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5555")
 			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 			w.Header().Set("Access-Control-Allow-Headers",
 				"x-grpc-web, content-type, x-user-agent, authorization, Authorization, accept, x-requested-with")

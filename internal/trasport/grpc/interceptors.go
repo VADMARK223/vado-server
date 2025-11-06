@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"strings"
+	"vado_server/internal/config/code"
 	"vado_server/internal/domain/auth"
 
 	"github.com/k0kubun/pp"
@@ -36,12 +37,32 @@ func NewAuthInterceptor(log *zap.SugaredLogger, secret string) grpc.UnaryServerI
 			return nil, status.Error(codes.Unauthenticated, "metadata отсутствует")
 		}
 
-		values := md["authorization"]
-		if len(values) == 0 {
-			return nil, status.Error(codes.Unauthenticated, "token not found")
+		var token string
+		// Пробуем достать токен из Authorization
+		if values := md["authorization"]; len(values) > 0 {
+			token = strings.TrimPrefix(values[0], "Bearer ")
+			log.Debugw("token source", "type", "Authorization header")
 		}
 
-		token := strings.TrimPrefix(values[0], "Bearer ")
+		if token == "" {
+			if cookies := md["cookie"]; len(cookies) > 0 {
+				for _, c := range cookies {
+					for _, part := range strings.Split(c, ";") {
+						part = strings.TrimSpace(part)
+						if strings.HasPrefix(part, code.JwtVado+"=") {
+							token = strings.TrimPrefix(part, code.JwtVado+"=")
+							log.Debugw("token source", "type", "Cookie")
+							break
+						}
+					}
+				}
+			}
+		}
+
+		if token == "" {
+			return nil, status.Error(codes.Unauthenticated, "token not found (no header or cookie)")
+		}
+
 		claims, err := auth.ParseToken(token, secret) // твоя функция проверки JWT
 		if err != nil {
 			_, _ = pp.Printf("not valid token: %v", err)

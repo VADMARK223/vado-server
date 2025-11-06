@@ -12,13 +12,14 @@ export function sayHello(name: string, token: string): Promise<HelloResponse.AsO
     req.setName(name);
 
     const md = new grpc.Metadata();
-    md.set("authorization", `Bearer ${token}`);
+    const transport = grpc.CrossBrowserHttpTransport({ withCredentials: true });
 
     return new Promise((resolve, reject) => {
         grpc.unary(HelloService.SayHello, {
             request: req,
             host: HOST,
             metadata: md,
+            transport: transport,
             onEnd: (res) => {
                 if (res.status === grpc.Code.OK && res.message) {
                     resolve((res.message as any).toObject());

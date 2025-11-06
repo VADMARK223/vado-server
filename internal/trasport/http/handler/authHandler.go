@@ -32,13 +32,24 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": err.Error()})
 	}
 
+	/*cookie := &http.Cookie{
+		Name:     code.JwtVado,
+		Value:    token,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true, // только https
+		SameSite: http.SameSiteLaxMode, c.SetSameSite(http.SameSiteStrictMode)
+		MaxAge:   3600 * 15, // 15 минут
+	}
+	http.SetCookie(c.Writer, cookie)*/
+
 	c.SetCookie(code.JwtVado,
 		token,
-		3600*24,
+		3600*24, // Срок жизни (1 день)
 		"/",
 		"",
-		false,
-		true)
+		false, // Cookie отправляется даже по HTTP (Надо поменять в production)
+		true)  // Нельзя прочитать из JS (document.cookie)
 	session := sessions.Default(c)
 
 	redirectTo := session.Get(code.RedirectTo)

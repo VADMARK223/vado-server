@@ -30,7 +30,6 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
-	// Логгер и защита от паники
 	r.Use(gin.Logger(), gin.Recovery())
 	// Шаблоны
 	tmpl := template.Must(template.ParseGlob("web/templates/*.html"))

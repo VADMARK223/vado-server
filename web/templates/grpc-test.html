@@ -34,14 +34,11 @@
     }
 
     sayHelloBtn.addEventListener('click', async () => {
-        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo1NCwicm9sZXMiOlsidXNlciJdLCJpc3MiOiJ2YWRvLXBpbmciLCJzdWIiOiJhY2Nlc3MiLCJleHAiOjE3NjI1MDYwNzksImlhdCI6MTc2MjQxOTY3OX0.qj4p8ltCakA8dNUknAEsc0k2fqWsxjbXfjpPU0YDPvc";
-        sayHello("Вадим", token)
+        sayHello("Вадим")
             .then((resp) => {
                 setStatus("Response: " + resp.message);
-                console.log("Ответ от сервера:", resp.message)
             })
             .catch((err) => {
-                console.error("Ошибка:", err)
                 setStatus("Error, " + err, true);
             });
     })
