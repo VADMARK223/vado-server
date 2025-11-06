@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"log"
 	netHttp "net/http"
 	"os"
 	"os/signal"
@@ -19,28 +18,10 @@ import (
 	"vado_server/internal/trasport/http"
 
 	"gorm.io/gorm"
-
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	//------------------------------------------------------------
-	// Загрузка окружения
-	//------------------------------------------------------------
-	env := os.Getenv("APP_ENV")
-	if env == "" {
-		env = code.Local // по умолчанию, если не задано
-	}
-	switch env {
-	case code.Local:
-		if err := godotenv.Load(".env.local"); err != nil {
-			log.Println("⚠️  .env.local not found — using system env")
-		} else {
-			log.Println("✅ Loaded .env.local")
-		}
-	default:
-		log.Println("ℹ️  Running in", env, "mode — skipping local env")
-	}
+	loadEnv()
 	//------------------------------------------------------------
 	// Инициализация логгера и контекста приложения
 	//------------------------------------------------------------
@@ -72,7 +53,7 @@ func main() {
 	// HTTP сервер (Gin)
 	//------------------------------------------------------------
 	wg.Add(1)
-	go startHTTPServer(ctxWithCancel, appCtx, &wg, appCtx.Cfg.Port)
+	srv := startHTTPServer(ctxWithCancel, appCtx, &wg, appCtx.Cfg.Port)
 
 	//------------------------------------------------------------
 	// gRPC сервер
@@ -128,7 +109,13 @@ func main() {
 		if grpcSrv != nil {
 			grpcSrv.Stop()
 		}
-		_ = consumer.Close()
+		if consumer != nil {
+			_ = consumer.Close()
+		}
+		if srv != nil {
+			_ = srv.Close()
+		}
+
 		os.Exit(0)
 	}
 
@@ -183,7 +170,7 @@ func initDB(appCtx *ctx.Context) *gorm.DB {
 }
 
 // startHTTPServer запускает Gin и корректно останавливает его при ctx.Done()
-func startHTTPServer(ctx context.Context, appCtx *ctx.Context, wg *sync.WaitGroup, port string) {
+func startHTTPServer(ctx context.Context, appCtx *ctx.Context, wg *sync.WaitGroup, port string) *netHttp.Server {
 	defer wg.Done()
 
 	router := http.SetupRouter(appCtx)
@@ -201,14 +188,18 @@ func startHTTPServer(ctx context.Context, appCtx *ctx.Context, wg *sync.WaitGrou
 	}()
 
 	// Ожидаем отмены контекста
-	<-ctx.Done()
-	appCtx.Log.Info("HTTP Server shutting down...")
+	go func() {
+		<-ctx.Done()
+		appCtx.Log.Info("HTTP Server shutting down...")
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := srv.Shutdown(shutdownCtx); err != nil {
-		appCtx.Log.Errorw("HTTP graceful shutdown failed", code.Error, err)
-	} else {
-		appCtx.Log.Info("HTTP Server stopped gracefully")
-	}
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			appCtx.Log.Errorw("HTTP graceful shutdown failed", code.Error, err)
+		} else {
+			appCtx.Log.Info("HTTP Server stopped gracefully")
+		}
+	}()
+
+	return srv
 }
