@@ -77,14 +77,14 @@ func main() {
 	//------------------------------------------------------------
 	// gRPC сервер
 	//------------------------------------------------------------
-	grpcServer, err := grpc.NewServer(appCtx, appCtx.Cfg.GrpcPort)
+	grpcSrv, err := grpc.NewServer(appCtx, appCtx.Cfg.GrpcPort)
 	if err != nil {
 		appCtx.Log.Fatalw("failed to start gRPC server", "error", err)
 	}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err := grpcServer.Start(); err != nil {
+		if err := grpcSrv.Start(); err != nil {
 			appCtx.Log.Errorw("gRPC server stopped", "error", err)
 		}
 	}()
@@ -121,6 +121,17 @@ func main() {
 	//------------------------------------------------------------
 	cancel()
 
+	isDev := appCtx.Cfg.AppEnv == code.Local
+	if isDev {
+		appCtx.Log.Warn("💥 DEV MODE: instant shutdown enabled")
+
+		if grpcSrv != nil {
+			grpcSrv.Stop()
+		}
+		_ = consumer.Close()
+		os.Exit(0)
+	}
+
 	//------------------------------------------------------------
 	// Завершаем Kafka
 	//------------------------------------------------------------
@@ -133,21 +144,21 @@ func main() {
 	//------------------------------------------------------------
 	// Graceful stop gRPC
 	//------------------------------------------------------------
-	if grpcServer != nil {
+	if grpcSrv != nil {
 		// GracefulStop не принимает контекст; оборачиваем в горутину, чтобы не блокировать поток
 		done := make(chan struct{})
 		go func() {
 			appCtx.Log.Info("gRPC: GracefulStop called")
-			grpcServer.GracefulStop()
+			grpcSrv.GracefulStop()
 			close(done)
 		}()
 
 		select {
 		case <-done:
-			appCtx.Log.Info("gRPC ping stopped gracefully")
+			appCtx.Log.Info("gRPC server stopped gracefully")
 		case <-time.After(10 * time.Second):
 			appCtx.Log.Warn("gRPC graceful stop timeout, forcing Stop()")
-			grpcServer.Stop()
+			grpcSrv.Stop()
 		}
 	}
 
@@ -155,7 +166,7 @@ func main() {
 	// Дожидаемся завершения всех горутин
 	//------------------------------------------------------------
 	wg.Wait()
-	appCtx.Log.Infow("✅ All servers stopped. Bye!")
+	appCtx.Log.Infow("✅ All servers stopped.")
 }
 
 // initDB подключает базу данных и возвращает gorm.DB
