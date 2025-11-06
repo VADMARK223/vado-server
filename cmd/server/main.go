@@ -109,9 +109,9 @@ func main() {
 		if grpcSrv != nil {
 			grpcSrv.Stop()
 		}
-		if consumer != nil {
-			_ = consumer.Close()
-		}
+		//if consumer != nil {
+		//	_ = consumer.Close()
+		//}
 		if srv != nil {
 			_ = srv.Close()
 		}
