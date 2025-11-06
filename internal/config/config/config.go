@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"strconv"
 )
 
 type Port string
@@ -17,6 +18,7 @@ type Config struct {
 	RefreshTTL  string
 	GinMode     string
 	PostgresDsn string
+	KafkaEnable bool
 	KafkaBroker string
 }
 
@@ -26,6 +28,7 @@ func Load() *Config {
 		Port:        getEnv("PORT"),
 		GrpcPort:    getEnv("GRPC_PORT"),
 		GrpcWebPort: getEnv("GRPC_WEB_PORT"),
+		KafkaEnable: getEnvBool("KAFKA_ENABLE"),
 		KafkaBroker: getEnv("KAFKA_BROKER"),
 		JwtSecret:   getEnv("JWT_SECRET"),
 		TokenTTL:    getEnv("TOKEN_TTL"),
@@ -45,4 +48,15 @@ func getEnv(key string) string {
 	}
 
 	panic("missing env var: " + key)
+}
+
+func getEnvBool(key string) bool {
+	val := getEnv(key)
+
+	parsed, err := strconv.ParseBool(val)
+	if err != nil {
+		panic("env " + key + " must be true/false, got: " + val)
+	}
+
+	return parsed
 }

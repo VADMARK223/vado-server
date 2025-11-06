@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"log"
 	netHttp "net/http"
 	"os"
 	"os/signal"
@@ -73,21 +74,26 @@ func main() {
 	//------------------------------------------------------------
 	// Kafka consumer
 	//------------------------------------------------------------
-	consumer := kafka.NewConsumer(appCtx)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		runErr := consumer.Run(ctxWithCancel, func(key, value []byte) error {
-			user := string(key)
-			msg := string(value)
-			appCtx.Log.Infow("Processing message", "user", user, "msg", msg)
-			return nil
-		})
+	kafkaEnable := appCtx.Cfg.KafkaEnable
+	log.Println("KafkaEnable", kafkaEnable)
+	var consumer *kafka.Consumer
+	if kafkaEnable {
+		consumer = kafka.NewConsumer(appCtx)
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			runErr := consumer.Run(ctxWithCancel, func(key, value []byte) error {
+				user := string(key)
+				msg := string(value)
+				appCtx.Log.Infow("Processing message", "user", user, "msg", msg)
+				return nil
+			})
 
-		if runErr != nil {
-			appCtx.Log.Errorw("Consumer stopped", "error", runErr)
-		}
-	}()
+			if runErr != nil {
+				appCtx.Log.Errorw("Consumer stopped", "error", runErr)
+			}
+		}()
+	}
 
 	//------------------------------------------------------------
 	// Ловим сигнал остановки
@@ -122,10 +128,12 @@ func main() {
 	//------------------------------------------------------------
 	// Завершаем Kafka
 	//------------------------------------------------------------
-	if err := consumer.Close(); err != nil {
-		appCtx.Log.Warnw("Kafka consumer close error", "error", err)
-	} else {
-		appCtx.Log.Info("Kafka consumer closed")
+	if consumer != nil {
+		if consumerErr := consumer.Close(); consumerErr != nil {
+			appCtx.Log.Warnw("Kafka consumer close error", "error", consumerErr)
+		} else {
+			appCtx.Log.Info("Kafka consumer closed")
+		}
 	}
 
 	//------------------------------------------------------------

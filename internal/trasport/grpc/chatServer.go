@@ -49,14 +49,14 @@ func (s *ChatServer) ChatStream(req *chat.ChatStreamRequest, stream chat.ChatSer
 		stream: stream,
 		user:   &chat.User{Id: userID, Username: req.User.Username, Color: color},
 	}
-	s.broadcastSystemMessage(req.User.Id, fmt.Sprintf("Новый участник: %s", req.User.Username), len(s.clients))
+	s.broadcastSystemMessage(req.User.Id, fmt.Sprintf("New member: %s", req.User.Username), len(s.clients))
 	s.mu.Unlock()
 
 	<-stream.Context().Done()
 
 	s.mu.Lock()
 	delete(s.clients, userID)
-	s.broadcastSystemMessage(req.User.Id, fmt.Sprintf("Участник покинул: %s", req.User.Username), len(s.clients))
+	s.broadcastSystemMessage(req.User.Id, fmt.Sprintf("The member left: %s", req.User.Username), len(s.clients))
 	s.mu.Unlock()
 
 	return nil
