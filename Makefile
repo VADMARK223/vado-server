@@ -79,9 +79,9 @@ proto-go:
 	done
 	@echo "✅ Generation complete."
 
-PB_WEB_OUT_DIR = web/static/js/pb
+PB_WEB_OUT_DIR = ./web/static/js/pb
 GRPC_WEB_PLUGIN = $(shell which protoc-gen-grpc-web)
-TS_PLUGIN = ./node_modules/.bin/protoc-gen-ts
+TS_PLUGIN := $(shell pwd)/node_modules/.bin/protoc-gen-ts
 
 proto-ts-clean:
 	@echo "$(ORANGE)⚠️ Clear all *.ts$(PB_WEB_OUT_DIR)...$(RESET)"
@@ -91,19 +91,19 @@ proto-ts-clean:
 proto-ts:
 	@echo "🔧 Generating gRPC-Web TypeScript files..."
 	@mkdir -p $(PB_WEB_OUT_DIR)
-	@for file in $(PROTO_FILES); do \
-		echo "  🔵 Compilation $$file"; \
-		$(PROTOC) -I=$(PROTO_DIR) $$file \
-			--plugin=protoc-gen-grpc-web=$(GRPC_WEB_PLUGIN) \
+	@for file in $(PROTO_DIR)/*.proto; do \
+		echo "  🔵 Compiling $$file"; \
+		protoc -I=$(PROTO_DIR) \
 			--plugin=protoc-gen-ts=$(TS_PLUGIN) \
 			--js_out=import_style=commonjs,binary:$(PB_WEB_OUT_DIR) \
-			--grpc-web_out=import_style=typescript,mode=grpcwebtext:$(PB_WEB_OUT_DIR); \
+			--ts_out=service=grpc-web:$(PB_WEB_OUT_DIR) \
+			$$file; \
 	done
-	@echo "$(GREEN)✅ Generation complete. Files in $(PB_WEB_OUT_DIR)$(RESET)"
+	@echo "✅ TypeScript gRPC stubs generated → $(PB_WEB_OUT_DIR)"
 
 bundle:
 	@echo "$(BLUE)📦 Bundling TypeScript client with esbuild...$(RESET)"
-	npx esbuild web/static/js/grpc.ts --bundle --format=esm --outfile=web/static/js/bundle.js --platform=browser --define:process.env.GRPC_WEB_PORT="'$(GRPC_WEB_PORT)'"
+	npx esbuild web/static/js/grpc.ts --bundle --format=esm --outfile=web/static/js/bundle.js --platform=browser --target=es2020 --define:process.env.GRPC_WEB_PORT="'$(GRPC_WEB_PORT)'"
 	@echo "$(GREEN)✅ Bundle created → web/static/js/bundle.js$(RESET)"
 
 proto-ts-all: ## 🚀 Full pipeline: clean → generate → bundle

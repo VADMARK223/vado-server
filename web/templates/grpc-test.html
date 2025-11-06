@@ -14,7 +14,6 @@
 <main>
     <div class="container">
         <div>
-            <button id="pingBtn" class="btn">Ping</button>
             <button id="sayHelloBtn" class="btn">SayHello</button>
         </div>
 
@@ -25,38 +24,26 @@
 {{ template "footer" . }}
 
 <script type="module">
-    import {pingServer, sayHello} from '/static/js/bundle.js';
+    import {sayHello} from '/static/js/bundle.js';
 
     const resultBox = document.getElementById('result');
-    const pingBtn = document.getElementById('pingBtn');
     const sayHelloBtn = document.getElementById('sayHelloBtn');
 
     function setStatus(message, isError = false) {
         resultBox.textContent = (isError ? '❌ ' : '✅ ') + message + '\n';
     }
 
-    pingBtn.addEventListener('click', async () => {
-        setStatus('Выполняется Ping...');
-        try {
-            const resp = await pingServer();
-            setStatus('Response: run=' + resp.getRun());
-        } catch (err) {
-            setStatus(err.message, true);
-        }
-    });
-
     sayHelloBtn.addEventListener('click', async () => {
         const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo1NCwicm9sZXMiOlsidXNlciJdLCJpc3MiOiJ2YWRvLXBpbmciLCJzdWIiOiJhY2Nlc3MiLCJleHAiOjE3NjI1MDYwNzksImlhdCI6MTc2MjQxOTY3OX0.qj4p8ltCakA8dNUknAEsc0k2fqWsxjbXfjpPU0YDPvc";
         sayHello("Вадим", token)
-            .then((resp) => console.log("Ответ от сервера:", resp.message))
-            .catch((err) => console.error("Ошибка:", err));
-        /*setStatus('Выполняется Say hello...')
-        try {
-            const resp = await sayHello('asd');
-            setStatus('Ответ: message=' + resp.getMessage());
-        } catch (err) {
-            setStatus(err.message, true);
-        }*/
+            .then((resp) => {
+                setStatus("Response: " + resp.message);
+                console.log("Ответ от сервера:", resp.message)
+            })
+            .catch((err) => {
+                console.error("Ошибка:", err)
+                setStatus("Error, " + err, true);
+            });
     })
 </script>
 

@@ -1,31 +1,34 @@
-import * as jspb from 'google-protobuf'
+// package: chat
+// file: chat.proto
 
-
+import * as jspb from "google-protobuf";
 
 export class ChatMessage extends jspb.Message {
   getId(): string;
-  setId(value: string): ChatMessage;
+  setId(value: string): void;
 
-  getUser(): User | undefined;
-  setUser(value?: User): ChatMessage;
   hasUser(): boolean;
-  clearUser(): ChatMessage;
+  clearUser(): void;
+  getUser(): User | undefined;
+  setUser(value?: User): void;
 
   getText(): string;
-  setText(value: string): ChatMessage;
+  setText(value: string): void;
 
   getTimestamp(): number;
-  setTimestamp(value: number): ChatMessage;
+  setTimestamp(value: number): void;
 
-  getType(): MessageType;
-  setType(value: MessageType): ChatMessage;
+  getType(): MessageTypeMap[keyof MessageTypeMap];
+  setType(value: MessageTypeMap[keyof MessageTypeMap]): void;
 
   getUsersCount(): number;
-  setUsersCount(value: number): ChatMessage;
+  setUsersCount(value: number): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ChatMessage.AsObject;
   static toObject(includeInstance: boolean, msg: ChatMessage): ChatMessage.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
   static serializeBinaryToWriter(message: ChatMessage, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): ChatMessage;
   static deserializeBinaryFromReader(message: ChatMessage, reader: jspb.BinaryReader): ChatMessage;
@@ -37,24 +40,26 @@ export namespace ChatMessage {
     user?: User.AsObject,
     text: string,
     timestamp: number,
-    type: MessageType,
+    type: MessageTypeMap[keyof MessageTypeMap],
     usersCount: number,
   }
 }
 
 export class User extends jspb.Message {
   getId(): number;
-  setId(value: number): User;
+  setId(value: number): void;
 
   getUsername(): string;
-  setUsername(value: string): User;
+  setUsername(value: string): void;
 
   getColor(): string;
-  setColor(value: string): User;
+  setColor(value: string): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): User.AsObject;
   static toObject(includeInstance: boolean, msg: User): User.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
   static serializeBinaryToWriter(message: User, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): User;
   static deserializeBinaryFromReader(message: User, reader: jspb.BinaryReader): User;
@@ -69,14 +74,16 @@ export namespace User {
 }
 
 export class ChatStreamRequest extends jspb.Message {
-  getUser(): User | undefined;
-  setUser(value?: User): ChatStreamRequest;
   hasUser(): boolean;
-  clearUser(): ChatStreamRequest;
+  clearUser(): void;
+  getUser(): User | undefined;
+  setUser(value?: User): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ChatStreamRequest.AsObject;
   static toObject(includeInstance: boolean, msg: ChatStreamRequest): ChatStreamRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
   static serializeBinaryToWriter(message: ChatStreamRequest, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): ChatStreamRequest;
   static deserializeBinaryFromReader(message: ChatStreamRequest, reader: jspb.BinaryReader): ChatStreamRequest;
@@ -92,6 +99,8 @@ export class Empty extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Empty.AsObject;
   static toObject(includeInstance: boolean, msg: Empty): Empty.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
   static serializeBinaryToWriter(message: Empty, writer: jspb.BinaryWriter): void;
   static deserializeBinary(bytes: Uint8Array): Empty;
   static deserializeBinaryFromReader(message: Empty, reader: jspb.BinaryReader): Empty;
@@ -102,9 +111,12 @@ export namespace Empty {
   }
 }
 
-export enum MessageType { 
-  MESSAGE_UNKNOWN = 0,
-  MESSAGE_USER = 1,
-  MESSAGE_SYSTEM = 2,
-  MESSAGE_SELF = 3,
+export interface MessageTypeMap {
+  MESSAGE_UNKNOWN: 0;
+  MESSAGE_USER: 1;
+  MESSAGE_SYSTEM: 2;
+  MESSAGE_SELF: 3;
 }
+
+export const MessageType: MessageTypeMap;
+

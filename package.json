@@ -7,7 +7,6 @@
   },
   "dependencies": {
     "@improbable-eng/grpc-web": "^0.15.0",
-    "google-protobuf": "^3.21.2",
-    "grpc-web": "^2.0.2"
+    "google-protobuf": "^3.21.2"
   }
 }
