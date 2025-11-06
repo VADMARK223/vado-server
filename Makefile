@@ -9,14 +9,6 @@ CYAN  := \033[1;36m
 ORANGE := \033[38;5;208m
 RESET := \033[0m
 
-PROJECT_NAME = vado-app
-COMPOSE = docker compose -p $(PROJECT_NAME)
-COMPOSE_FULL = $(COMPOSE) -f docker-compose.yml -f docker-compose.kafka.yml
-
-PROTO_DIR = api/proto
-PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
-PROTOC = protoc
-
 # =========================
 # Read .env.prod
 # =========================
@@ -24,21 +16,31 @@ ifneq (,$(wildcard .env.prod))
     include .env.prod
     export $(shell sed -n 's/^\([^#[:space:]]\+\)=.*/\1/p' .env.prod)
 endif
+ifeq ($(KAFKA_ENABLE), true)
+    KAFKA_FILE = -f docker-compose.kafka.yml
+else
+    KAFKA_FILE =
+endif
 
-test:
-	@echo "GRPC_WEB_PORT = $(GRPC_WEB_PORT)"
+PROJECT_NAME = vado-app
+COMPOSE = docker compose -p $(PROJECT_NAME)
+COMPOSE_FULL = $(COMPOSE) -f docker-compose.yml $(KAFKA_YML)
+
+PROTO_DIR = api/proto
+PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
+PROTOC = protoc
 
 all-up:
-	docker compose -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.kafka.yml up -d
+	docker compose -p $(PROJECT_NAME) -f docker-compose.yml $(KAFKA_YML) up -d
 
 all-down:
 	docker compose -p $(PROJECT_NAME) down
 
 kafka-up:
-	$(COMPOSE) -f docker-compose.kafka.yml up -d
+	$(COMPOSE) $(KAFKA_YML) up -d
 
 kafka-down:
-	$(COMPOSE) -f docker-compose.kafka.yml down
+	$(COMPOSE) $(KAFKA_YML) down
 
 up-main:
 	docker compose -f docker-compose.yml up -d
@@ -58,7 +60,7 @@ rebuild:
 
 rebuild-full:
 	docker compose -p $(PROJECT_NAME) down --rmi all --volumes
-	docker compose -p $(PROJECT_NAME) -f docker-compose.yml -f docker-compose.kafka.yml up -d --build
+	docker compose -p $(PROJECT_NAME) -f docker-compose.yml $(KAFKA_YML) up -d --build
 
 rebuild-server:
 	docker compose up -d --build --no-deps vado-server
