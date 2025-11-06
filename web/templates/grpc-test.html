@@ -46,13 +46,17 @@
     });
 
     sayHelloBtn.addEventListener('click', async () => {
-        setStatus('Выполняется Say hello...')
+        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo1NCwicm9sZXMiOlsidXNlciJdLCJpc3MiOiJ2YWRvLXBpbmciLCJzdWIiOiJhY2Nlc3MiLCJleHAiOjE3NjI1MDYwNzksImlhdCI6MTc2MjQxOTY3OX0.qj4p8ltCakA8dNUknAEsc0k2fqWsxjbXfjpPU0YDPvc";
+        sayHello("Вадим", token)
+            .then((resp) => console.log("Ответ от сервера:", resp.message))
+            .catch((err) => console.error("Ошибка:", err));
+        /*setStatus('Выполняется Say hello...')
         try {
             const resp = await sayHello('asd');
             setStatus('Ответ: message=' + resp.getMessage());
         } catch (err) {
             setStatus(err.message, true);
-        }
+        }*/
     })
 </script>
 

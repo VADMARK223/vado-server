@@ -6,7 +6,8 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "google-protobuf": "^4.0.0",
+    "@improbable-eng/grpc-web": "^0.15.0",
+    "google-protobuf": "^3.21.2",
     "grpc-web": "^2.0.2"
   }
 }

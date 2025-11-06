@@ -6,13 +6,14 @@ import (
 	"vado_server/internal/domain/auth"
 
 	"github.com/k0kubun/pp"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
-func NewAuthInterceptor(secret string) grpc.UnaryServerInterceptor {
+func NewAuthInterceptor(log *zap.SugaredLogger, secret string) grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
 		req interface{},
@@ -30,13 +31,14 @@ func NewAuthInterceptor(secret string) grpc.UnaryServerInterceptor {
 		}
 
 		md, ok := metadata.FromIncomingContext(ctx)
+		log.Debugw("metadata", "md", md)
 		if !ok {
 			return nil, status.Error(codes.Unauthenticated, "metadata отсутствует")
 		}
 
 		values := md["authorization"]
 		if len(values) == 0 {
-			return nil, status.Error(codes.Unauthenticated, "токен не найден")
+			return nil, status.Error(codes.Unauthenticated, "token not found")
 		}
 
 		token := strings.TrimPrefix(values[0], "Bearer ")

@@ -36,7 +36,7 @@ func NewServer(ctx *app.Context, port string) (*Server, error) {
 
 	s := &Server{
 		grpcServer: grpc.NewServer(
-			grpc.UnaryInterceptor(NewAuthInterceptor(ctx.Cfg.JwtSecret)),
+			grpc.UnaryInterceptor(NewAuthInterceptor(ctx.Log, ctx.Cfg.JwtSecret)),
 		),
 		listener: lis,
 		log:      ctx.Log,
@@ -58,8 +58,10 @@ func NewServer(ctx *app.Context, port string) (*Server, error) {
 			return true
 		}),
 		grpcweb.WithAllowedRequestHeaders([]string{
-			"x-grpc-web", "content-type", "x-user-agent", "authorization",
+			"x-grpc-web", "content-type", "x-user-agent", "authorization", "Authorization",
 		}),
+		grpcweb.WithWebsockets(true),
+		grpcweb.WithCorsForRegisteredEndpointsOnly(false),
 	)
 	portHttp := "8090"
 	httpServer := &http.Server{
@@ -70,7 +72,7 @@ func NewServer(ctx *app.Context, port string) (*Server, error) {
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 			w.Header().Set("Access-Control-Allow-Headers",
-				"x-grpc-web, content-type, x-user-agent, authorization, accept, x-requested-with")
+				"x-grpc-web, content-type, x-user-agent, authorization, Authorization, accept, x-requested-with")
 			w.Header().Set("Access-Control-Expose-Headers", "Grpc-Status, Grpc-Message, Grpc-Encoding, Grpc-Accept-Encoding")
 
 			if r.Method == http.MethodOptions {
