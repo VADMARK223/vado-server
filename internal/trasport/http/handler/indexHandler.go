@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 	"vado_server/internal/config/code"
@@ -17,6 +18,12 @@ func ShowIndex(secret string, log *zap.SugaredLogger) gin.HandlerFunc {
 
 		tokenStr, errCookie := c.Cookie(code.JwtVado)
 		log.Debugw("Index", "token", tokenStr, "err", errCookie)
+		if errCookie != nil {
+			c.HTML(http.StatusBadRequest, "register.html", gin.H{
+				"Error": fmt.Sprintf("Error get token: %s", errCookie.Error()),
+			})
+			return
+		}
 		if errCookie == nil {
 			claims, err := auth.ParseToken(tokenStr, secret)
 			if err == nil {

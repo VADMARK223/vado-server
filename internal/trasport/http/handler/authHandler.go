@@ -45,8 +45,8 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		Name:     code.JwtVado,
 		Value:    token,
 		Path:     "/",
-		HttpOnly: true, // Нельзя прочитать из JS (document.cookie) Защита от XSS
-		Secure:   true, // Cookie отправляется даже по HTTP (Надо поменять в production) Защита от MITM
+		HttpOnly: true,  // Нельзя прочитать из JS (document.cookie) Защита от XSS
+		Secure:   false, // Cookie отправляется даже по HTTP (Надо поменять в production) Защита от MITM
 		SameSite: http.SameSiteNoneMode,
 		MaxAge:   h.tokenTTLSecs,
 	}
