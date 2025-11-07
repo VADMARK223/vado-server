@@ -29,7 +29,7 @@ services:
   vado-server:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile_full
     container_name: vado-server
     ports:
       - "5556:5556"
