@@ -193,6 +193,8 @@ Configuration is stored in `.env` file. Key variables typically include:
 - Kafka broker addresses
 
 ## Future Enhancements
+- [ ] try https://github.com/spf13/viper
+- [ ] try https://github.com/charmbracelet/bubbletea
 - [ ] golang-migrate integration for database migrations
 - [ ] Additional API endpoints
 - [ ] Enhanced monitoring and observability
