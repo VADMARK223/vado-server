@@ -10,21 +10,24 @@ import (
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type AuthHandler struct {
 	service      *user.Service
 	secret       string
 	tokenTTLSecs int
+	log          *zap.SugaredLogger
 }
 
-func NewAuthHandler(service *user.Service, secret string, tokenTTL string) *AuthHandler {
+func NewAuthHandler(service *user.Service, secret string, tokenTTL string, log *zap.SugaredLogger) *AuthHandler {
 	tokenTTLSecs, _ := strconv.Atoi(tokenTTL)
 
 	return &AuthHandler{
 		service:      service,
 		secret:       secret,
 		tokenTTLSecs: tokenTTLSecs,
+		log:          log,
 	}
 }
 
@@ -33,6 +36,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	password := c.PostForm("password")
 
 	_, token, _, err := h.service.Login(username, password, h.secret)
+	h.log.Debugw("Token from service", "token", token)
 	if err != nil {
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": err.Error()})
 	}
@@ -46,6 +50,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		SameSite: http.SameSiteNoneMode,
 		MaxAge:   h.tokenTTLSecs,
 	}
+	h.log.Debugw("SetCookieData", "token", token)
 	c.SetCookieData(cookie)
 	session := sessions.Default(c)
 

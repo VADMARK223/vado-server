@@ -7,14 +7,16 @@ import (
 	"vado_server/internal/domain/auth"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
-func ShowIndex(secret string) gin.HandlerFunc {
+func ShowIndex(secret string, log *zap.SugaredLogger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		td, _ := c.Get(code.TemplateData)
 		data := td.(gin.H)
 
 		tokenStr, errCookie := c.Cookie(code.JwtVado)
+		log.Debugw("Index", "token", tokenStr, "err", errCookie)
 		if errCookie == nil {
 			claims, err := auth.ParseToken(tokenStr, secret)
 			if err == nil {

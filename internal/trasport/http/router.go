@@ -26,7 +26,7 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	refreshTTL, _ := strconv.Atoi(ctx.Cfg.RefreshTTL)
 	userSvc := user.NewService(gorm.NewUserRepo(ctx), time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
 	// Хендлеры
-	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.TokenTTL)
+	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.TokenTTL, ctx.Log)
 
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
@@ -49,7 +49,7 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	r.Use(middleware.TemplateContext)
 
 	// Публичные маршруты
-	r.GET(route.Index, handler.ShowIndex(ctx.Cfg.JwtSecret))
+	r.GET(route.Index, handler.ShowIndex(ctx.Cfg.JwtSecret, ctx.Log))
 	r.GET(route.Login, handler.ShowLogin)
 	r.POST(route.Login, authH.Login)
 	r.GET(route.Register, handler.ShowSignup)
