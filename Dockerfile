@@ -6,6 +6,8 @@ WORKDIR /app
 # копируем бинарь внутрь контейнера
 COPY vado-server .
 
+COPY web ./web
+
 # открываем нужные порты
 EXPOSE 8090 50051 5556
 
