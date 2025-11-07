@@ -47,7 +47,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		Path:     "/",
 		HttpOnly: true,  // Нельзя прочитать из JS (document.cookie) Защита от XSS
 		Secure:   false, // Cookie отправляется даже по HTTP (Надо поменять в production) Защита от MITM
-		SameSite: http.SameSiteNoneMode,
+		SameSite: http.SameSiteLaxMode,
 		MaxAge:   h.tokenTTLSecs,
 	}
 	h.log.Debugw("SetCookieData", "token", token)
