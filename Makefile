@@ -127,6 +127,7 @@ proto-ts-all: ## 🚀 Full pipeline: clean → generate → bundle
 help:
 	@echo "$(YELLOW)🧩 Available Make targets:$(RESET)"
 	@echo ""
+	@echo "  $(GREEN)vado-server-build$(RESET)    - 🔧 build vado-server image"
 	@echo "  $(GREEN)make all-ud$(RESET)          - start all containers"
 	@echo "  $(GREEN)make all-down$(RESET)        - stop all containers"
 	@echo "  $(GREEN)make kafka-up$(RESET)        - start kafka and kafka UI containers"
