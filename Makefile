@@ -30,6 +30,15 @@ PROTO_DIR = api/proto
 PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
 PROTOC = protoc
 
+vado-server-build:
+	docker build -t ghcr.io/vadmark223/vado-server:latest .
+
+vado-server-push:
+	docker push ghcr.io/vadmark223/vado-server:latest
+
+vado-server-pull:
+	docker pull ghcr.io/vadmark223/vado-server:latest
+
 all-up:
 	docker compose -p $(PROJECT_NAME) -f docker-compose.yml $(KAFKA_YML) up -d
 

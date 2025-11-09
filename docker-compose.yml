@@ -12,8 +12,6 @@ services:
       POSTGRES_USER: vadmark
       POSTGRES_PASSWORD: 5125341
       POSTGRES_DB: vadodb
-    #    ports:
-    #      - "5432:5432" # Не пробрасываем порт, потому что локально уже запущен Postgres на этом порту
     volumes:
       - postgres-data:/var/lib/postgresql/data # том для сохранения БД
       - ./db:/docker-entrypoint-initdb.d # SQL-скрипты при старте
@@ -27,9 +25,7 @@ services:
                 -c effective_cache_size=256MB
 
   vado-server:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/vadmark223/vado-server:latest
     container_name: vado-server
     ports:
       - "5556:5556"
@@ -40,7 +36,7 @@ services:
       - .env.prod
     depends_on:
       postgres:
-        condition: service_healthy # app ждет healthcheck БД
+        condition: service_healthy
     networks:
       - vado-net
 

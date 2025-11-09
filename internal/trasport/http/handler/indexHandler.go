@@ -16,7 +16,6 @@ func ShowIndex(secret string, log *zap.SugaredLogger) gin.HandlerFunc {
 		data := td.(gin.H)
 
 		tokenStr, errCookie := c.Cookie(code.JwtVado)
-		log.Debugw(">>>>Index", "token", tokenStr, "err", errCookie)
 		if errCookie == nil {
 			claims, err := auth.ParseToken(tokenStr, secret)
 			if err == nil {
