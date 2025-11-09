@@ -46,6 +46,7 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	store := cookie.NewStore([]byte("super-secret-key"))
 	r.Use(sessions.Sessions("vado-session", store))
 	r.Use(middleware.CheckJWT(ctx.Cfg.JwtSecret, ctx.Cfg.TokenTTL, ctx.Cfg.RefreshTTL))
+	r.Use(middleware.NoCache)
 	r.Use(middleware.TemplateContext)
 
 	// Публичные маршруты
@@ -63,6 +64,7 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 		auth.GET(route.Tasks, handler.Tasks(taskSvc))
 		auth.POST(route.Tasks, handler.AddTask(ctx))
 		auth.DELETE("/tasks/:id", handler.DeleteTask(ctx))
+		auth.PUT("/tasks/:id", handler.UpdateTask(ctx, taskSvc))
 		auth.GET(route.Users, handler.ShowUsers(userSvc))
 		auth.POST(route.Users, handler.PostUser(userSvc))
 		auth.DELETE("/users/:id", handler.DeleteUser(userSvc))

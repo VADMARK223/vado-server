@@ -46,3 +46,13 @@ func (r TaskRepo) GetAllByUserID(ID uint) ([]task.Task, error) {
 
 	return result, err
 }
+
+func (r TaskRepo) UpdateCompleted(taskID, userID uint, completed bool) error {
+	taskEntity := TaskEntity{}
+	if err := r.db.Where("id = ? AND user_id = ?", taskID, userID).First(&taskEntity).Error; err != nil {
+		return err
+	}
+
+	taskEntity.Completed = completed
+	return r.db.Save(&taskEntity).Error
+}

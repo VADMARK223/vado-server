@@ -9,25 +9,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CheckJWT(secret string, tokenTTL string, refreshTokenTTL string) gin.HandlerFunc {
+func CheckJWT(secret, tokenTTL, refreshTokenTTL string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenTTLSecs, _ := strconv.Atoi(tokenTTL)
-		refreashTokenTTLSecs, _ := strconv.Atoi(refreshTokenTTL)
+		refreshTokenTTLSecs, _ := strconv.Atoi(refreshTokenTTL)
 		tokenStr, err := c.Cookie(code.VadoToken)
 		if err != nil || tokenStr == "" {
-			tryRefresh(c, secret, tokenTTLSecs, refreashTokenTTLSecs)
+			tryRefresh(c, secret, tokenTTLSecs, refreshTokenTTLSecs)
 			return
 		}
 
 		claims, err := auth.ParseToken(tokenStr, secret)
 		if err != nil {
-			tryRefresh(c, secret, tokenTTLSecs, refreashTokenTTLSecs)
+			tryRefresh(c, secret, tokenTTLSecs, refreshTokenTTLSecs)
 			return
 		}
 
 		// Проверка срока действия токена
 		if claims.ExpiresAt != nil && claims.ExpiresAt.Time.Before(time.Now()) {
-			tryRefresh(c, secret, tokenTTLSecs, refreashTokenTTLSecs)
+			tryRefresh(c, secret, tokenTTLSecs, refreshTokenTTLSecs)
 			return
 		}
 

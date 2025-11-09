@@ -9,18 +9,6 @@
 <header>
     <h1>Tasks</h1>
     {{ template "menu" . }}
-    <script>
-        async function deleteTask(id) {
-            if (!confirm('Delete task?')) return;
-
-            const res = await fetch(`/tasks/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                document.getElementById(`task-${id}`).remove();
-            } else {
-                alert('Error deleting task');
-            }
-        }
-    </script>
 </header>
 
 <main>
@@ -50,7 +38,11 @@
 
                 <div>
                     <label>
-                        <input type="checkbox" name="completed" {{if .Completed}}checked{{end}}>
+                        <input type="checkbox"
+                               name="completed"
+                               {{if .Completed}}checked{{end}}
+                               onchange="toggleCompleted('{{.ID}}', this.checked)"
+                        >
                         Completed
                     </label>
 
@@ -65,5 +57,39 @@
 </main>
 
 {{ template "footer" . }}
+<script>
+    async function deleteTask(id) {
+        if (!confirm('Delete task?')) return;
+
+        const res = await fetch(`/tasks/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            document.getElementById(`task-${id}`).remove();
+        } else {
+            alert('Error deleting task');
+        }
+    }
+
+    async function toggleCompleted(id, completed) {
+        const res = await fetch(`/tasks/${id}`, {
+            method: 'PUT',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ completed })
+        });
+
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            alert("Error task updating: " + (data.error || res.statusText));
+            return;
+        }
+
+        // Меняем стиль строки без обновления страницы
+        const li = document.getElementById(`task-${id}`);
+        if (completed) {
+            li.classList.add("completed");
+        } else {
+            li.classList.remove("completed");
+        }
+    }
+</script>
 </body>
 </html>

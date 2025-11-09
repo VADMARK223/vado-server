@@ -15,3 +15,7 @@ func (s *Service) GetAllTasks() ([]Task, error) {
 func (s *Service) GetAllByUser(userID uint) ([]Task, error) {
 	return s.repo.GetAllByUserID(userID)
 }
+
+func (s *Service) UpdateCompleted(taskID, userID uint, completed bool) error {
+	return s.repo.UpdateCompleted(taskID, userID, completed)
+}

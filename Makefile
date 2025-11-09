@@ -30,19 +30,19 @@ PROTO_DIR = api/proto
 PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
 PROTOC = protoc
 
-vado-server-build:
+build:
 	docker build -t ghcr.io/vadmark223/vado-server:latest .
 
-vado-server-push:
+push:
 	docker push ghcr.io/vadmark223/vado-server:latest
 
-vado-server-pull:
+pull:
 	docker pull ghcr.io/vadmark223/vado-server:latest
 
-all-up:
+up:
 	docker compose -p $(PROJECT_NAME) -f docker-compose.yml $(KAFKA_YML) up -d
 
-all-down:
+down:
 	docker compose -p $(PROJECT_NAME) down
 
 ps:
@@ -110,23 +110,24 @@ kafka-down:
 help:
 	@echo "$(YELLOW)🧩 Available Make targets:$(RESET)"
 	@echo ""
-	@echo "  $(GREEN)make vado-server-build$(RESET)- 🔧 build vado-server image"
-	@echo "  $(GREEN)make vado-server-push$(RESET) - 📤 push image in GHCR"
-	@echo "  $(GREEN)make vado-server-pull$(RESET) - 📥 pull image from GHCR"
-	@echo "  $(GREEN)make all-ud$(RESET)           - 🚀 start all containers"
-	@echo "  $(GREEN)make all-down$(RESET)         - 🧯 stop all containers"
-	@echo "  $(GREEN)make logs$(RESET)             - 🧾 show logs"
-	@echo "  $(GREEN)make psql$(RESET)             - 🐘 open psql shell"
-	@echo "  $(GREEN)make clean-all$(RESET)        - ⚠️ clean all Docker (containers, images, volumes, networks)"
-	@echo "  $(GREEN)make proto-go$(RESET)         - 🧠generating gRPC Go files"
+	@echo "  $(GREEN)make build$(RESET)     - 🔧 build image ghcr.io/vadmark223/vado-server:latest from Dockerfile"
+	@echo "  $(GREEN)make push$(RESET)      - 📤 push image in GHCR"
+	@echo "  $(GREEN)make pull$(RESET)      - 📥 pull image from GHCR"
+	@echo "  $(GREEN)make up$(RESET)        - 🚀 start all containers"
+	@echo "  $(GREEN)make down$(RESET)      - 🧯 stop all containers"
+	@echo "  $(GREEN)make ps$(RESET)        - show containers"
+	@echo "  $(GREEN)make logs$(RESET)      - 🧾 show logs"
+	@echo "  $(GREEN)make psql$(RESET)      - 🐘 open psql shell"
+	@echo "  $(GREEN)make clean-all$(RESET) - ⚠️ clean all Docker (containers, images, volumes, networks)"
+	@echo "  $(GREEN)make proto-go$(RESET)  - 🧠generating gRPC Go files"
 	@echo ""
 	@echo "$(CYAN)Type script proto:$(RESET)"
-	@echo "  $(GREEN)make proto-ts-clean$(RESET)   - 🧹 Clean generated *.ts and *.js, files from $(PB_WEB_OUT_DIR)"
-	@echo "  $(GREEN)make proto-ts$(RESET)         - 🔧 Generate gRPC-Web client files (.js, .d.ts, .ts)"
-	@echo "  $(GREEN)make bundle$(RESET)           - 📦 Bundle TypeScript client into a single bundle.js using esbuild"
-	@echo "  $(GREEN)make proto-ts-all$(RESET)     - 🚀 Run the full pipeline: clean → generate → bundle"
+	@echo "  $(GREEN)make proto-ts-clean$(RESET) - 🧹 Clean generated *.ts and *.js, files from $(PB_WEB_OUT_DIR)"
+	@echo "  $(GREEN)make proto-ts$(RESET)       - 🔧 Generate gRPC-Web client files (.js, .d.ts, .ts)"
+	@echo "  $(GREEN)make bundle$(RESET)         - 📦 Bundle TypeScript client into a single bundle.js using esbuild"
+	@echo "  $(GREEN)make proto-ts-all$(RESET)   - 🚀 Run the full pipeline: clean → generate → bundle"
 	@echo ""
 	@echo "$(CYAN)Others:$(RESET)"
-	@echo "  $(GREEN)make kafka-up$(RESET)         - start kafka and kafka UI containers"
-	@echo "  $(GREEN)make kafka-down$(RESET)       - stop kafka and kafka UI containers"
+	@echo "  $(GREEN)make kafka-up$(RESET)   - start kafka and kafka UI containers"
+	@echo "  $(GREEN)make kafka-down$(RESET) - stop kafka and kafka UI containers"
 .DEFAULT_GOAL := help
