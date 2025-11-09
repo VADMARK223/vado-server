@@ -14,15 +14,39 @@ type CustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-func CreateToken(userID uint, roles []string, ttl time.Duration, secret string) (string, error) {
+type TokenPair struct {
+	AccessToken  string
+	RefreshToken string
+}
+
+func CreateTokenPair(userID uint, roles []string, accessTTL, refreshTTL time.Duration, secret string) (*TokenPair, error) {
+	access, err := CreateToken(userID, roles, accessTTL, "access", secret)
+	if err != nil {
+		return nil, err
+	}
+
+	refresh, err := CreateToken(userID, roles, refreshTTL, "refresh", secret)
+	if err != nil {
+		return nil, err
+	}
+
+	return &TokenPair{
+		AccessToken:  access,
+		RefreshToken: refresh,
+	}, nil
+}
+
+func CreateToken(userID uint, roles []string, ttl time.Duration, subject, secret string) (string, error) {
+	now := time.Now()
 	claims := CustomClaims{
 		UserID: userID,
 		Roles:  roles,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "vado-ping",
-			Subject:   "access",
+			ExpiresAt: jwt.NewNumericDate(now.Add(ttl)),
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now), // Делает токен “активным не раньше определённого момента”
+			Issuer:    "vado-server",
+			Subject:   subject,
 		},
 	}
 

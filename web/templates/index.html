@@ -16,6 +16,7 @@
         {{if .is_auth}}
         <h3>Debugging</h3>
         <p>JWT token expires: {{.token_expire_at}} (via {{.token_remaining}})</p>
+        <p>JWT refresh token expires: {{.refresh_token_expire_at}} (via {{.refresh_token_remaining}})</p>
         {{else}}
         <p>You must log in...</p>
         {{end}}

@@ -39,27 +39,22 @@ func (s *Service) DeleteUser(id uint) error {
 	return s.repo.DeleteUser(id)
 }
 
-func (s *Service) Login(username, password, secret string) (*User, string, string, error) {
+func (s *Service) Login(username, password, secret string) (*User, *auth.TokenPair, error) {
 	u, errGetUser := s.repo.GetByUsername(username)
 	if errGetUser != nil {
-		return nil, "", "", errors.New("user not found")
+		return nil, nil, errors.New("user not found")
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)) != nil {
-		return u, "", "", errors.New("incorrect password")
+		return u, nil, errors.New("incorrect password")
 	}
 
-	accessToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.tokenTTL, secret)
-	if errToken != nil {
-		return u, "", "", errors.New(fmt.Sprintf("Error creating token (access): %s", errToken.Error()))
+	tokens, err := auth.CreateTokenPair(u.ID, []string{"user"}, s.tokenTTL, s.refreshTTL, secret)
+	if err != nil {
+		return nil, nil, errors.New(fmt.Sprintf("Error creating tokens: %s", err.Error()))
 	}
 
-	refreshToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.refreshTTL, secret)
-	if errToken != nil {
-		return u, "", "", errors.New(fmt.Sprintf("Error creating token (refresh): %s", errToken.Error()))
-	}
-
-	return u, accessToken, refreshToken, nil
+	return u, tokens, nil
 }
 
 func (s *Service) Refresh(token string, secret string) (*User, string, error) {
@@ -72,7 +67,7 @@ func (s *Service) Refresh(token string, secret string) (*User, string, error) {
 		return nil, "", errors.New("user not found")
 	}
 
-	newToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.tokenTTL, secret)
+	newToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.tokenTTL, "refresh", secret)
 	if errToken != nil {
 		return nil, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Error creating new token: %s", errToken.Error()))
 	}

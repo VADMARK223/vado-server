@@ -1,0 +1,13 @@
+# --- служебное ---
+.git
+.gitignore
+.idea
+
+# --- конфиги и документация ---
+.env.local
+.env.prod
+*.md
+*.json
+
+# --- ресурсы, не нужные в runtime ---
+node_modules

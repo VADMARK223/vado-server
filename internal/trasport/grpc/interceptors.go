@@ -49,8 +49,8 @@ func NewAuthInterceptor(log *zap.SugaredLogger, secret string) grpc.UnaryServerI
 				for _, c := range cookies {
 					for _, part := range strings.Split(c, ";") {
 						part = strings.TrimSpace(part)
-						if strings.HasPrefix(part, code.JwtVado+"=") {
-							token = strings.TrimPrefix(part, code.JwtVado+"=")
+						if strings.HasPrefix(part, code.VadoToken+"=") {
+							token = strings.TrimPrefix(part, code.VadoToken+"=")
 							log.Debugw("token source", "type", "Cookie")
 							break
 						}

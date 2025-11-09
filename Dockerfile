@@ -1,4 +1,4 @@
-# Этап 1: Сборка (builder)
+# Этап 1: Сборка (builder) слой с зависимостями
 FROM golang:1.25 AS builder
 
 # Рабочая директория
@@ -9,8 +9,11 @@ COPY go.mod go.sum ./
 # Качаем зависимости
 RUN go mod download
 
-# Копируем остальной код
-COPY . .
+# Копируем только исходники
+COPY api ./api
+COPY "cmd" "./cmd"
+COPY internal ./internal
+COPY web ./web
 
 # Сборка бинарника (статическая, без CGO)
 # CGO_ENABLED=0 компилято выключает исользование С, и Go собирает чистый статический бинарник. Если чистое CLI, для GUI может все сломать
@@ -26,11 +29,7 @@ WORKDIR /app
 # Копируем бинарник из builder-этапа
 COPY --from=builder /app/vado-server .
 # Копируем шаблоны и статику
-COPY --from=builder /app/web/templates ./web/templates
-COPY --from=builder /app/web/static ./web/static
-
-## Копируем только .env.prod (а не .env.local!)
-#COPY .env.prod .env
+COPY --from=builder /app/web ./web
 
 # Порт для gRPC и HTTP
 EXPOSE 50051 5556 8090

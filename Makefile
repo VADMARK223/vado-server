@@ -45,39 +45,16 @@ all-up:
 all-down:
 	docker compose -p $(PROJECT_NAME) down
 
-kafka-up:
-	$(COMPOSE) $(KAFKA_YML) up -d
-
-kafka-down:
-	$(COMPOSE) $(KAFKA_YML) down
-
-up-main:
-	docker compose -f docker-compose.yml up -d
-
-down-main:
-	docker compose -f docker-compose.yml down
-
 ps:
 	$(COMPOSE) ps --format 'table {{.Name}}\t{{.Ports}}'
 
 logs:
 	docker compose -p $(PROJECT_NAME) logs vado-server
 
-rebuild:
-	$(COMPOSE_FULL) down --volumes
-	$(COMPOSE_FULL) up -d --build --remove-orphans
-
-rebuild-full:
-	docker compose -p $(PROJECT_NAME) down --rmi all --volumes
-	docker compose -p $(PROJECT_NAME) -f docker-compose.yml $(KAFKA_YML) up -d --build
-
-rebuild-server:
-	docker compose up -d --build --no-deps vado-server
-
 psql:
 	docker exec -it vado-postgres psql -U vadmark -d vadodb
 
-clean:
+clean-all:
 	docker system prune -af --volumes
 
 proto-go:
@@ -124,27 +101,32 @@ proto-ts-all: ## 🚀 Full pipeline: clean → generate → bundle
 	@$(MAKE) bundle || { echo "$(ORANGE)❌ Stage failed: bundle$(RESET)"; exit 1; }
 	@echo "$(GREEN)✅ All stages completed successfully!$(RESET)"
 
+kafka-up:
+	$(COMPOSE) $(KAFKA_YML) up -d
+
+kafka-down:
+	$(COMPOSE) $(KAFKA_YML) down
+
 help:
 	@echo "$(YELLOW)🧩 Available Make targets:$(RESET)"
 	@echo ""
-	@echo "  $(GREEN)vado-server-build$(RESET)    - 🔧 build vado-server image"
-	@echo "  $(GREEN)make all-ud$(RESET)          - start all containers"
-	@echo "  $(GREEN)make all-down$(RESET)        - stop all containers"
-	@echo "  $(GREEN)make kafka-up$(RESET)        - start kafka and kafka UI containers"
-	@echo "  $(GREEN)make kafka-down$(RESET)      - stop kafka and kafka UI containers"
-	@echo "  $(GREEN)make down-main$(RESET)       - stop server and postgres containers"
-	@echo "  $(GREEN)make up-main$(RESET)         - start server and postgres containers"
-	@echo "  $(GREEN)make logs$(RESET)            - show logs"
-	@echo "  $(GREEN)make rebuild$(RESET)         - rebuild"
-	@echo "  $(GREEN)make rebuild-full$(RESET)    - rebuild everything (fresh DB)"
-	@echo "  $(GREEN)make rebuild-server$(RESET)  - rebuild only Go server"
-	@echo "  $(GREEN)make psql$(RESET)            - open psql shell"
-	@echo "  $(GREEN)make clean$(RESET)           - clean Docker cache"
-	@echo "  $(GREEN)make proto-go$(RESET)        - generating gRPC Go files"
+	@echo "  $(GREEN)make vado-server-build$(RESET)- 🔧 build vado-server image"
+	@echo "  $(GREEN)make vado-server-push$(RESET) - 📤 push image in GHCR"
+	@echo "  $(GREEN)make vado-server-pull$(RESET) - 📥 pull image from GHCR"
+	@echo "  $(GREEN)make all-ud$(RESET)           - 🚀 start all containers"
+	@echo "  $(GREEN)make all-down$(RESET)         - 🧯 stop all containers"
+	@echo "  $(GREEN)make logs$(RESET)             - 🧾 show logs"
+	@echo "  $(GREEN)make psql$(RESET)             - 🐘 open psql shell"
+	@echo "  $(GREEN)make clean-all$(RESET)        - ⚠️ clean all Docker (containers, images, volumes, networks)"
+	@echo "  $(GREEN)make proto-go$(RESET)         - 🧠generating gRPC Go files"
 	@echo ""
 	@echo "$(CYAN)Type script proto:$(RESET)"
-	@echo "  $(GREEN)make proto-ts-clean$(RESET)  - 🧹 Clean generated *.ts and *.js, files from $(PB_WEB_OUT_DIR)"
-	@echo "  $(GREEN)make proto-ts$(RESET)        - 🔧 Generate gRPC-Web client files (.js, .d.ts, .ts)"
-	@echo "  $(GREEN)make bundle$(RESET)          - 📦 Bundle TypeScript client into a single bundle.js using esbuild"
-	@echo "  $(GREEN)make proto-ts-all$(RESET)    - 🚀 Run the full pipeline: clean → generate → bundle"
+	@echo "  $(GREEN)make proto-ts-clean$(RESET)   - 🧹 Clean generated *.ts and *.js, files from $(PB_WEB_OUT_DIR)"
+	@echo "  $(GREEN)make proto-ts$(RESET)         - 🔧 Generate gRPC-Web client files (.js, .d.ts, .ts)"
+	@echo "  $(GREEN)make bundle$(RESET)           - 📦 Bundle TypeScript client into a single bundle.js using esbuild"
+	@echo "  $(GREEN)make proto-ts-all$(RESET)     - 🚀 Run the full pipeline: clean → generate → bundle"
+	@echo ""
+	@echo "$(CYAN)Others:$(RESET)"
+	@echo "  $(GREEN)make kafka-up$(RESET)         - start kafka and kafka UI containers"
+	@echo "  $(GREEN)make kafka-down$(RESET)       - stop kafka and kafka UI containers"
 .DEFAULT_GOAL := help

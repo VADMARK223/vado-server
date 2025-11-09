@@ -26,7 +26,7 @@ func (s *AuthServer) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRe
 	username := req.Username
 	password := req.Password
 
-	u, accessToken, refreshToken, err := s.service.Login(username, password, s.secret)
+	u, tokens, err := s.service.Login(username, password, s.secret)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
@@ -34,8 +34,8 @@ func (s *AuthServer) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRe
 	return &pb.LoginResponse{
 		Id:           uint64(u.ID),
 		Username:     u.Username,
-		Token:        accessToken,
-		RefreshToken: refreshToken,
+		Token:        tokens.AccessToken,
+		RefreshToken: tokens.RefreshToken,
 	}, nil
 }
 

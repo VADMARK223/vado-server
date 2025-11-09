@@ -7,16 +7,15 @@ import (
 	"vado_server/internal/domain/auth"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 )
 
-func ShowIndex(secret string, log *zap.SugaredLogger) gin.HandlerFunc {
+func ShowIndex(secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		td, _ := c.Get(code.TemplateData)
 		data := td.(gin.H)
 
-		tokenStr, errCookie := c.Cookie(code.JwtVado)
-		if errCookie == nil {
+		tokenStr, errTokenCookie := c.Cookie(code.VadoToken)
+		if errTokenCookie == nil {
 			claims, err := auth.ParseToken(tokenStr, secret)
 			if err == nil {
 				expTime := claims.ExpiresAt.Time
@@ -28,6 +27,21 @@ func ShowIndex(secret string, log *zap.SugaredLogger) gin.HandlerFunc {
 			}
 		} else {
 			data[code.TokenExpireAt] = "токена нет"
+		}
+
+		refreshTokenStr, errRefreshTokenCookie := c.Cookie(code.VadoRefreshToken)
+		if errRefreshTokenCookie == nil {
+			claims, err := auth.ParseToken(refreshTokenStr, secret)
+			if err == nil {
+				expTime := claims.ExpiresAt.Time
+				remaining := time.Until(expTime).Truncate(time.Second)
+				data[code.RefreshTokenExpireAt] = expTime.Format("02.01.2006 15:04:05")
+				data[code.RefreshTokenRemaining] = remaining.String()
+			} else {
+				data[code.RefreshTokenExpireAt] = "refresh токен невалиден"
+			}
+		} else {
+			data[code.RefreshTokenExpireAt] = "refresh токена нет"
 		}
 
 		c.HTML(http.StatusOK, "index.html", data)
