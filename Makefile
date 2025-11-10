@@ -49,7 +49,10 @@ ps:
 	$(COMPOSE) ps --format 'table {{.Name}}\t{{.Ports}}'
 
 logs:
-	docker compose -p $(PROJECT_NAME) logs vado-server
+	docker compose -p $(PROJECT_NAME) logs --tail=20 vado-server
+
+logs-f:
+	docker compose -p $(PROJECT_NAME) logs -f --tail=20 vado-server
 
 psql:
 	docker exec -it vado-postgres psql -U vadmark -d vadodb
@@ -117,6 +120,7 @@ help:
 	@echo "  $(GREEN)make down$(RESET)      - 🧯 stop all containers"
 	@echo "  $(GREEN)make ps$(RESET)        - show containers"
 	@echo "  $(GREEN)make logs$(RESET)      - 🧾 show logs"
+	@echo "  $(GREEN)make logs-f$(RESET)    - 🧾 show logs (Follow)"
 	@echo "  $(GREEN)make psql$(RESET)      - 🐘 open psql shell"
 	@echo "  $(GREEN)make clean-all$(RESET) - ⚠️ clean all Docker (containers, images, volumes, networks)"
 	@echo "  $(GREEN)make proto-go$(RESET)  - 🧠generating gRPC Go files"

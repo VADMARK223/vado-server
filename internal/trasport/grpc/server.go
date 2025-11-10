@@ -70,18 +70,18 @@ func NewServer(ctx *app.Context, grpcPort, grpcWebPort, port string) (*Server, e
 	httpServer := &http.Server{
 		Addr: ":" + grpcWebPort,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			s.log.Debugw("HTTP request", "method", r.Method, "path", r.URL.Path, "headers", r.Header)
+			s.log.Infow("HTTP request", "method", r.Method, "path", r.URL.Path, "headers", r.Header)
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			corsAllowedOrigins := ctx.Cfg.CorsAllowedOrigins()
 			origin := r.Header.Get("Origin")
-			ctx.Log.Debugw("Check cors allowed origins.")
+			ctx.Log.Infow("Check cors allowed origins.")
 			if corsAllowedOrigins[origin] {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
 				w.Header().Set("Vary", "Origin")
 			} else {
-				ctx.Log.Debugw("BAD")
-				ctx.Log.Debugw("test", "origin", origin)
-				ctx.Log.Debugw("test", "corsAllowedOrigins", corsAllowedOrigins)
+				ctx.Log.Infow("BAD")
+				ctx.Log.Infow("test", "origin", origin)
+				ctx.Log.Infow("test", "corsAllowedOrigins", corsAllowedOrigins)
 			}
 			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 			w.Header().Set("Access-Control-Allow-Headers",
@@ -102,7 +102,7 @@ func NewServer(ctx *app.Context, grpcPort, grpcWebPort, port string) (*Server, e
 			if wrappedGrpc.IsGrpcWebRequest(r) ||
 				wrappedGrpc.IsAcceptableGrpcCorsRequest(r) ||
 				wrappedGrpc.IsGrpcWebSocketRequest(r) {
-				s.log.Debugw("gRPC-Web request", "content-type", r.Header.Get("content-type"))
+				s.log.Infow("gRPC-Web request", "content-type", r.Header.Get("content-type"))
 				wrappedGrpc.ServeHTTP(w, r)
 				return
 			}
