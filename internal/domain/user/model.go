@@ -27,6 +27,6 @@ type WithRoles struct {
 }
 
 type RoleDTO struct {
-	ID   int
+	ID   uint
 	Name string
 }

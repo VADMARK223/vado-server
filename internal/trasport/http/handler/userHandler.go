@@ -12,17 +12,26 @@ import (
 
 func ShowUsers(service *user.Service) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		var users, err = service.GetAllUsersWithRoles()
-		if err != nil {
-			ShowError(c, "Failed to load users", err.Error())
-			return
-		}
-
-		td, _ := c.Get(code.TemplateData)
-		data := td.(gin.H)
-		data["Users"] = users
-		c.HTML(http.StatusOK, "users.html", data)
+		renderUsersPage(c, service, "")
 	}
+}
+
+func renderUsersPage(c *gin.Context, service *user.Service, errorMsg string) {
+	users, err := service.GetAllUsersWithRoles()
+	if err != nil {
+		ShowError(c, "Failed to load users", err.Error())
+		return
+	}
+
+	td, _ := c.Get(code.TemplateData)
+	data := td.(gin.H)
+	data["Users"] = users
+
+	if errorMsg != "" {
+		data["Error"] = errorMsg
+	}
+
+	c.HTML(http.StatusOK, "users.html", data)
 }
 
 func PostUser(service *user.Service) func(c *gin.Context) {
@@ -32,28 +41,24 @@ func PostUser(service *user.Service) func(c *gin.Context) {
 		email := c.PostForm("email")
 
 		if username == "" {
-			c.String(http.StatusBadRequest, "Имя обязательно")
+			renderUsersPage(c, service, "Name is required")
 			return
 		}
 
 		if password == "" {
-			c.String(http.StatusBadRequest, "Пароль обязателен")
+			renderUsersPage(c, service, "Password is required")
 			return
 		}
 
-		userDto := user.DTO{
-			Username: username,
-			Password: password,
-			Email:    email,
+		if email == "" {
+			renderUsersPage(c, service, "Email is required")
+			return
 		}
 
-		err := service.CreateUser(userDto)
+		err := service.CreateUser(user.DTO{Username: username, Email: email, Password: password})
 
 		if err != nil {
-			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
-				"Message": "Ошибка добавления пользователя c ролью",
-				"Error":   err.Error(),
-			})
+			ShowError(c, "Error adding user with role", err.Error())
 			return
 		}
 		c.Redirect(http.StatusSeeOther, route.Users)

@@ -7,6 +7,7 @@
     --accent: #6897bb;
     --accent-strong: #4e94ce;
     --orange: #cc7832;
+    --error: #d9534f;
     --danger: rgba(255, 0, 0, 0.87);
     --border: #3c3f41;
 }
@@ -44,6 +45,12 @@ a, .link {
 }
 a:hover {
     color: var(--orange);
+}
+
+.error-msg {
+    color: var(--error);
+    font-weight: 600;
+    margin-top: 8px;
 }
 
 .vado-menu {

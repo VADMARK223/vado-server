@@ -27,11 +27,7 @@ func NewService(repo Repository, tokenTTL time.Duration, refreshTTL time.Duratio
 
 func (s *Service) CreateUser(dto DTO) error {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
-	user := User{
-		Username: dto.Username,
-		Password: string(hash),
-		Email:    dto.Email,
-	}
+	user := User{Username: dto.Username, Password: string(hash), Email: dto.Email}
 	return s.repo.CreateUser(user)
 }
 

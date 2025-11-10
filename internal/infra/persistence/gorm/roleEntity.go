@@ -1,7 +1,7 @@
 package gorm
 
 type RoleEntity struct {
-	ID   int
+	ID   uint
 	Name string `gorm:"unique;not null"`
 }
 

@@ -1,7 +1,9 @@
 package gorm
 
 import (
+	"fmt"
 	"vado_server/internal/app"
+	"vado_server/internal/domain/role"
 	"vado_server/internal/domain/user"
 
 	"go.uber.org/zap"
@@ -21,25 +23,33 @@ func NewUserRepo(ctx *app.Context) user.Repository {
 }
 
 func (r *UserRepository) CreateUser(u user.User) error {
-	entity := &UserEntity{
-		Username: u.Username,
-		Password: u.Password,
-		Email:    u.Email,
-	}
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		entity := &UserEntity{Username: u.Username, Password: u.Password, Email: u.Email}
+		if err := tx.Create(entity).Error; err != nil {
+			return fmt.Errorf("failed to create user: %w", err)
+		}
 
-	if err := r.db.Create(entity).Error; err != nil {
-		r.log.Errorw("failed to create user", "error", err)
-		return err
-	}
+		var roleEntity RoleEntity
+		if err := tx.First(&roleEntity, "id = ?", role.User.ID).Error; err != nil {
+			return fmt.Errorf("failed to find role 'user': %w", err)
+		}
 
-	u.ID = entity.ID
-	return nil
+		userRole := UserRoleEntity{
+			UserID: entity.ID,
+			RoleID: roleEntity.ID,
+		}
+		if err := tx.Create(&userRole).Error; err != nil {
+			return fmt.Errorf("failed to assign default role: %w", err)
+		}
+
+		u.ID = entity.ID
+		return nil
+	})
 }
 
 func (r *UserRepository) DeleteUser(id uint) error {
 	if err := r.db.Delete(&UserEntity{}, id).Error; err != nil {
-		r.log.Errorw("failed to delete user", "error", err)
-		return err
+		return fmt.Errorf("failed to delete user: %w", err)
 	}
 
 	return nil

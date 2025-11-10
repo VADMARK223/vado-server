@@ -72,7 +72,17 @@ func NewServer(ctx *app.Context, grpcPort, grpcWebPort, port string) (*Server, e
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			s.log.Debugw("HTTP request", "method", r.Method, "path", r.URL.Path, "headers", r.Header)
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
-			w.Header().Set("Access-Control-Allow-Origin", "http://localhost:"+port)
+			corsAllowedOrigins := ctx.Cfg.CorsAllowedOrigins()
+			origin := r.Header.Get("Origin")
+			ctx.Log.Debugw("Check cors allowed origins.")
+			if corsAllowedOrigins[origin] {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+				w.Header().Set("Vary", "Origin")
+			} else {
+				ctx.Log.Debugw("BAD")
+				ctx.Log.Debugw("test", "origin", origin)
+				ctx.Log.Debugw("test", "corsAllowedOrigins", corsAllowedOrigins)
+			}
 			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 			w.Header().Set("Access-Control-Allow-Headers",
 				"x-grpc-web, content-type, x-user-agent, authorization, Authorization, accept, x-requested-with")

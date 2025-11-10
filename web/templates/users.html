@@ -61,6 +61,7 @@
             <label>
                 <input type="email" name="email" placeholder="Email" required>
             </label>
+            {{if .Error}}<p class="error-msg">{{.Error}}</p>{{end}}
             <button type="submit" class="btn"><i class="fa-solid fa-plus"></i></button>
         </form>
     </div>
