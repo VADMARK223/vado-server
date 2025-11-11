@@ -10,7 +10,8 @@ import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 declare const process: any;
 
 const GRPC_WEB_PORT = process.env.GRPC_WEB_PORT || '1111'
-const HOST = 'http://localhost:' + GRPC_WEB_PORT;
+// const HOST = 'http://localhost:' + GRPC_WEB_PORT;
+const HOST = `${window.location.protocol}//${window.location.hostname}:${GRPC_WEB_PORT}`;
 const defaultTransport = grpc.CrossBrowserHttpTransport({ withCredentials: true });
 
 export function sayHello(name: string): Promise<HelloResponse> {
@@ -18,6 +19,8 @@ export function sayHello(name: string): Promise<HelloResponse> {
     req.setName(name);
 
     const md = new grpc.Metadata();
+
+    console.log("HOST:" + HOST)
 
     return new Promise((resolve, reject) => {
         grpc.unary(HelloService.SayHello, {
@@ -38,6 +41,8 @@ export function sayHello(name: string): Promise<HelloResponse> {
 
 export function ping(): Promise<PingResponse> {
     const req = new Empty();
+
+    console.log("HOST:" + HOST)
 
     return new Promise((resolve, reject) => {
         grpc.unary(PingService.Ping, {
