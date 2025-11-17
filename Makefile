@@ -94,7 +94,7 @@ proto-ts:
 
 bundle:
 	@echo "$(BLUE)📦 Bundling TypeScript client with esbuild...$(RESET)"
-	npx esbuild web/static/js/grpc.ts --bundle --format=esm --outfile=web/static/js/bundle.js --platform=browser --target=es2020 --define:process.env.GRPC_WEB_PORT="'$(GRPC_WEB_PORT)'"
+	npx esbuild web/static/js/main.ts --bundle --format=esm --outfile=web/static/js/bundle.js --platform=browser --target=es2020 --define:process.env.GRPC_WEB_PORT="'$(GRPC_WEB_PORT)'"
 	@echo "$(GREEN)✅ Bundle created → web/static/js/bundle.js$(RESET)"
 
 proto-ts-all: ## 🚀 Full pipeline: clean → generate → bundle
