@@ -54,6 +54,12 @@ go mod init vado_server
 ```shell
 go mod tidy
 ```
+Обновить все зависимости:
+```shell
+go get -u ./...
+go mod tidy
+
+```
 
 Показывает, почему модуль был добавлен
 ```shell

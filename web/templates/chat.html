@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>WebSocket Chat</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<header>
+    <h1>WebSocket Chat</h1>
+    {{ template "menu" . }}
+</header>
+
+<main>
+    <div class="container">
+        <div class="chat">
+            <div id="status"></div>
+            <div id="messages" class="chat-messages"></div>
+
+            <label for="msgInput">
+                <input id="msgInput" class="chat-message-input" type="text" placeholder="Enter message...">
+            </label>
+        </div>
+        <button id="sendBtn" class="btn">Send</button>
+    </div>
+</main>
+
+{{ template "footer" . }}
+
+<script type="module">
+    const socket = new WebSocket("ws://localhost:5555/ws");
+
+    const statusDiv = document.getElementById("status");
+    const messagesDiv = document.getElementById("messages");
+    const input = document.getElementById("msgInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    socket.onopen = () => {
+        updateStatus("🟢 Connected")
+    };
+
+    // === 3. Когда пришло сообщение от сервера ===
+    socket.onmessage = (event) => {
+        addMessage(event.data);
+    };
+
+    socket.onerror = (err) => {
+        updateStatus("❌ Error: " + err.message)
+    };
+
+    socket.onclose = () => {
+        updateStatus("🔴 Disconnected");
+    };
+
+    sendBtn.onclick = () => sendMessage();
+    input.onkeypress = (e) => {
+        if (e.key === "Enter") sendMessage();
+    };
+
+    function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        socket.send(text);
+        input.value = "";
+    }
+
+    function updateStatus(text) {
+        statusDiv.textContent = text
+    }
+
+    // === Helper: красиво добавляем сообщения ===
+    function addMessage(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        messagesDiv.appendChild(div);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+</script>
+
+</body>
+</html>

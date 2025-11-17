@@ -215,3 +215,24 @@ input[type="checkbox"]:checked::after {
     text-align: center;
     color: #777;
 }
+
+
+.chat {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-messages {
+    border: 1px solid #6897bb;
+    padding: 10px;
+    border-radius: 8px;
+    height: 50px;
+    overflow-y: scroll;
+}
+
+.chat-message-input {
+    width: 100%;
+    font-size: 14px;
+    box-sizing: border-box;
+}

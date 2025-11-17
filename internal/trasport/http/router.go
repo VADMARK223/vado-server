@@ -12,6 +12,7 @@ import (
 	"vado_server/internal/infra/persistence/gorm"
 	"vado_server/internal/trasport/http/handler"
 	"vado_server/internal/trasport/http/middleware"
+	"vado_server/internal/trasport/ws"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -19,6 +20,9 @@ import (
 )
 
 func SetupRouter(ctx *app.Context) *gin.Engine {
+	// WS
+	hub := ws.NewHub(ctx.Log)
+	go hub.Run()
 	// Сервисы
 	taskSvc := task.NewService(gorm.NewTaskRepo(ctx.DB))
 	roleSvc := role.NewService(gorm.NewRoleRepo(ctx))
@@ -56,6 +60,8 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	r.GET(route.Register, handler.ShowSignup)
 	r.POST(route.Register, handler.PerformRegister(userSvc))
 	r.POST(route.Logout, handler.Logout)
+	r.GET("/ws", handler.ChatHandler(hub, ctx.Log))
+	r.GET("/chat", handler.ShowChat())
 
 	// Защищенные маршруты
 	auth := r.Group("/")

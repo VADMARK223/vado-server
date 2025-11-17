@@ -51,6 +51,11 @@ func main() {
 	defer cancel()
 
 	//------------------------------------------------------------
+	// Web socket (Gorilla)
+	//------------------------------------------------------------
+	wg.Add(1)
+
+	//------------------------------------------------------------
 	// HTTP сервер (Gin)
 	//------------------------------------------------------------
 	wg.Add(1)
@@ -180,7 +185,6 @@ func initDB(appCtx *ctx.Context) *gorm.DB {
 // startHTTPServer запускает Gin и корректно останавливает его при ctx.Done()
 func startHTTPServer(ctx context.Context, appCtx *ctx.Context, wg *sync.WaitGroup, port string) *netHttp.Server {
 	defer wg.Done()
-
 	router := http.SetupRouter(appCtx)
 	srv := &netHttp.Server{
 		Addr:    ":" + port,
