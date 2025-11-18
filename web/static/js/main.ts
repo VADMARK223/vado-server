@@ -64,6 +64,7 @@ export function ping(): Promise<PingResponse> {
 
 export function initChat(cfg: {
     userId: string
+    token: string
     status: HTMLElement,
     messages: HTMLElement,
     input: HTMLInputElement,
@@ -71,7 +72,12 @@ export function initChat(cfg: {
 }) {
     const myUserId = cfg.userId;
     console.log("BUNDLE: my user id: " + myUserId)
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlcyI6WyJ1c2VyIl0sImlzcyI6InZhZG8tc2VydmVyIiwic3ViIjoiYWNjZXNzIiwiZXhwIjoxNzY0MDI3OTI0LCJuYmYiOjE3NjM0MjMxMjQsImlhdCI6MTc2MzQyMzEyNH0.sEaDHzD9UzYyXPk3Qsi0Wwlc9HEeomhVu12j98AHauI"
+    const token = cfg.token
+    console.log("BUNDLE: token: " + token)
+    if (!token) {
+        cfg.status.textContent = "❌ Token not found. Please log in.";
+        return;
+    }
     const host = `ws://${HOSTNAME}:${PORT}/ws`
     const url = host + "?token=" + token
     const socket = new WebSocket(url);

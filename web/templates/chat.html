@@ -32,9 +32,11 @@
     import {initChat} from "../static/js/bundle.js";
 
     const myUserId = "{{ .user_id }}";
+    const token = "{{ .ws_token }}";
 
     initChat({
         userId: myUserId,
+        token: token,
         status: document.getElementById("status"),
         messages: document.getElementById("messages"),
         input: document.getElementById("msgInput"),
@@ -45,7 +47,8 @@
 <!--<script type="module">
     const myUserId = "{{ .user_id }}";
     console.log("My user id: " + myUserId)
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlcyI6WyJ1c2VyIl0sImlzcyI6InZhZG8tc2VydmVyIiwic3ViIjoiYWNjZXNzIiwiZXhwIjoxNzY0MDI3OTI0LCJuYmYiOjE3NjM0MjMxMjQsImlhdCI6MTc2MzQyMzEyNH0.sEaDHzD9UzYyXPk3Qsi0Wwlc9HEeomhVu12j98AHauI"
+    const token = "{{ .ws_token }}"
+    console.log('Token: ' + token)
     const host = "ws://localhost:5555/ws"
     const url = host + "?token=" + token
     const socket = new WebSocket(url);

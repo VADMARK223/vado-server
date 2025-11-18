@@ -13,10 +13,18 @@ import (
 	"go.uber.org/zap"
 )
 
-func ShowChat() func(c *gin.Context) {
+func ShowChat() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		td, _ := c.Get(code.TemplateData)
 		data := td.(gin.H)
+
+		tokenStr, errTokenCookie := c.Cookie(code.VadoToken)
+		if errTokenCookie == nil && tokenStr != "" {
+			data["ws_token"] = tokenStr
+		} else {
+			data["ws_token"] = ""
+		}
+
 		c.HTML(http.StatusOK, "chat.html", data)
 	}
 }
@@ -31,11 +39,16 @@ var upgrader = websocket.Upgrader{
 func ServeSW(hub *ws.Hub, log *zap.SugaredLogger, secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr := c.Query("token")
-		log.Infow("ServeSW", "tokenStr", tokenStr)
+		// Если токена нет в query параметре, пробуем взять из кук
 		if tokenStr == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "token required"})
-			return
+			var err error
+			tokenStr, err = c.Cookie(code.VadoToken)
+			if err != nil || tokenStr == "" {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "token required"})
+				return
+			}
 		}
+		log.Infow("ServeSW", "tokenStr", tokenStr)
 
 		claims, err := auth.ParseToken(tokenStr, secret)
 		if err != nil {
