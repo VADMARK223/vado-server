@@ -1,7 +1,7 @@
 package ws
 
 import (
-	"fmt"
+	"encoding/json"
 	"log"
 	"time"
 
@@ -10,18 +10,33 @@ import (
 )
 
 type Client struct {
-	Conn *websocket.Conn
-	Hub  *Hub
-	Send chan []byte
-	log  *zap.SugaredLogger
+	Conn   *websocket.Conn
+	Hub    *Hub
+	Send   chan []byte
+	log    *zap.SugaredLogger
+	UserID uint
 }
 
-func NewClient(conn *websocket.Conn, hub *Hub, log *zap.SugaredLogger) *Client {
+type ClientPacket struct {
+	Type string `json:"type"`
+	Text string `json:"text"`
+}
+
+type ServerMessage struct {
+	Type     string `json:"type"` // "message"
+	UserID   uint   `json:"userId"`
+	Username string `json:"username"`
+	Text     string `json:"text"`
+	Time     int64  `json:"time"`
+}
+
+func NewClient(conn *websocket.Conn, hub *Hub, userID uint, log *zap.SugaredLogger) *Client {
 	client := &Client{
-		Conn: conn,
-		Hub:  hub,
-		Send: make(chan []byte, 256),
-		log:  log,
+		Conn:   conn,
+		Hub:    hub,
+		Send:   make(chan []byte, 256),
+		UserID: userID,
+		log:    log,
 	}
 	return client
 }
@@ -47,8 +62,30 @@ func (c *Client) IncomingLoop() {
 			break
 		}
 
-		c.log.Infow("Received message", "message", string(message))
-		c.Hub.Broadcast <- message
+		var packet ClientPacket
+		if errUnmarshal := json.Unmarshal(message, &packet); errUnmarshal != nil {
+			log.Println("WS json error:", errUnmarshal)
+			continue
+		}
+
+		c.log.Infow("Received message", "packet", packet)
+
+		switch packet.Type {
+		case "message":
+			serverMsg := ServerMessage{
+				Type:     "message",
+				UserID:   c.UserID,
+				Username: "test",
+				Text:     packet.Text,
+				Time:     time.Now().Unix(),
+			}
+
+			serverMsgBytes, _ := json.Marshal(serverMsg)
+
+			c.Hub.Broadcast <- serverMsgBytes
+		default:
+			c.log.Warnw("Unknown message type", "type", packet.Type)
+		}
 	}
 }
 
@@ -78,8 +115,7 @@ func (c *Client) OutgoingLoop() {
 				return
 			}
 
-			username := "VADMARK"
-			_, err = w.Write([]byte(fmt.Sprintf("%s: %s", username, message)))
+			_, err = w.Write(message)
 			if err != nil {
 				return
 			}

@@ -1,9 +1,11 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"vado_server/internal/config/code"
+	"vado_server/internal/domain/auth"
+
+	//"vado_server/internal/domain/auth"
 	"vado_server/internal/trasport/ws"
 
 	"github.com/gin-gonic/gin"
@@ -26,15 +28,28 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
-func ChatHandler(hub *ws.Hub, logger *zap.SugaredLogger) gin.HandlerFunc {
+func ServeSW(hub *ws.Hub, log *zap.SugaredLogger, secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-		if err != nil {
-			log.Println("Upgrade error:", err)
+		tokenStr := c.Query("token")
+		log.Infow("ServeSW", "tokenStr", tokenStr)
+		if tokenStr == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "token required"})
 			return
 		}
 
-		client := ws.NewClient(conn, hub, logger)
+		claims, err := auth.ParseToken(tokenStr, secret)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+			return
+		}
+
+		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+		if err != nil {
+			log.Errorw("Upgrader error", "error", err)
+			return
+		}
+
+		client := ws.NewClient(conn, hub, claims.UserID, log)
 		hub.Register <- client
 
 		go client.OutgoingLoop()

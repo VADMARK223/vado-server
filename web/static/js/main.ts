@@ -60,34 +60,67 @@ export function ping(): Promise<PingResponse> {
 }
 
 export function initChat(cfg: {
+    userId: string
     status: HTMLElement,
     messages: HTMLElement,
     input: HTMLInputElement,
     sendBtn: HTMLButtonElement
 }) {
-    console.log("Init chat, host: ");
-    const socket = new WebSocket("ws://localhost:5555/ws");
+    const myUserId = cfg.userId;
+    console.log("BUNDLE: my user id: " + myUserId)
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlcyI6WyJ1c2VyIl0sImlzcyI6InZhZG8tc2VydmVyIiwic3ViIjoiYWNjZXNzIiwiZXhwIjoxNzY0MDI3OTI0LCJuYmYiOjE3NjM0MjMxMjQsImlhdCI6MTc2MzQyMzEyNH0.sEaDHzD9UzYyXPk3Qsi0Wwlc9HEeomhVu12j98AHauI"
+    const host = "ws://localhost:5555/ws"
+    const url = host + "?token=" + token
+    const socket = new WebSocket(url);
 
-    socket.onopen = () => cfg.status.textContent = "🟢 Connected";
+    socket.onopen = () => cfg.status.textContent = "🟢 Connected (" + host + ")";
     socket.onclose = () => cfg.status.textContent = "🔴 Disconnected";
     socket.onerror = () => cfg.status.textContent = "❌ Error";
 
-    socket.onmessage = (e) => addMessage(e.data);
+    // socket.onmessage = (e) => addMessage(e.data);
+    socket.onmessage = (event) => {
+        try {
+            const msg = JSON.parse(event.data);
+            if (msg.type === "message") {
+                const isMine = String(msg.userId) === String(myUserId)
+                addMessage(`${msg.userId}: ${msg.text}`, isMine);
+            } else {
+                console.log("Other msg:", msg);
+            }
+        } catch (e) {
+            console.error("Bad JSON:", e);
+        }
+    };
 
     cfg.sendBtn.onclick = sendMessage;
-    cfg.input.onkeypress = (e) => e.key === "Enter" && sendMessage();
+    cfg.input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
 
     function sendMessage() {
         const text = cfg.input.value.trim();
-        if (!text) return;
+        if (!text || socket.readyState !== WebSocket.OPEN) return;
 
-        socket.send(text);
+        const packet = {
+            type: "message",
+            text: text,
+        };
+
+        socket.send(JSON.stringify(packet));
         cfg.input.value = "";
     }
 
-    function addMessage(text: string) {
+    function addMessage(text:string, isMine = false) {
         const div = document.createElement("div");
         div.textContent = text;
+
+        if (isMine) {
+            div.classList.add("chat-my-message")
+        }
+
         cfg.messages.appendChild(div);
         cfg.messages.scrollTop = cfg.messages.scrollHeight;
     }

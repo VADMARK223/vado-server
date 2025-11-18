@@ -231,19 +231,12 @@ input[type="checkbox"]:checked::after {
     overflow-y: scroll;
 }
 
-/*.chat-message-input {
-    width: 100%;
-    font-size: 14px;
-    box-sizing: border-box;
-}*/
-
 .chat-input-row {
     display: flex;
     flex-direction: row;
     gap: 8px;
 }
 
-.test-input {
-    flex: 1;
-    margin-bottom: 0;
+.chat-my-message {
+    text-align: right;
 }

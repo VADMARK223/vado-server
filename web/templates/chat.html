@@ -31,7 +31,10 @@
 <script type="module">
     import {initChat} from "../static/js/bundle.js";
 
+    const myUserId = "{{ .user_id }}";
+
     initChat({
+        userId: myUserId,
         status: document.getElementById("status"),
         messages: document.getElementById("messages"),
         input: document.getElementById("msgInput"),
@@ -40,7 +43,11 @@
 </script>
 
 <!--<script type="module">
-    const url = "ws://localhost:5555/ws"
+    const myUserId = "{{ .user_id }}";
+    console.log("My user id: " + myUserId)
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlcyI6WyJ1c2VyIl0sImlzcyI6InZhZG8tc2VydmVyIiwic3ViIjoiYWNjZXNzIiwiZXhwIjoxNzY0MDI3OTI0LCJuYmYiOjE3NjM0MjMxMjQsImlhdCI6MTc2MzQyMzEyNH0.sEaDHzD9UzYyXPk3Qsi0Wwlc9HEeomhVu12j98AHauI"
+    const host = "ws://localhost:5555/ws"
+    const url = host + "?token=" + token
     const socket = new WebSocket(url);
 
     const statusDiv = document.getElementById("status");
@@ -49,11 +56,21 @@
     const sendBtn = document.getElementById("sendBtn");
 
     socket.onopen = () => {
-        updateStatus("🟢 Connected (" + url + ")")
+        updateStatus("🟢 Connected (" + host + ")")
     };
 
     socket.onmessage = (event) => {
-        addMessage(event.data);
+        try {
+            const msg = JSON.parse(event.data);
+            if (msg.type === "message") {
+                const isMine = String(msg.userId) === String(myUserId)
+                addMessage(`${msg.userId}: ${msg.text}`, isMine);
+            } else {
+                console.log("Other msg:", msg);
+            }
+        } catch (e) {
+            console.error("Bad JSON:", e);
+        }
     };
 
     socket.onerror = (err) => {
@@ -65,15 +82,23 @@
     };
 
     sendBtn.onclick = () => sendMessage();
-    input.onkeypress = (e) => {
-        if (e.key === "Enter") sendMessage();
-    };
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
 
     function sendMessage() {
         const text = input.value.trim();
-        if (!text) return;
+        if (!text || socket.readyState !== WebSocket.OPEN) return;
 
-        socket.send(text);
+        const packet = {
+            type: "message",
+            text: text,
+        };
+
+        socket.send(JSON.stringify(packet));
         input.value = "";
     }
 
@@ -81,9 +106,14 @@
         statusDiv.textContent = text
     }
 
-    function addMessage(text) {
+    function addMessage(text, isMine = false) {
         const div = document.createElement("div");
         div.textContent = text;
+
+        if (isMine) {
+            div.classList.add("chat-my-message")
+        }
+
         messagesDiv.appendChild(div);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }

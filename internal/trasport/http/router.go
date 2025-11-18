@@ -60,7 +60,7 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	r.GET(route.Register, handler.ShowSignup)
 	r.POST(route.Register, handler.PerformRegister(userSvc))
 	r.POST(route.Logout, handler.Logout)
-	r.GET("/ws", handler.ChatHandler(hub, ctx.Log))
+	r.GET("/ws", handler.ServeSW(hub, ctx.Log, ctx.Cfg.JwtSecret))
 	r.GET("/chat", handler.ShowChat())
 
 	// Защищенные маршруты
