@@ -10,8 +10,11 @@ import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 
 declare const process: any;
 
-const GRPC_WEB_PORT = process.env.GRPC_WEB_PORT || '1111'
-const HOST = `${window.location.protocol}//${window.location.hostname}:${GRPC_WEB_PORT}`;
+const PORT = process.env.PORT || '1111'
+const GRPC_WEB_PORT = process.env.GRPC_WEB_PORT || '2222'
+const PROTOCOL = window.location.protocol
+const HOSTNAME = window.location.hostname
+const HOST = `${PROTOCOL}//${HOSTNAME}:${GRPC_WEB_PORT}`;
 const defaultTransport = grpc.CrossBrowserHttpTransport({ withCredentials: true });
 
 export function sayHello(name: string): Promise<HelloResponse> {
@@ -69,7 +72,7 @@ export function initChat(cfg: {
     const myUserId = cfg.userId;
     console.log("BUNDLE: my user id: " + myUserId)
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlcyI6WyJ1c2VyIl0sImlzcyI6InZhZG8tc2VydmVyIiwic3ViIjoiYWNjZXNzIiwiZXhwIjoxNzY0MDI3OTI0LCJuYmYiOjE3NjM0MjMxMjQsImlhdCI6MTc2MzQyMzEyNH0.sEaDHzD9UzYyXPk3Qsi0Wwlc9HEeomhVu12j98AHauI"
-    const host = "ws://localhost:5555/ws"
+    const host = `ws://${HOSTNAME}:${PORT}/ws`
     const url = host + "?token=" + token
     const socket = new WebSocket(url);
 
