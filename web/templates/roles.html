@@ -14,15 +14,17 @@
 <main>
     <div class="container">
         <div class="scrollable-content">
-            {{range .Roles}}
-            <div class="task-item">
-                <div>
-                    <h3>{{.Name}}</h3>
+            <div class="vado-list">
+                {{range .Roles}}
+                <div class="vado-item">
+                    <div>
+                        <h3>{{.Name}}</h3>
+                    </div>
                 </div>
+                {{else}}
+                <p class="empty">No roles</p>
+                {{end}}
             </div>
-            {{else}}
-            <p class="empty">No roles</p>
-            {{end}}
         </div>
     </div>
 </main>

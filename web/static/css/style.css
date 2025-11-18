@@ -216,13 +216,13 @@ input[type="checkbox"]:checked::after {
     gap: 4px;
 }
 
-.users-list {
+.vado-list {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.user-item {
+.vado-item {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -233,45 +233,20 @@ input[type="checkbox"]:checked::after {
     transition: background 0.2s;
 }
 
-.user-item p,h3 {
+.vado-item p, h3 {
     margin: 0;
 }
 
-.user-item-info {
-    flex: 1;
+.vado-item-info {
+    flex: 1
 }
 
-.task-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.task-item {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    padding: 15px;
-    border-radius: 8px;
-    transition: background 0.2s;
-}
-
-.task-item p,h3 {
-    margin: 0;
-}
-
-.task-item-info {
-    flex:1
-}
-
-.task-item.completed {
+.vado-item.completed {
     opacity: 0.6;
     text-decoration: line-through;
 }
 
-.task-item:hover {
+.vado-item:hover {
     background: #353739;
 }
 
@@ -279,7 +254,6 @@ input[type="checkbox"]:checked::after {
     text-align: center;
     color: #777;
 }
-
 
 .chat {
     display: flex;

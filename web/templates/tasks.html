@@ -28,10 +28,10 @@
         </form>
 
         <div class="scrollable-content">
-            <div class="task-list">
+            <div class="vado-list">
                 {{range .Tasks}}
-                <div class="task-item {{if .Completed}}completed{{end}}" id="task-{{.ID}}">
-                    <div class="task-item-info">
+                <div class="vado-item {{if .Completed}}completed{{end}}" id="task-{{.ID}}">
+                    <div class="vado-item-info">
                         <h3>{{.Name}}</h3>
                         <p>{{.Description}}</p>
                         <small>Created: {{.CreatedAt.Format "02.01.2006 15:04"}}</small>
