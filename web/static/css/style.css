@@ -79,13 +79,34 @@ a:hover {
     gap: 10px;
 }
 
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Важно для правильной работы flex внутри */
+}
+
 .container {
     max-width: 800px;
-    margin: 40px auto;
+    width: 100%;
+    margin: 20px auto;
     padding: 20px;
     background: var(--bg-alt);
     border-radius: 10px;
     box-shadow: 0 0 10px #0008;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* Важно для правильной работы flex внутри */
+    overflow: hidden; /* Скрываем переполнение контейнера */
+}
+
+/* Скроллируемая область контента */
+.scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    margin: 0;
 }
 
 .btn, .btn-small, .btn-danger {
@@ -140,7 +161,6 @@ a:hover {
     color: white;
 }
 
-
 input, textarea {
     width: 100%;
     background: var(--bg);
@@ -148,8 +168,8 @@ input, textarea {
     border: 1px solid var(--border);
     border-radius: 5px;
     padding: 8px;
-    margin-bottom: 10px;
     font-family: inherit;
+    box-sizing: border-box;
 }
 
 input[type="checkbox"] {
@@ -189,21 +209,61 @@ input[type="checkbox"]:checked::after {
     transform: rotate(45deg);
 }
 
-.vado-list {
-    list-style: none;
-    padding: 0;
+.vado-add-form {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
-.task-item {
+.users-list {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.user-item {
+    display: flex;
+    flex-direction: row;
     align-items: center;
     background: var(--bg);
     border: 1px solid var(--border);
     padding: 15px;
     border-radius: 8px;
-    margin-bottom: 10px;
     transition: background 0.2s;
+}
+
+.user-item p,h3 {
+    margin: 0;
+}
+
+.user-item-info {
+    flex: 1;
+}
+
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.task-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 15px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.task-item p,h3 {
+    margin: 0;
+}
+
+.task-item-info {
+    flex:1
 }
 
 .task-item.completed {
@@ -225,6 +285,8 @@ input[type="checkbox"]:checked::after {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    flex: 1;
+    min-height: 0;
 }
 
 #status {
@@ -242,12 +304,13 @@ input[type="checkbox"]:checked::after {
     border: 1px solid #6897bb;
     padding: 15px;
     border-radius: 8px;
-    height: 400px;
     overflow-y: scroll;
     background: var(--bg);
     display: flex;
     flex-direction: column;
     gap: 12px;
+    flex: 1; /* Заменяет height: 400px - теперь растягивается динамически */
+    min-height: 0; /* Важно для правильной работы flex внутри */
 }
 
 /* Стили для всех сообщений */
@@ -305,7 +368,6 @@ input[type="checkbox"]:checked::after {
 /* Компонент ввода сообщения */
 .chat-message-input {
     flex: 1;
-    margin-bottom: 0;
     padding: 12px 15px;
     border-radius: 20px;
     font-size: 14px;

@@ -25,33 +25,7 @@
 
 <main>
     <div class="container">
-        <ul class="vado-list">
-            {{range .Users}}
-            <li class="task-item" id="user-{{.ID}}">
-                <div class="task-info">
-                    <h3>{{.Username}} (ID {{.ID}})</h3>
-                    {{if .Roles}}
-                    <p class="roles">
-                        Roles:
-                        {{range .Roles}}
-                        <span class="role">{{.Name}}</span>
-                        {{end}}
-                    </p>
-                    {{else}}
-                    <p class="roles">No role</p>
-                    {{end}}
-
-                    <p>E-mail: {{.Email}}</p>
-                </div>
-
-                <button class="btn-small btn-danger" onclick="deleteUser('{{.ID}}')"><i class="fa-solid fa-trash"></i></button>
-            </li>
-            {{else}}
-            <p class="empty">No users</p>
-            {{end}}
-        </ul>
-
-        <form class="add-form" action="/users" method="POST">
+        <form class="vado-add-form" action="/users" method="POST">
             <label>
                 <input type="text" name="username" placeholder="Username" required>
             </label>
@@ -64,6 +38,34 @@
             {{if .Error}}<p class="error-msg">{{.Error}}</p>{{end}}
             <button type="submit" class="btn"><i class="fa-solid fa-plus"></i></button>
         </form>
+
+        <div class="scrollable-content">
+            <div class="users-list">
+                {{range .Users}}
+                <div class="user-item">
+                    <div class="user-item-info">
+                        <h3>{{.Username}} (ID {{.ID}})</h3>
+                        {{if .Roles}}
+                        <p class="roles">
+                            Roles:
+                            {{range .Roles}}
+                            <span class="role">{{.Name}}</span>
+                            {{end}}
+                        </p>
+                        {{else}}
+                        <p class="roles">No role</p>
+                        {{end}}
+                        <p>E-mail: {{.Email}}</p>
+                    </div>
+                    <div>
+                        <button class="btn-small btn-danger" onclick="deleteUser('{{.ID}}')"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+                {{else}}
+                <p class="empty">No users</p>
+                {{end}}
+            </div>
+        </div>
     </div>
 </main>
 
