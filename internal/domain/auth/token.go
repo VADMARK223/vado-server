@@ -3,29 +3,25 @@ package auth
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/k0kubun/pp"
 )
-
-type CustomClaims struct {
-	UserID uint     `json:"user_id"`
-	Roles  []string `json:"roles,omitempty"`
-	jwt.RegisteredClaims
-}
 
 type TokenPair struct {
 	AccessToken  string
 	RefreshToken string
 }
 
-func CreateTokenPair(userID uint, roles []string, accessTTL, refreshTTL time.Duration, secret string) (*TokenPair, error) {
-	access, err := CreateToken(userID, roles, accessTTL, "access", secret)
+func CreateTokenPair(userID uint, roles []uint, accessTTL, refreshTTL time.Duration, secret string) (*TokenPair, error) {
+	access, err := CreateToken(userID, roles, accessTTL, secret)
 	if err != nil {
 		return nil, err
 	}
 
-	refresh, err := CreateToken(userID, roles, refreshTTL, "refresh", secret)
+	refresh, err := CreateToken(userID, roles, refreshTTL, secret)
 	if err != nil {
 		return nil, err
 	}
@@ -36,19 +32,20 @@ func CreateTokenPair(userID uint, roles []string, accessTTL, refreshTTL time.Dur
 	}, nil
 }
 
-func CreateToken(userID uint, roles []string, ttl time.Duration, subject, secret string) (string, error) {
+func CreateToken(userID uint, roles []uint, ttl time.Duration, secret string) (string, error) {
 	now := time.Now()
 	claims := CustomClaims{
-		UserID: userID,
-		Roles:  roles,
+		Roles: roles,
 		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   strconv.Itoa(int(userID)),
 			ExpiresAt: jwt.NewNumericDate(now.Add(ttl)),
 			IssuedAt:  jwt.NewNumericDate(now),
 			NotBefore: jwt.NewNumericDate(now), // Делает токен “активным не раньше определённого момента”
 			Issuer:    "vado-server",
-			Subject:   subject,
 		},
 	}
+
+	_, _ = pp.Println("claims: ", claims)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(secret))

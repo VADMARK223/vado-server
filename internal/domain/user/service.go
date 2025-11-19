@@ -37,6 +37,7 @@ func (s *Service) DeleteUser(id uint) error {
 
 func (s *Service) Login(username, password, secret string) (*User, *auth.TokenPair, error) {
 	u, errGetUser := s.repo.GetByUsername(username)
+
 	if errGetUser != nil {
 		return nil, nil, errors.New("user not found")
 	}
@@ -45,7 +46,7 @@ func (s *Service) Login(username, password, secret string) (*User, *auth.TokenPa
 		return u, nil, errors.New("incorrect password")
 	}
 
-	tokens, err := auth.CreateTokenPair(u.ID, []string{"user"}, s.tokenTTL, s.refreshTTL, secret)
+	tokens, err := auth.CreateTokenPair(u.ID, u.RolesIDs, s.tokenTTL, s.refreshTTL, secret)
 	if err != nil {
 		return nil, nil, errors.New(fmt.Sprintf("Error creating tokens: %s", err.Error()))
 	}
@@ -58,12 +59,12 @@ func (s *Service) Refresh(token string, secret string) (*User, string, error) {
 	if errParseToken != nil {
 		return nil, "", status.Error(codes.Unauthenticated, "token read error")
 	}
-	u, errGetUser := s.repo.GetByID(claims.UserID)
+	u, errGetUser := s.repo.GetByID(claims.UserID())
 	if errGetUser != nil {
 		return nil, "", errors.New("user not found")
 	}
 
-	newToken, errToken := auth.CreateToken(u.ID, []string{"user"}, s.tokenTTL, "refresh", secret)
+	newToken, errToken := auth.CreateToken(u.ID, u.RolesIDs, s.tokenTTL, secret)
 	if errToken != nil {
 		return nil, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Error creating new token: %s", errToken.Error()))
 	}

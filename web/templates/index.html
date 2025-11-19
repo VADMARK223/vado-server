@@ -14,9 +14,32 @@
 <main>
     <div class="container">
         {{if .is_auth}}
-        <h3>Debugging</h3>
-        <p>JWT token expires: {{.token_expire_at}} (via {{.token_remaining}})</p>
-        <p>JWT refresh token expires: {{.refresh_token_expire_at}} (via {{.refresh_token_remaining}})</p>
+        <div class="vado-list">
+            <div class="vado-item">
+                <div>
+                    <h3>Token</h3>
+                    <div>Status: {{.token_status}}</div>
+<!--                    <div>Expires: {{.token_expire_at}} (via {{.token_remaining}})</div>-->
+                    <div>Expires: {{.token_expire_at}}</div>
+                </div>
+            </div>
+
+            <div class="vado-item">
+                <div>
+                    <h3>User info</h3>
+                    <div>Roles: {{.roles}}</div>
+                </div>
+            </div>
+
+            <div class="vado-item">
+                <div>
+                    <h3>Refresh token</h3>
+                    <div>Status: {{.refresh_token_status}}</div>
+<!--                    <div>Expires: {{.refresh_token_expire_at}} (via {{.refresh_token_remaining}})</div>-->
+                    <div>Expires: {{.refresh_token_expire_at}}</div>
+                </div>
+            </div>
+        </div>
         {{else}}
         <p>You must log in...</p>
         {{end}}

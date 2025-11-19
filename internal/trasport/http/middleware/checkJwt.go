@@ -31,7 +31,7 @@ func CheckJWT(secret, tokenTTL, refreshTokenTTL string) gin.HandlerFunc {
 			return
 		}
 
-		setAuth(c, claims.UserID, claims.Roles)
+		setAuth(c, claims.UserID(), claims.Roles)
 	}
 }
 
@@ -48,7 +48,7 @@ func tryRefresh(c *gin.Context, secret string, tokenTTL, refRefreshTokenTTL int)
 		return
 	}
 
-	newAccess, err := auth.CreateToken(refreshClaims.UserID, refreshClaims.Roles, time.Second*time.Duration(tokenTTL), "access", secret)
+	newAccess, err := auth.CreateToken(refreshClaims.UserID(), refreshClaims.Roles, time.Second*time.Duration(tokenTTL), secret)
 	if err != nil {
 		setNotAuth(c)
 		return
@@ -56,10 +56,10 @@ func tryRefresh(c *gin.Context, secret string, tokenTTL, refRefreshTokenTTL int)
 
 	auth.SetCookie(c, code.VadoToken, newAccess, refRefreshTokenTTL)
 
-	setAuth(c, refreshClaims.UserID, refreshClaims.Roles)
+	setAuth(c, refreshClaims.UserID(), refreshClaims.Roles)
 }
 
-func setAuth(c *gin.Context, id uint, roles []string) {
+func setAuth(c *gin.Context, id uint, roles []uint) {
 	c.Set(code.IsAuth, true)
 	c.Set(code.UserId, id)
 	c.Set("roles", roles)

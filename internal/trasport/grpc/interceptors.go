@@ -69,11 +69,11 @@ func NewAuthInterceptor(log *zap.SugaredLogger, secret string) grpc.UnaryServerI
 			return nil, status.Error(codes.Unauthenticated, "некорректный токен")
 		}
 
-		if claims.UserID == 0 {
+		if claims.UserID() == 0 {
 			return nil, status.Error(codes.Unauthenticated, "пустой userID в токене")
 		}
 
-		ctx = wrap(ctx, claims.UserID)
+		ctx = wrap(ctx, claims.UserID())
 
 		return handler(ctx, req)
 	}
