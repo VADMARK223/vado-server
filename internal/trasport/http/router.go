@@ -47,7 +47,7 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	})
 
 	// Настраиваем cookie-сессии
-	store := cookie.NewStore([]byte("super-secret-key"))
+	store := cookie.NewStore([]byte("super-secret-key")) // TODO: разобраться для чего это написано.
 	r.Use(sessions.Sessions("vado-session", store))
 	r.Use(middleware.CheckJWT(ctx.Cfg.JwtSecret, ctx.Cfg.TokenTTL, ctx.Cfg.RefreshTTL))
 	r.Use(middleware.NoCache)
@@ -62,6 +62,7 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	r.POST(route.Logout, handler.Logout)
 	r.GET("/ws", handler.ServeSW(hub, ctx.Log, ctx.Cfg.JwtSecret))
 	r.GET("/chat", handler.ShowChat())
+	r.GET("/me", handler.MeHandler(ctx.Log, ctx.Cfg.JwtSecret, userSvc))
 
 	// Защищенные маршруты
 	auth := r.Group("/")

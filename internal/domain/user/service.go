@@ -35,6 +35,10 @@ func (s *Service) DeleteUser(id uint) error {
 	return s.repo.DeleteUser(id)
 }
 
+func (s *Service) GetByID(id uint) (*User, error) {
+	return s.repo.GetByID(id)
+}
+
 func (s *Service) Login(username, password, secret string) (*User, *auth.TokenPair, error) {
 	u, errGetUser := s.repo.GetByUsername(username)
 

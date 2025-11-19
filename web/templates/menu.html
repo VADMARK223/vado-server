@@ -9,12 +9,12 @@
         <a href="/grpc-test" class="btn"><i class="fa-solid fa-j"></i></a>
     </div>
 
-    <div class="vado-user-info">
+    <div class="vado-menu-info">
         <p>Hello, {{.user_id}}!</p>
+        <p id="email"></p>
         {{if .is_auth}}
         <form action="/logout" method="POST" style="display:inline;">
             <button class="btn">
-<!--                <i class="fa-solid fa-right-from-bracket"></i>-->
                 <i class="fa-solid fa-person-walking-dashed-line-arrow-right"></i>
             </button>
         </form>
@@ -27,4 +27,13 @@
         {{end}}
     </div>
 </div>
+<script type="module">
+    import {initAuth} from "../static/js/auth.js";
+
+    const email = document.getElementById("email")
+
+    initAuth().then(r => {
+        email.textContent = `(${r.email})`
+    })
+</script>
 {{ end }}

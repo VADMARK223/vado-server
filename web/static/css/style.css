@@ -73,7 +73,7 @@ a:hover {
     box-shadow: 0 0 10px #0008;
 }
 
-.vado-user-info {
+.vado-menu-info {
     display: flex;
     align-items: center;
     gap: 10px;
