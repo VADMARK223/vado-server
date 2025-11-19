@@ -71,9 +71,7 @@ export function initChat(cfg: {
     sendBtn: HTMLButtonElement
 }) {
     const myUserId = cfg.userId;
-    console.log("BUNDLE: my user id: " + myUserId)
     const token = cfg.token
-    console.log("BUNDLE: token: " + token)
     if (!token) {
         cfg.status.textContent = "❌ Token not found. Please log in.";
         return;
@@ -86,13 +84,13 @@ export function initChat(cfg: {
     socket.onclose = () => cfg.status.textContent = "🔴 Disconnected";
     socket.onerror = () => cfg.status.textContent = "❌ Error";
 
-    // socket.onmessage = (e) => addMessage(e.data);
     socket.onmessage = (event) => {
         try {
             const msg = JSON.parse(event.data);
             if (msg.type === "message") {
                 const isMine = String(msg.userId) === String(myUserId)
-                addMessage(`${msg.userId}: ${msg.text}`, isMine);
+                const text = isMine ? `${msg.text}` : `${msg.userId}: ${msg.text}`
+                addMessage(text, isMine);
             } else {
                 console.log("Other msg:", msg);
             }

@@ -34,14 +34,18 @@
     const myUserId = "{{ .user_id }}";
     const token = "{{ .ws_token }}";
 
+    const msgInput = document.getElementById("msgInput");
+
     initChat({
         userId: myUserId,
         token: token,
         status: document.getElementById("status"),
         messages: document.getElementById("messages"),
-        input: document.getElementById("msgInput"),
+        input: msgInput,
         sendBtn: document.getElementById("sendBtn")
     });
+
+    msgInput.focus();
 </script>
 
 <!--<script type="module">
@@ -56,6 +60,7 @@
     const statusDiv = document.getElementById("status");
     const messagesDiv = document.getElementById("messages");
     const input = document.getElementById("msgInput");
+    input.focus()
     const sendBtn = document.getElementById("sendBtn");
 
     socket.onopen = () => {
@@ -67,7 +72,8 @@
             const msg = JSON.parse(event.data);
             if (msg.type === "message") {
                 const isMine = String(msg.userId) === String(myUserId)
-                addMessage(`${msg.userId}: ${msg.text}`, isMine);
+                const text = isMine ? `${msg.text}` : `${msg.userId}: ${msg.text}`
+                addMessage(text, isMine);
             } else {
                 console.log("Other msg:", msg);
             }

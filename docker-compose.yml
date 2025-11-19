@@ -28,7 +28,7 @@ services:
     image: ghcr.io/vadmark223/vado-server:latest
     container_name: vado-server
     ports:
-      - "5556:5556"
+      - "5555:5555" # Main port
       - "50051:50051" # gRPC
       - "8090:8090" # gRPC-web
     restart: unless-stopped

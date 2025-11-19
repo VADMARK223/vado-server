@@ -32,7 +32,7 @@ COPY --from=builder /app/vado-server .
 COPY --from=builder /app/web ./web
 
 # Порт для gRPC и HTTP
-EXPOSE 50051 5556 8090
+EXPOSE 50051 5555 8090
 
 # Устанавливаем базовые env (не мешают docker-compose)
 ENV APP_ENV=production \
