@@ -39,7 +39,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
 
-	_, tokens, err := h.service.Login(username, password, h.secret)
+	_, tokens, err := h.service.Login(username, password)
 	h.log.Debugw("Token from service", "tokens", tokens)
 	if err != nil {
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": err.Error()})
@@ -69,7 +69,7 @@ func PerformRegister(service *user.Service) gin.HandlerFunc {
 		role := c.PostForm(code.Role)
 		color := c.PostForm(code.Color)
 
-		err := service.CreateUser(user.DTO{Username: username, Email: email, Password: password, Role: role, Color: color})
+		err := service.CreateUser(user.DTO{Username: username, Email: email, Password: password, Role: user.Role(role), Color: color})
 
 		if err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{

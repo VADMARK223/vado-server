@@ -12,9 +12,6 @@ type UserEntity struct {
 	Color     string    `gorm:"not null"`
 	Email     string    `gorm:"unique"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
-
-	// Связь с задачами (1 пользователь и много задач)
-	//Tasks []task.Task `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
 }
 
 func (UserEntity) TableName() string {

@@ -26,7 +26,7 @@ func (s *AuthServer) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRe
 	username := req.Username
 	password := req.Password
 
-	u, tokens, err := s.service.Login(username, password, s.secret)
+	u, tokens, err := s.service.Login(username, password)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
@@ -45,7 +45,7 @@ func (s *AuthServer) Refresh(_ context.Context, req *pb.RefreshRequest) (*pb.Log
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}
 
-	if u == nil {
+	if u.ID == 0 {
 		return nil, status.Error(codes.Internal, "user not found")
 	}
 

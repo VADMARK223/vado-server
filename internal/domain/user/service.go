@@ -32,42 +32,42 @@ func (s *Service) DeleteUser(id uint) error {
 	return s.repo.DeleteUser(id)
 }
 
-func (s *Service) GetByID(id uint) (*User, error) {
+func (s *Service) GetByID(id uint) (User, error) {
 	return s.repo.GetByID(id)
 }
 
-func (s *Service) Login(username, password, secret string) (*User, *auth.TokenPair, error) {
+func (s *Service) Login(username, password string) (User, *auth.TokenPair, error) {
 	u, errGetUser := s.repo.GetByUsername(username)
 
 	if errGetUser != nil {
-		return nil, nil, errors.New("user not found")
+		return User{}, nil, errors.New("user not found")
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)) != nil {
 		return u, nil, errors.New("incorrect password")
 	}
 
-	tokens, err := s.tokens.CreateTokenPair(u.ID, u.Role)
+	tokens, err := s.tokens.CreateTokenPair(u.ID, string(u.Role))
 	if err != nil {
-		return nil, nil, fmt.Errorf("error creating tokens: %s", err.Error())
+		return User{}, nil, fmt.Errorf("error creating tokens: %s", err.Error())
 	}
 
 	return u, tokens, nil
 }
 
-func (s *Service) Refresh(token string) (*User, string, error) {
+func (s *Service) Refresh(token string) (User, string, error) {
 	claims, errParseToken := s.tokens.ParseToken(token)
 	if errParseToken != nil {
-		return nil, "", status.Error(codes.Unauthenticated, "token read error")
+		return User{}, "", status.Error(codes.Unauthenticated, "token read error")
 	}
 	u, errGetUser := s.repo.GetByID(claims.UserID())
 	if errGetUser != nil {
-		return nil, "", errors.New("user not found")
+		return User{}, "", errors.New("user not found")
 	}
 
-	newToken, errToken := s.tokens.CreateToken(u.ID, u.Role)
+	newToken, errToken := s.tokens.CreateToken(u.ID, string(u.Role))
 	if errToken != nil {
-		return nil, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Error creating new token: %s", errToken.Error()))
+		return User{}, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Error creating new token: %s", errToken.Error()))
 	}
 
 	return u, newToken, nil

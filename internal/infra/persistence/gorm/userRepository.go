@@ -22,15 +22,11 @@ func NewUserRepo(ctx *app.Context) user.Repository {
 }
 
 func (r *UserRepository) CreateUser(u user.User) error {
-	return r.db.Transaction(func(tx *gorm.DB) error {
-		entity := &UserEntity{Username: u.Username, Password: u.Password, Email: u.Email, Role: u.Role, Color: u.Color}
-		if err := tx.Create(entity).Error; err != nil {
-			return fmt.Errorf("failed to create user: %w", err)
-		}
-
-		u.ID = entity.ID
-		return nil
-	})
+	entity := toEntity(u)
+	if err := r.db.Create(&entity).Error; err != nil {
+		return fmt.Errorf("failed to create user: %w", err)
+	}
+	return nil
 }
 
 func (r *UserRepository) DeleteUser(id uint) error {
@@ -41,38 +37,22 @@ func (r *UserRepository) DeleteUser(id uint) error {
 	return nil
 }
 
-func (r *UserRepository) GetByUsername(username string) (*user.User, error) {
+func (r *UserRepository) GetByUsername(username string) (user.User, error) {
 	var entity UserEntity
 	if err := r.db.Where("username = ?", username).First(&entity).Error; err != nil {
-		return nil, err
+		return user.User{}, err
 	}
 
-	return &user.User{
-		ID:        entity.ID,
-		Username:  entity.Username,
-		Password:  entity.Password,
-		Email:     entity.Email,
-		CreatedAt: entity.CreatedAt,
-		Role:      entity.Role,
-		Color:     entity.Color,
-	}, nil
+	return toDomain(entity), nil
 }
 
-func (r *UserRepository) GetByID(id uint) (*user.User, error) {
+func (r *UserRepository) GetByID(id uint) (user.User, error) {
 	var entity UserEntity
 	if err := r.db.First(&entity, id).First(&entity).Error; err != nil {
-		return nil, err
+		return user.User{}, err
 	}
 
-	return &user.User{
-		ID:        entity.ID,
-		Username:  entity.Username,
-		Password:  entity.Password,
-		Email:     entity.Email,
-		CreatedAt: entity.CreatedAt,
-		Role:      entity.Role,
-		Color:     entity.Color,
-	}, nil
+	return toDomain(entity), nil
 }
 
 func (r *UserRepository) GetAll() ([]user.User, error) {
@@ -81,15 +61,32 @@ func (r *UserRepository) GetAll() ([]user.User, error) {
 	result := make([]user.User, 0, len(entities))
 
 	for _, entity := range entities {
-		result = append(result, user.User{
-			ID:        entity.ID,
-			Username:  entity.Username,
-			Email:     entity.Email,
-			CreatedAt: entity.CreatedAt,
-			Role:      entity.Role,
-			Color:     entity.Color,
-		})
+		result = append(result, toDomain(entity))
 	}
 
 	return result, err
+}
+
+func toDomain(e UserEntity) user.User {
+	return user.User{
+		ID:        e.ID,
+		Username:  e.Username,
+		Password:  e.Password,
+		Email:     e.Email,
+		CreatedAt: e.CreatedAt,
+		Role:      user.Role(e.Role),
+		Color:     e.Color,
+	}
+}
+
+func toEntity(u user.User) UserEntity {
+	return UserEntity{
+		ID:        u.ID,
+		Username:  u.Username,
+		Password:  u.Password,
+		Email:     u.Email,
+		Color:     u.Color,
+		Role:      string(u.Role), // доменный тип → строка
+		CreatedAt: u.CreatedAt,
+	}
 }

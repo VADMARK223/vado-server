@@ -9,7 +9,7 @@ type User struct {
 	Username  string
 	Password  string
 	Email     string
-	Role      string
+	Role      Role
 	Color     string
 	CreatedAt time.Time
 
@@ -20,6 +20,6 @@ type DTO struct {
 	Username string
 	Password string
 	Email    string
-	Role     string
+	Role     Role
 	Color    string
 }
