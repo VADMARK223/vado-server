@@ -3,7 +3,6 @@ package user
 import (
 	"errors"
 	"fmt"
-	"time"
 	"vado_server/internal/domain/auth"
 
 	"golang.org/x/crypto/bcrypt"
@@ -12,16 +11,14 @@ import (
 )
 
 type Service struct {
-	repo       Repository
-	tokenTTL   time.Duration
-	refreshTTL time.Duration
+	repo   Repository
+	tokens auth.TokenProvider
 }
 
-func NewService(repo Repository, tokenTTL time.Duration, refreshTTL time.Duration) *Service {
+func NewService(repo Repository, tokens auth.TokenProvider) *Service {
 	return &Service{
-		repo:       repo,
-		tokenTTL:   tokenTTL,
-		refreshTTL: refreshTTL,
+		repo:   repo,
+		tokens: tokens,
 	}
 }
 
@@ -50,16 +47,16 @@ func (s *Service) Login(username, password, secret string) (*User, *auth.TokenPa
 		return u, nil, errors.New("incorrect password")
 	}
 
-	tokens, err := auth.CreateTokenPair(u.ID, u.Role, s.tokenTTL, s.refreshTTL, secret)
+	tokens, err := s.tokens.CreateTokenPair(u.ID, u.Role)
 	if err != nil {
-		return nil, nil, errors.New(fmt.Sprintf("Error creating tokens: %s", err.Error()))
+		return nil, nil, fmt.Errorf("error creating tokens: %s", err.Error())
 	}
 
 	return u, tokens, nil
 }
 
-func (s *Service) Refresh(token string, secret string) (*User, string, error) {
-	claims, errParseToken := auth.ParseToken(token, secret)
+func (s *Service) Refresh(token string) (*User, string, error) {
+	claims, errParseToken := s.tokens.ParseToken(token)
 	if errParseToken != nil {
 		return nil, "", status.Error(codes.Unauthenticated, "token read error")
 	}
@@ -68,7 +65,7 @@ func (s *Service) Refresh(token string, secret string) (*User, string, error) {
 		return nil, "", errors.New("user not found")
 	}
 
-	newToken, errToken := auth.CreateToken(u.ID, u.Role, s.tokenTTL, secret)
+	newToken, errToken := s.tokens.CreateToken(u.ID, u.Role)
 	if errToken != nil {
 		return nil, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Error creating new token: %s", errToken.Error()))
 	}

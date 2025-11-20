@@ -3,14 +3,14 @@ package handler
 import (
 	"net/http"
 	"vado_server/internal/config/code"
-	"vado_server/internal/domain/auth"
 	"vado_server/internal/domain/user"
+	"vado_server/internal/infra/token"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
-func MeHandler(log *zap.SugaredLogger, secret string, svc *user.Service) gin.HandlerFunc {
+func MeHandler(log *zap.SugaredLogger, svc *user.Service, provider *token.JWTProvider) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr, errTokenCookie := c.Cookie(code.VadoToken)
 		if errTokenCookie != nil {
@@ -18,7 +18,7 @@ func MeHandler(log *zap.SugaredLogger, secret string, svc *user.Service) gin.Han
 			return
 		}
 
-		claims, err := auth.ParseToken(tokenStr, secret)
+		claims, err := provider.ParseToken(tokenStr)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"Error": errTokenCookie.Error()})
 			return

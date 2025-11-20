@@ -5,29 +5,29 @@ import (
 	"time"
 	"vado_server/internal/config/code"
 	"vado_server/internal/domain/auth"
+	"vado_server/internal/infra/token"
 
 	"github.com/gin-gonic/gin"
 )
 
-func CheckJWT(secret, tokenTTL, refreshTokenTTL string) gin.HandlerFunc {
+func CheckJWT(provider *token.JWTProvider, refreshTokenTTL string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenTTLSecs, _ := strconv.Atoi(tokenTTL)
 		refreshTokenTTLSecs, _ := strconv.Atoi(refreshTokenTTL)
 		tokenStr, err := c.Cookie(code.VadoToken)
 		if err != nil || tokenStr == "" {
-			tryRefresh(c, secret, tokenTTLSecs, refreshTokenTTLSecs)
+			tryRefresh(c, refreshTokenTTLSecs, provider)
 			return
 		}
 
-		claims, err := auth.ParseToken(tokenStr, secret)
+		claims, err := provider.ParseToken(tokenStr)
 		if err != nil {
-			tryRefresh(c, secret, tokenTTLSecs, refreshTokenTTLSecs)
+			tryRefresh(c, refreshTokenTTLSecs, provider)
 			return
 		}
 
 		// Проверка срока действия токена
 		if claims.ExpiresAt != nil && claims.ExpiresAt.Time.Before(time.Now()) {
-			tryRefresh(c, secret, tokenTTLSecs, refreshTokenTTLSecs)
+			tryRefresh(c, refreshTokenTTLSecs, provider)
 			return
 		}
 
@@ -35,20 +35,20 @@ func CheckJWT(secret, tokenTTL, refreshTokenTTL string) gin.HandlerFunc {
 	}
 }
 
-func tryRefresh(c *gin.Context, secret string, tokenTTL, refRefreshTokenTTL int) {
+func tryRefresh(c *gin.Context, refRefreshTokenTTL int, provider *token.JWTProvider) {
 	refreshStr, err := c.Cookie(code.VadoRefreshToken)
 	if err != nil || refreshStr == "" {
 		setNotAuth(c)
 		return
 	}
 
-	refreshClaims, err := auth.ParseToken(refreshStr, secret)
+	refreshClaims, err := provider.ParseToken(refreshStr)
 	if err != nil || (refreshClaims.ExpiresAt != nil && refreshClaims.ExpiresAt.Time.Before(time.Now())) {
 		setNotAuth(c)
 		return
 	}
 
-	newAccess, err := auth.CreateToken(refreshClaims.UserID(), refreshClaims.Role, time.Second*time.Duration(tokenTTL), secret)
+	newAccess, err := provider.CreateToken(refreshClaims.UserID(), refreshClaims.Role)
 	if err != nil {
 		setNotAuth(c)
 		return

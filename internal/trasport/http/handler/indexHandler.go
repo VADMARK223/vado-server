@@ -5,24 +5,24 @@ import (
 	"net/http"
 	"time"
 	"vado_server/internal/config/code"
-	"vado_server/internal/domain/auth"
+	"vado_server/internal/infra/token"
 
 	"github.com/gin-gonic/gin"
 )
 
-func ShowIndex(secret string) gin.HandlerFunc {
+func ShowIndex(provider *token.JWTProvider) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		td, _ := c.Get(code.TemplateData)
 		data := td.(gin.H)
 
-		updateTokenInfo(c, data, secret)
-		updateRefreshTokenInfo(c, data, secret)
+		updateTokenInfo(c, data, provider)
+		updateRefreshTokenInfo(c, data, provider)
 
 		c.HTML(http.StatusOK, "index.html", data)
 	}
 }
 
-func updateTokenInfo(c *gin.Context, data gin.H, secret string) {
+func updateTokenInfo(c *gin.Context, data gin.H, provider *token.JWTProvider) {
 	data[code.TokenStatus] = "✅"
 	data[code.TokenExpireAt] = "-"
 	data[code.Role] = "-"
@@ -33,7 +33,7 @@ func updateTokenInfo(c *gin.Context, data gin.H, secret string) {
 		return
 	}
 
-	claims, err := auth.ParseToken(tokenStr, secret)
+	claims, err := provider.ParseToken(tokenStr)
 	if err != nil {
 		data[code.TokenStatus] = "❌" + err.Error()
 		return
@@ -44,7 +44,7 @@ func updateTokenInfo(c *gin.Context, data gin.H, secret string) {
 	data[code.Role] = claims.Role
 }
 
-func updateRefreshTokenInfo(c *gin.Context, data gin.H, secret string) {
+func updateRefreshTokenInfo(c *gin.Context, data gin.H, provider *token.JWTProvider) {
 	data[code.RefreshTokenStatus] = "✅"
 	data[code.RefreshTokenExpireAt] = "-"
 
@@ -55,7 +55,7 @@ func updateRefreshTokenInfo(c *gin.Context, data gin.H, secret string) {
 		return
 	}
 
-	claims, err := auth.ParseToken(tokenStr, secret)
+	claims, err := provider.ParseToken(tokenStr)
 	if err != nil {
 		data[code.RefreshTokenStatus] = "❌" + err.Error()
 		return

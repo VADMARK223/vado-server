@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 	"vado_server/internal/config/code"
-	"vado_server/internal/domain/auth"
+	"vado_server/internal/infra/token"
 
 	"github.com/k0kubun/pp"
 	"go.uber.org/zap"
@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func NewAuthInterceptor(log *zap.SugaredLogger, secret string) grpc.UnaryServerInterceptor {
+func NewAuthInterceptor(log *zap.SugaredLogger, provider *token.JWTProvider) grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
 		req interface{},
@@ -63,7 +63,7 @@ func NewAuthInterceptor(log *zap.SugaredLogger, secret string) grpc.UnaryServerI
 			return nil, status.Error(codes.Unauthenticated, "token not found (no header or cookie)")
 		}
 
-		claims, err := auth.ParseToken(token, secret) // твоя функция проверки JWT
+		claims, err := provider.ParseToken(token) // твоя функция проверки JWT
 		if err != nil {
 			_, _ = pp.Printf("not valid token: %v", err)
 			return nil, status.Error(codes.Unauthenticated, "некорректный токен")

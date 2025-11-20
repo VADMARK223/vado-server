@@ -40,7 +40,7 @@ func (s *AuthServer) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRe
 }
 
 func (s *AuthServer) Refresh(_ context.Context, req *pb.RefreshRequest) (*pb.LoginResponse, error) {
-	u, newToken, err := s.service.Refresh(req.RefreshToken, s.secret)
+	u, newToken, err := s.service.Refresh(req.RefreshToken)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, err.Error())
 	}

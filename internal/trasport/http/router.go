@@ -9,6 +9,7 @@ import (
 	"vado_server/internal/domain/task"
 	"vado_server/internal/domain/user"
 	"vado_server/internal/infra/persistence/gorm"
+	"vado_server/internal/infra/token"
 	"vado_server/internal/trasport/http/handler"
 	"vado_server/internal/trasport/http/middleware"
 	"vado_server/internal/trasport/ws"
@@ -26,7 +27,8 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	taskSvc := task.NewService(gorm.NewTaskRepo(ctx.DB))
 	tokenTTL, _ := strconv.Atoi(ctx.Cfg.TokenTTL)
 	refreshTTL, _ := strconv.Atoi(ctx.Cfg.RefreshTTL)
-	userSvc := user.NewService(gorm.NewUserRepo(ctx), time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
+	tokenProvider := token.NewJWTProvider(ctx.Cfg.JwtSecret, time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
+	userSvc := user.NewService(gorm.NewUserRepo(ctx), tokenProvider)
 	// Хендлеры
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.TokenTTL, ctx.Cfg.RefreshTTL, ctx.Log)
 
@@ -47,20 +49,20 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	// Настраиваем cookie-сессии
 	store := cookie.NewStore([]byte("super-secret-key")) // TODO: разобраться для чего это написано.
 	r.Use(sessions.Sessions("vado-session", store))
-	r.Use(middleware.CheckJWT(ctx.Cfg.JwtSecret, ctx.Cfg.TokenTTL, ctx.Cfg.RefreshTTL))
+	r.Use(middleware.CheckJWT(tokenProvider, ctx.Cfg.RefreshTTL))
 	r.Use(middleware.NoCache)
 	r.Use(middleware.TemplateContext)
 
 	// Публичные маршруты
-	r.GET(route.Index, handler.ShowIndex(ctx.Cfg.JwtSecret))
+	r.GET(route.Index, handler.ShowIndex(tokenProvider))
 	r.GET(route.Login, handler.ShowLogin)
 	r.POST(route.Login, authH.Login)
 	r.GET(route.Register, handler.ShowSignup)
 	r.POST(route.Register, handler.PerformRegister(userSvc))
 	r.POST(route.Logout, handler.Logout)
-	r.GET("/ws", handler.ServeSW(hub, ctx.Log, ctx.Cfg.JwtSecret))
+	r.GET("/ws", handler.ServeSW(hub, ctx.Log, tokenProvider))
 	r.GET("/chat", handler.ShowChat())
-	r.GET("/me", handler.MeHandler(ctx.Log, ctx.Cfg.JwtSecret, userSvc))
+	r.GET("/me", handler.MeHandler(ctx.Log, userSvc, tokenProvider))
 
 	// Защищенные маршруты
 	auth := r.Group("/")

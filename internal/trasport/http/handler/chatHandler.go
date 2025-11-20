@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 	"vado_server/internal/config/code"
-	"vado_server/internal/domain/auth"
+	"vado_server/internal/infra/token"
 
 	//"vado_server/internal/domain/auth"
 	"vado_server/internal/trasport/ws"
@@ -36,7 +36,7 @@ var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
-func ServeSW(hub *ws.Hub, log *zap.SugaredLogger, secret string) gin.HandlerFunc {
+func ServeSW(hub *ws.Hub, log *zap.SugaredLogger, provider *token.JWTProvider) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr := c.Query("token")
 		// Если токена нет в query параметре, пробуем взять из кук
@@ -50,7 +50,7 @@ func ServeSW(hub *ws.Hub, log *zap.SugaredLogger, secret string) gin.HandlerFunc
 		}
 		log.Infow("ServeSW", "tokenStr", tokenStr)
 
-		claims, err := auth.ParseToken(tokenStr, secret)
+		claims, err := provider.ParseToken(tokenStr)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return

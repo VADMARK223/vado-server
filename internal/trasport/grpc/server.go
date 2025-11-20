@@ -16,6 +16,7 @@ import (
 	"vado_server/internal/domain/user"
 	"vado_server/internal/infra/kafka"
 	"vado_server/internal/infra/persistence/gorm"
+	"vado_server/internal/infra/token"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"go.uber.org/zap"
@@ -34,16 +35,18 @@ func NewServer(ctx *app.Context, grpcPort, grpcWebPort, port string) (*Server, e
 		return nil, fmt.Errorf("failed to listen on port %s: %w", grpcPort, err)
 	}
 
+	tokenTTL, _ := strconv.Atoi(ctx.Cfg.TokenTTL)
+	refreshTTL, _ := strconv.Atoi(ctx.Cfg.RefreshTTL)
+	tokenProvider := token.NewJWTProvider(ctx.Cfg.JwtSecret, time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
 	s := &Server{
 		grpcServer: grpc.NewServer(
-			grpc.UnaryInterceptor(NewAuthInterceptor(ctx.Log, ctx.Cfg.JwtSecret)),
+			grpc.UnaryInterceptor(NewAuthInterceptor(ctx.Log, tokenProvider)),
 		),
 		listener: lis,
 		log:      ctx.Log,
 	}
-	tokenTTL, _ := strconv.Atoi(ctx.Cfg.TokenTTL)
-	refreshTTL, _ := strconv.Atoi(ctx.Cfg.RefreshTTL)
-	userSvc := user.NewService(gorm.NewUserRepo(ctx), time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
+
+	userSvc := user.NewService(gorm.NewUserRepo(ctx), tokenProvider)
 
 	pbAuth.RegisterAuthServiceServer(s.grpcServer, NewAuthServer(userSvc, ctx.Cfg.JwtSecret))
 	pbHello.RegisterHelloServiceServer(s.grpcServer, NewHelloServer(ctx.Log))
