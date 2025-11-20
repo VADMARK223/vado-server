@@ -36,10 +36,10 @@ func NewAuthHandler(service *user.Service, secret string, tokenTTL string, refre
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
-	username := c.PostForm("username")
+	login := c.PostForm("login")
 	password := c.PostForm("password")
 
-	_, tokens, err := h.service.Login(username, password)
+	_, tokens, err := h.service.Login(login, password)
 	h.log.Debugw("Token from service", "tokens", tokens)
 	if err != nil {
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": err.Error()})
@@ -63,13 +63,13 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 func PerformRegister(service *user.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		username := c.PostForm("username")
+		login := c.PostForm("login")
 		email := c.PostForm("email")
 		password := c.PostForm("password")
 		role := c.PostForm(code.Role)
 		color := c.PostForm(code.Color)
 
-		err := service.CreateUser(user.DTO{Username: username, Email: email, Password: password, Role: user.Role(role), Color: color})
+		err := service.CreateUser(user.DTO{Login: login, Email: email, Password: password, Role: user.Role(role), Color: color})
 
 		if err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{

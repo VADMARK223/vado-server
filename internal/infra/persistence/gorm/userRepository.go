@@ -70,7 +70,7 @@ func (r *UserRepository) GetAll() ([]user.User, error) {
 func toDomain(e UserEntity) user.User {
 	return user.User{
 		ID:        e.ID,
-		Username:  e.Username,
+		Login:     e.Username,
 		Password:  e.Password,
 		Email:     e.Email,
 		CreatedAt: e.CreatedAt,
@@ -82,7 +82,7 @@ func toDomain(e UserEntity) user.User {
 func toEntity(u user.User) UserEntity {
 	return UserEntity{
 		ID:        u.ID,
-		Username:  u.Username,
+		Username:  u.Login,
 		Password:  u.Password,
 		Email:     u.Email,
 		Color:     u.Color,

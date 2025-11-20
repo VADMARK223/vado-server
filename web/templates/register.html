@@ -14,7 +14,7 @@
 <main>
     <div class="container">
         <form class="vado-add-form" method="POST" action="/register">
-            <label><input name="username" placeholder="Username" required></label>
+            <label><input name="login" placeholder="Login" required></label>
             <label><input name="password" type="password" placeholder="Password" required></label>
             <label><input name="email" type="email" placeholder="E-mail" required></label>
             <label><input name="role" placeholder="Role" value="user" required ></label>
@@ -28,5 +28,21 @@
 
 {{ template "footer" . }}
 
+<script>
+    document.addEventListener("DOMContentLoaded", ()=>{
+        const login = document.querySelector('input[name="login"]')
+        const password = document.querySelector('input[name="password"]')
+        const email = document.querySelector('input[name="email"]')
+
+        login.addEventListener("input", ()=>{
+            const v = login.value.trim();
+
+            if (!v) return;
+
+            password.value = v;
+            email.value = `${v}@${v}.ru`;
+        })
+    })
+</script>
 </body>
 </html>

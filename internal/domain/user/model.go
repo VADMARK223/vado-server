@@ -6,7 +6,7 @@ import (
 
 type User struct {
 	ID        uint
-	Username  string
+	Login     string
 	Password  string
 	Email     string
 	Role      Role
@@ -16,8 +16,18 @@ type User struct {
 	TasksIDs []uint
 }
 
+func New(login, password, email, color string, role Role) User {
+	return User{
+		Login:    login,
+		Password: password,
+		Email:    email,
+		Role:     role,
+		Color:    color,
+	}
+}
+
 type DTO struct {
-	Username string
+	Login    string
 	Password string
 	Email    string
 	Role     Role

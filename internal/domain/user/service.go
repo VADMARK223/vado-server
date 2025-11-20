@@ -24,7 +24,7 @@ func NewService(repo Repository, tokens auth.TokenProvider) *Service {
 
 func (s *Service) CreateUser(dto DTO) error {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
-	user := User{Username: dto.Username, Password: string(hash), Email: dto.Email, Role: dto.Role, Color: dto.Color}
+	user := New(dto.Login, string(hash), dto.Email, dto.Color, dto.Role)
 	return s.repo.CreateUser(user)
 }
 
@@ -36,8 +36,8 @@ func (s *Service) GetByID(id uint) (User, error) {
 	return s.repo.GetByID(id)
 }
 
-func (s *Service) Login(username, password string) (User, *auth.TokenPair, error) {
-	u, errGetUser := s.repo.GetByUsername(username)
+func (s *Service) Login(login, password string) (User, *auth.TokenPair, error) {
+	u, errGetUser := s.repo.GetByUsername(login)
 
 	if errGetUser != nil {
 		return User{}, nil, errors.New("user not found")

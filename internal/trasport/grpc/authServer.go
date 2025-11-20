@@ -33,7 +33,7 @@ func (s *AuthServer) Login(_ context.Context, req *pb.LoginRequest) (*pb.LoginRe
 
 	return &pb.LoginResponse{
 		Id:           uint64(u.ID),
-		Username:     u.Username,
+		Username:     u.Login,
 		Token:        tokens.AccessToken,
 		RefreshToken: tokens.RefreshToken,
 	}, nil
@@ -51,7 +51,7 @@ func (s *AuthServer) Refresh(_ context.Context, req *pb.RefreshRequest) (*pb.Log
 
 	return &pb.LoginResponse{
 		Id:           uint64(u.ID),
-		Username:     u.Username,
+		Username:     u.Login,
 		Token:        newToken,
 		RefreshToken: req.RefreshToken,
 	}, nil

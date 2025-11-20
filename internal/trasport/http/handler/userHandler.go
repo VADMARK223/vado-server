@@ -34,37 +34,6 @@ func renderUsersPage(c *gin.Context, service *user.Service, errorMsg string) {
 	c.HTML(http.StatusOK, "users.html", data)
 }
 
-func PostUser(service *user.Service) func(c *gin.Context) {
-	return func(c *gin.Context) {
-		username := c.PostForm("username")
-		password := c.PostForm("password")
-		email := c.PostForm("email")
-
-		if username == "" {
-			renderUsersPage(c, service, "Name is required")
-			return
-		}
-
-		if password == "" {
-			renderUsersPage(c, service, "Password is required")
-			return
-		}
-
-		if email == "" {
-			renderUsersPage(c, service, "Email is required")
-			return
-		}
-
-		err := service.CreateUser(user.DTO{Username: username, Email: email, Password: password})
-
-		if err != nil {
-			ShowError(c, "Error adding user with role", err.Error())
-			return
-		}
-		c.Redirect(http.StatusSeeOther, route.Users)
-	}
-}
-
 func DeleteUser(service *user.Service) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		parseUint, parseUintErr := strconv.ParseUint(c.Param("id"), 10, 32)
