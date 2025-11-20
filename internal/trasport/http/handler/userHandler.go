@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strconv"
 	"vado_server/internal/config/code"
-	"vado_server/internal/config/route"
 	"vado_server/internal/domain/user"
 
 	"github.com/gin-gonic/gin"
+	"github.com/k0kubun/pp"
 )
 
 func ShowUsers(service *user.Service) func(c *gin.Context) {
@@ -26,6 +26,9 @@ func renderUsersPage(c *gin.Context, service *user.Service, errorMsg string) {
 	td, _ := c.Get(code.TemplateData)
 	data := td.(gin.H)
 	data["Users"] = users
+
+	pp.Println("=============")
+	pp.Println(len(users))
 
 	if errorMsg != "" {
 		data["Error"] = errorMsg
@@ -47,6 +50,6 @@ func DeleteUser(service *user.Service) func(c *gin.Context) {
 			return
 		}
 
-		c.Redirect(http.StatusSeeOther, route.Users)
+		c.JSON(200, gin.H{"status": "deleted"})
 	}
 }

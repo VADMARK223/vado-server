@@ -37,7 +37,7 @@ func (s *Service) GetByID(id uint) (User, error) {
 }
 
 func (s *Service) Login(login, password string) (User, *auth.TokenPair, error) {
-	u, errGetUser := s.repo.GetByUsername(login)
+	u, errGetUser := s.repo.GetByLogin(login)
 
 	if errGetUser != nil {
 		return User{}, nil, errors.New("user not found")
