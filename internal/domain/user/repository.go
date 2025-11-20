@@ -5,5 +5,5 @@ type Repository interface {
 	DeleteUser(id uint) error
 	GetByUsername(username string) (*User, error)
 	GetByID(id uint) (*User, error)
-	GetAllWithRoles() ([]WithRoles, error)
+	GetAll() ([]User, error)
 }

@@ -27,7 +27,7 @@ func NewService(repo Repository, tokenTTL time.Duration, refreshTTL time.Duratio
 
 func (s *Service) CreateUser(dto DTO) error {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
-	user := User{Username: dto.Username, Password: string(hash), Email: dto.Email}
+	user := User{Username: dto.Username, Password: string(hash), Email: dto.Email, Role: dto.Role, Color: dto.Color}
 	return s.repo.CreateUser(user)
 }
 
@@ -50,7 +50,7 @@ func (s *Service) Login(username, password, secret string) (*User, *auth.TokenPa
 		return u, nil, errors.New("incorrect password")
 	}
 
-	tokens, err := auth.CreateTokenPair(u.ID, u.RolesIDs, s.tokenTTL, s.refreshTTL, secret)
+	tokens, err := auth.CreateTokenPair(u.ID, u.Role, s.tokenTTL, s.refreshTTL, secret)
 	if err != nil {
 		return nil, nil, errors.New(fmt.Sprintf("Error creating tokens: %s", err.Error()))
 	}
@@ -68,7 +68,7 @@ func (s *Service) Refresh(token string, secret string) (*User, string, error) {
 		return nil, "", errors.New("user not found")
 	}
 
-	newToken, errToken := auth.CreateToken(u.ID, u.RolesIDs, s.tokenTTL, secret)
+	newToken, errToken := auth.CreateToken(u.ID, u.Role, s.tokenTTL, secret)
 	if errToken != nil {
 		return nil, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Error creating new token: %s", errToken.Error()))
 	}
@@ -76,6 +76,6 @@ func (s *Service) Refresh(token string, secret string) (*User, string, error) {
 	return u, newToken, nil
 }
 
-func (s *Service) GetAllUsersWithRoles() ([]WithRoles, error) {
-	return s.repo.GetAllWithRoles()
+func (s *Service) GetAll() ([]User, error) {
+	return s.repo.GetAll()
 }

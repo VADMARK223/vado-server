@@ -15,5 +15,6 @@ const (
 	Error                = "error"
 	TokenExpireAt        = "token_expire_at"
 	RefreshTokenExpireAt = "refresh_token_expire_at"
-	Roles                = "roles"
+	Role                 = "role"
+	Color                = "color"
 )

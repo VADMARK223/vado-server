@@ -6,7 +6,6 @@ import (
 	"time"
 	"vado_server/internal/app"
 	"vado_server/internal/config/route"
-	"vado_server/internal/domain/role"
 	"vado_server/internal/domain/task"
 	"vado_server/internal/domain/user"
 	"vado_server/internal/infra/persistence/gorm"
@@ -25,7 +24,6 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	go hub.Run()
 	// Сервисы
 	taskSvc := task.NewService(gorm.NewTaskRepo(ctx.DB))
-	roleSvc := role.NewService(gorm.NewRoleRepo(ctx))
 	tokenTTL, _ := strconv.Atoi(ctx.Cfg.TokenTTL)
 	refreshTTL, _ := strconv.Atoi(ctx.Cfg.RefreshTTL)
 	userSvc := user.NewService(gorm.NewUserRepo(ctx), time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
@@ -75,7 +73,6 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 		auth.GET(route.Users, handler.ShowUsers(userSvc))
 		auth.POST(route.Users, handler.PostUser(userSvc))
 		auth.DELETE("/users/:id", handler.DeleteUser(userSvc))
-		auth.GET(route.Roles, handler.Roles(roleSvc))
 		auth.GET("/grpc-test", handler.Grpc)
 	}
 

@@ -9,9 +9,10 @@ type User struct {
 	Username  string
 	Password  string
 	Email     string
+	Role      string
+	Color     string
 	CreatedAt time.Time
 
-	RolesIDs []uint
 	TasksIDs []uint
 }
 
@@ -19,14 +20,6 @@ type DTO struct {
 	Username string
 	Password string
 	Email    string
-}
-
-type WithRoles struct {
-	User
-	Roles []RoleDTO
-}
-
-type RoleDTO struct {
-	ID   uint
-	Name string
+	Role     string
+	Color    string
 }

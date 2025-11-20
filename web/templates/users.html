@@ -45,16 +45,7 @@
                 <div class="vado-item">
                     <div class="vado-item-info">
                         <h3>{{.Username}} (ID {{.ID}})</h3>
-                        {{if .Roles}}
-                        <p class="roles">
-                            Roles:
-                            {{range .Roles}}
-                            <span class="role">{{.Name}}</span>
-                            {{end}}
-                        </p>
-                        {{else}}
-                        <p class="roles">No role</p>
-                        {{end}}
+                        <p>Role: {{.Role}}</p>
                         <p>E-mail: {{.Email}}</p>
                     </div>
                     <div>

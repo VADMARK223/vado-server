@@ -17,7 +17,7 @@ func ShowUsers(service *user.Service) func(c *gin.Context) {
 }
 
 func renderUsersPage(c *gin.Context, service *user.Service, errorMsg string) {
-	users, err := service.GetAllUsersWithRoles()
+	users, err := service.GetAll()
 	if err != nil {
 		ShowError(c, "Failed to load users", err.Error())
 		return

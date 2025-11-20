@@ -1,28 +1,16 @@
 CREATE TABLE IF NOT EXISTS users
 (
     id         SERIAL PRIMARY KEY,
-    username   VARCHAR(100) UNIQUE NOT NULL,
-    password   VARCHAR(255)        NOT NULL,
+    username   VARCHAR(100) UNIQUE                                        NOT NULL,
+    password   VARCHAR(255)                                               NOT NULL,
     email      VARCHAR(255) UNIQUE,
+    role       varchar(20) CHECK (role IN ('user', 'moderator', 'admin')) NOT NULL,
+    color      VARCHAR(7) CHECK (color ~ '^#[0-9A-Fa-f]{6}$')             NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 comment on table users is 'Таблица пользователей';
-
-CREATE TABLE IF NOT EXISTS roles
-(
-    id   INT PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL -- например: 'admin', 'user'
-);
-comment on table roles is 'Таблица ролей';
-
-create table if not exists user_roles
-(
-    user_id integer references users (id) on delete cascade, -- Удаляем запись таблицы, если роль удалена
-    role_id integer references roles (id) on delete cascade, -- Удаляем запись таблицы, если пользователь удален
-    primary key (user_id, role_id)
-);
-
-comment on table user_roles is 'Таблица связи пользователей и ролей (многие-ко-многим)';
+comment on column users.color is 'Цвет пользователя в HEX (#RRGGBB)';
+comment on column users.role is 'Роль пользователя';
 
 create table if not exists tasks
 (

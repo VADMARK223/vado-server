@@ -25,7 +25,7 @@ func ShowIndex(secret string) gin.HandlerFunc {
 func updateTokenInfo(c *gin.Context, data gin.H, secret string) {
 	data[code.TokenStatus] = "✅"
 	data[code.TokenExpireAt] = "-"
-	data[code.Roles] = "-"
+	data[code.Role] = "-"
 
 	tokenStr, errTokenCookie := c.Cookie(code.VadoToken)
 	if errTokenCookie != nil {
@@ -41,11 +41,7 @@ func updateTokenInfo(c *gin.Context, data gin.H, secret string) {
 	expTime := claims.ExpiresAt.Time
 	remaining := time.Until(expTime).Truncate(time.Second)
 	data[code.TokenExpireAt] = fmt.Sprintf("%s (via %s)", expTime.Format("02.01.2006 15:04:05"), remaining.String())
-	if len(claims.Roles) > 0 {
-		data[code.Roles] = claims.Roles
-	} else {
-		data[code.Roles] = "no roles"
-	}
+	data[code.Role] = claims.Role
 }
 
 func updateRefreshTokenInfo(c *gin.Context, data gin.H, secret string) {

@@ -7,5 +7,4 @@ const (
 	Register = "/register"
 	Tasks    = "/tasks"
 	Users    = "/users"
-	Roles    = "/roles"
 )

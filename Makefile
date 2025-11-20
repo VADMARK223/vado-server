@@ -45,6 +45,9 @@ up:
 down:
 	docker compose -p $(PROJECT_NAME) down
 
+down-v:
+	docker compose -p $(PROJECT_NAME) down -v
+
 ps:
 	$(COMPOSE) ps --format 'table {{.Name}}\t{{.Ports}}'
 
@@ -124,6 +127,7 @@ help:
 	@echo "  $(GREEN)make pull$(RESET)      - 📥 pull image from GHCR"
 	@echo "  $(GREEN)make up$(RESET)        - 🚀 start all containers"
 	@echo "  $(GREEN)make down$(RESET)      - 🧯 stop all containers"
+	@echo "  $(GREEN)make down-v$(RESET)    - 🧯 stop all containers (remove volumes)"
 	@echo "  $(GREEN)make ps$(RESET)        - show containers"
 	@echo "  $(GREEN)make logs$(RESET)      - 🧾 show logs"
 	@echo "  $(GREEN)make logs-f$(RESET)    - 🧾 show logs (Follow)"

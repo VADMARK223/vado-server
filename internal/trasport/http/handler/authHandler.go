@@ -66,8 +66,10 @@ func PerformRegister(service *user.Service) gin.HandlerFunc {
 		username := c.PostForm("username")
 		email := c.PostForm("email")
 		password := c.PostForm("password")
+		role := c.PostForm(code.Role)
+		color := c.PostForm(code.Color)
 
-		err := service.CreateUser(user.DTO{Username: username, Email: email, Password: password})
+		err := service.CreateUser(user.DTO{Username: username, Email: email, Password: password, Role: role, Color: color})
 
 		if err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{

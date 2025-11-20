@@ -3,6 +3,7 @@ package auth
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
@@ -15,13 +16,13 @@ type TokenPair struct {
 	RefreshToken string
 }
 
-func CreateTokenPair(userID uint, roles []uint, accessTTL, refreshTTL time.Duration, secret string) (*TokenPair, error) {
-	access, err := CreateToken(userID, roles, accessTTL, secret)
+func CreateTokenPair(userID uint, role string, accessTTL, refreshTTL time.Duration, secret string) (*TokenPair, error) {
+	access, err := CreateToken(userID, role, accessTTL, secret)
 	if err != nil {
 		return nil, err
 	}
 
-	refresh, err := CreateToken(userID, roles, refreshTTL, secret)
+	refresh, err := CreateToken(userID, role, refreshTTL, secret)
 	if err != nil {
 		return nil, err
 	}
@@ -32,10 +33,11 @@ func CreateTokenPair(userID uint, roles []uint, accessTTL, refreshTTL time.Durat
 	}, nil
 }
 
-func CreateToken(userID uint, roles []uint, ttl time.Duration, secret string) (string, error) {
+func CreateToken(userID uint, role string, ttl time.Duration, secret string) (string, error) {
 	now := time.Now()
+	log.Println("ROLE:", role)
 	claims := CustomClaims{
-		Roles: roles,
+		Role: role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   strconv.Itoa(int(userID)),
 			ExpiresAt: jwt.NewNumericDate(now.Add(ttl)),

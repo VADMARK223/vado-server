@@ -7,7 +7,7 @@ import (
 )
 
 type CustomClaims struct {
-	Roles []uint `json:"roles,omitempty"` // Если поле пустое, если не нужно включать в итоговый JSON
+	Role string `json:"role"`
 	jwt.RegisteredClaims
 }
 

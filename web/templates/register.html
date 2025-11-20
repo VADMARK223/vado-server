@@ -17,6 +17,8 @@
             <label><input name="username" placeholder="Username" required></label>
             <label><input name="password" type="password" placeholder="Password" required></label>
             <label><input name="email" type="email" placeholder="E-mail" required></label>
+            <label><input name="role" placeholder="Role" value="user" required ></label>
+            <label><input name="color" placeholder="Color" value="#FF5733" required></label>
             {{if .Error}}<p class="error">{{.Error}}</p>{{end}}
             <button class="btn" type="submit">Create account</button>
             <p><a href="/login">Sign in</a></p>
