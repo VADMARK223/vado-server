@@ -62,13 +62,14 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 func PerformRegister(service *user.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		login := c.PostForm("login")
-		email := c.PostForm("email")
-		password := c.PostForm("password")
+		login := c.PostForm(code.Login)
+		email := c.PostForm(code.Email)
+		password := c.PostForm(code.Password)
 		role := c.PostForm(code.Role)
 		color := c.PostForm(code.Color)
+		username := c.PostForm(code.Username)
 
-		err := service.CreateUser(user.DTO{Login: login, Email: email, Password: password, Role: user.Role(role), Color: color})
+		err := service.CreateUser(user.DTO{Login: login, Email: email, Password: password, Role: user.Role(role), Color: color, Username: username})
 
 		if err != nil {
 			c.HTML(http.StatusBadRequest, "register.html", gin.H{

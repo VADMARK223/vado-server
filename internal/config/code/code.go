@@ -3,7 +3,6 @@ package code
 const (
 	RedirectTo           = "redirect_to"
 	UserId               = "user_id"
-	IsAuth               = "is_auth"
 	VadoToken            = "vado_token"
 	TokenStatus          = "token_status"
 	RefreshTokenStatus   = "refresh_token_status"
@@ -18,7 +17,9 @@ const (
 	Role                 = "role"
 	Color                = "color"
 	Email                = "email"
+	Password             = "password"
 	CurrentUser          = "current_user"
-	Login                = "Login"
+	Login                = "login"
 	Username             = "username"
+	IsAdmin              = "is_admin"
 )

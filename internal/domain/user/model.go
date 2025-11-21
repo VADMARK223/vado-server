@@ -17,11 +17,16 @@ type User struct {
 	TasksIDs []uint
 }
 
-func New(login, password, email, color string, role Role) User {
+func (u User) IsAdmin() bool {
+	return u.Role == RoleAdmin
+}
+
+func New(login, password, email, username, color string, role Role) User {
 	return User{
 		Login:    login,
 		Password: password,
 		Email:    email,
+		Username: username,
 		Role:     role,
 		Color:    color,
 	}
@@ -31,6 +36,7 @@ type DTO struct {
 	Login    string
 	Password string
 	Email    string
+	Username string
 	Role     Role
 	Color    string
 }

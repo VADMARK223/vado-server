@@ -16,6 +16,7 @@
         <form class="vado-add-form" method="POST" action="/register">
             <label><input name="login" placeholder="Login" required></label>
             <label><input name="password" type="password" placeholder="Password" required></label>
+            <label><input name="username" placeholder="Username" required></label>
             <label><input name="email" type="email" placeholder="E-mail" required></label>
             <label><input name="role" placeholder="Role" value="user" required ></label>
             <label><input name="color" placeholder="Color" value="#FF5733" required></label>
@@ -33,6 +34,7 @@
         const login = document.querySelector('input[name="login"]')
         const password = document.querySelector('input[name="password"]')
         const email = document.querySelector('input[name="email"]')
+        const username = document.querySelector('input[name="username"]')
 
         login.addEventListener("input", ()=>{
             const v = login.value.trim();
@@ -41,6 +43,7 @@
 
             password.value = v;
             email.value = `${v}@${v}.ru`;
+            username.value = `User${v}`;
         })
     })
 </script>

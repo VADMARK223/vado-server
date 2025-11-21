@@ -85,6 +85,7 @@ func toEntity(u user.User) UserEntity {
 		ID:        u.ID,
 		Login:     u.Login,
 		Password:  u.Password,
+		Username:  u.Username,
 		Email:     u.Email,
 		Color:     u.Color,
 		Role:      string(u.Role), // доменный тип → строка
