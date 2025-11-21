@@ -9,7 +9,7 @@
     </div>
 
     <div class="vado-menu-info">
-        <p>Hello, {{.user_id}}!</p>
+        <p>Hello, {{.username}}!</p>
         <p id="email"></p>
         {{if .is_auth}}
         <form action="/logout" method="POST" style="display:inline;">
@@ -26,17 +26,4 @@
         {{end}}
     </div>
 </div>
-<script type="module">
-    import {initAuth, logout} from "../static/js/auth.js";
-
-    const email = document.getElementById("email")
-    const logBtn = document.getElementById("logBtn")
-    logBtn.addEventListener('click', () => {
-        logout()
-    })
-
-    initAuth().then(r => {
-        email.textContent = `(${r.email})`
-    })
-</script>
 {{ end }}

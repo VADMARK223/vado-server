@@ -25,7 +25,6 @@ func ShowIndex(provider *token.JWTProvider) gin.HandlerFunc {
 func updateTokenInfo(c *gin.Context, data gin.H, provider *token.JWTProvider) {
 	data[code.TokenStatus] = "✅"
 	data[code.TokenExpireAt] = "-"
-	data[code.Role] = "-"
 
 	tokenStr, errTokenCookie := c.Cookie(code.VadoToken)
 	if errTokenCookie != nil {
@@ -41,7 +40,6 @@ func updateTokenInfo(c *gin.Context, data gin.H, provider *token.JWTProvider) {
 	expTime := claims.ExpiresAt.Time
 	remaining := time.Until(expTime).Truncate(time.Second)
 	data[code.TokenExpireAt] = fmt.Sprintf("%s (via %s)", expTime.Format("02.01.2006 15:04:05"), remaining.String())
-	data[code.Role] = claims.Role
 }
 
 func updateRefreshTokenInfo(c *gin.Context, data gin.H, provider *token.JWTProvider) {

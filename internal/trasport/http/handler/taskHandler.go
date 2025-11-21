@@ -10,7 +10,6 @@ import (
 	"vado_server/internal/infra/persistence/gorm"
 
 	"github.com/gin-gonic/gin"
-	"github.com/k0kubun/pp"
 )
 
 func Tasks(service *task.Service) gin.HandlerFunc {
@@ -19,7 +18,6 @@ func Tasks(service *task.Service) gin.HandlerFunc {
 		data := td.(gin.H)
 
 		tasks, err := service.GetAllByUser(data[code.UserId].(uint))
-		_, _ = pp.Println(tasks)
 		if err != nil {
 			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
 				"Message": "Не удалось загрузить задачи",

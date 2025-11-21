@@ -60,14 +60,11 @@ func tryRefresh(c *gin.Context, refRefreshTokenTTL int, provider *token.JWTProvi
 }
 
 func setAuth(c *gin.Context, id uint, role string) {
-	c.Set(code.IsAuth, true)
 	c.Set(code.UserId, id)
 	c.Set(code.Role, role)
 	c.Next()
 }
 
 func setNotAuth(c *gin.Context) {
-	c.Set(code.IsAuth, false)
-	c.Set(code.UserId, "Guest")
 	c.Next()
 }

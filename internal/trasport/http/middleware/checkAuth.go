@@ -11,8 +11,7 @@ import (
 
 func CheckAuthAndRedirect() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		isAuth, ok := c.Get(code.IsAuth)
-		if !ok || isAuth == false {
+		if _, ok := c.Get(code.UserId); !ok {
 			session := sessions.Default(c)
 			session.Set(code.RedirectTo, c.Request.URL.Path)
 			_ = session.Save()

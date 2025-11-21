@@ -3,13 +3,11 @@ package token
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 	"vado_server/internal/domain/auth"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/k0kubun/pp"
 )
 
 type JWTProvider struct {
@@ -41,7 +39,6 @@ func (j *JWTProvider) CreateTokenPair(userID uint, role string) (*auth.TokenPair
 
 func (j *JWTProvider) CreateToken(userID uint, role string) (string, error) {
 	now := time.Now()
-	log.Println("ROLE:", role)
 	claims := auth.CustomClaims{
 		Role: role,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -52,8 +49,6 @@ func (j *JWTProvider) CreateToken(userID uint, role string) (string, error) {
 			Issuer:    "vado-server",
 		},
 	}
-
-	_, _ = pp.Println("claims: ", claims)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(j.secret))

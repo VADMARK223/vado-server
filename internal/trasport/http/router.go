@@ -14,8 +14,6 @@ import (
 	"vado_server/internal/trasport/http/middleware"
 	"vado_server/internal/trasport/ws"
 
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,6 +27,7 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	refreshTTL, _ := strconv.Atoi(ctx.Cfg.RefreshTTL)
 	tokenProvider := token.NewJWTProvider(ctx.Cfg.JwtSecret, time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
 	userSvc := user.NewService(gorm.NewUserRepo(ctx), tokenProvider)
+	localCache := app.NewLocalCache()
 	// Хендлеры
 	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.TokenTTL, ctx.Cfg.RefreshTTL, ctx.Log)
 
@@ -46,10 +45,10 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 		c.File("web/static/favicon.ico")
 	})
 
-	// Настраиваем cookie-сессии
-	store := cookie.NewStore([]byte("super-secret-key")) // TODO: разобраться для чего это написано.
-	r.Use(sessions.Sessions("vado-session", store))
+	// Middleware
+	r.Use(middleware.SessionMiddleware())
 	r.Use(middleware.CheckJWT(tokenProvider, ctx.Cfg.RefreshTTL))
+	r.Use(middleware.LoadUserContext(userSvc, localCache))
 	r.Use(middleware.NoCache)
 	r.Use(middleware.TemplateContext)
 
@@ -62,7 +61,6 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	r.POST(route.Logout, handler.Logout)
 	r.GET("/ws", handler.ServeSW(hub, ctx.Log, tokenProvider))
 	r.GET("/chat", handler.ShowChat())
-	r.GET("/me", handler.MeHandler(ctx.Log, userSvc, tokenProvider))
 
 	// Защищенные маршруты
 	auth := r.Group("/")

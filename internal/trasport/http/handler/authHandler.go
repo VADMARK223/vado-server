@@ -40,7 +40,6 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	password := c.PostForm("password")
 
 	_, tokens, err := h.service.Login(login, password)
-	h.log.Debugw("Token from service", "tokens", tokens)
 	if err != nil {
 		c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": err.Error()})
 	}

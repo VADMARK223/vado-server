@@ -7,6 +7,7 @@ import (
 type User struct {
 	ID        uint
 	Login     string
+	Username  string
 	Password  string
 	Email     string
 	Role      Role

@@ -5,7 +5,6 @@ import (
 	"vado_server/internal/app"
 	"vado_server/internal/domain/user"
 
-	"github.com/k0kubun/pp"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -23,11 +22,7 @@ func NewUserRepo(ctx *app.Context) user.Repository {
 }
 
 func (r *UserRepository) CreateUser(u user.User) error {
-	pp.Println("===CreateUser===")
-	pp.Println(u)
-	pp.Println("====== Entity")
 	entity := toEntity(u)
-	pp.Println(entity)
 	if err := r.db.Create(&entity).Error; err != nil {
 		return fmt.Errorf("failed to create user: %w", err)
 	}
@@ -75,7 +70,8 @@ func (r *UserRepository) GetAll() ([]user.User, error) {
 func toDomain(e UserEntity) user.User {
 	return user.User{
 		ID:        e.ID,
-		Login:     e.Username,
+		Login:     e.Login,
+		Username:  e.Username,
 		Password:  e.Password,
 		Email:     e.Email,
 		CreatedAt: e.CreatedAt,

@@ -6,7 +6,6 @@ import (
 	"vado_server/internal/config/code"
 	"vado_server/internal/infra/token"
 
-	"github.com/k0kubun/pp"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -37,20 +36,20 @@ func NewAuthInterceptor(log *zap.SugaredLogger, provider *token.JWTProvider) grp
 			return nil, status.Error(codes.Unauthenticated, "metadata отсутствует")
 		}
 
-		var token string
+		var tkn string
 		// Пробуем достать токен из Authorization
 		if values := md["authorization"]; len(values) > 0 {
-			token = strings.TrimPrefix(values[0], "Bearer ")
+			tkn = strings.TrimPrefix(values[0], "Bearer ")
 			log.Debugw("token source", "type", "Authorization header")
 		}
 
-		if token == "" {
+		if tkn == "" {
 			if cookies := md["cookie"]; len(cookies) > 0 {
 				for _, c := range cookies {
 					for _, part := range strings.Split(c, ";") {
 						part = strings.TrimSpace(part)
 						if strings.HasPrefix(part, code.VadoToken+"=") {
-							token = strings.TrimPrefix(part, code.VadoToken+"=")
+							tkn = strings.TrimPrefix(part, code.VadoToken+"=")
 							log.Debugw("token source", "type", "Cookie")
 							break
 						}
@@ -59,13 +58,12 @@ func NewAuthInterceptor(log *zap.SugaredLogger, provider *token.JWTProvider) grp
 			}
 		}
 
-		if token == "" {
+		if tkn == "" {
 			return nil, status.Error(codes.Unauthenticated, "token not found (no header or cookie)")
 		}
 
-		claims, err := provider.ParseToken(token) // твоя функция проверки JWT
+		claims, err := provider.ParseToken(tkn) // твоя функция проверки JWT
 		if err != nil {
-			_, _ = pp.Printf("not valid token: %v", err)
 			return nil, status.Error(codes.Unauthenticated, "некорректный токен")
 		}
 
