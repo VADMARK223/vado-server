@@ -26,13 +26,16 @@
     --space-10: 40px;
     --space-12: 48px;
 
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 16px;
+    --radius-sm: 2px;
+    --radius-md: 4px;
+    --radius-lg: 8px;
 
     --border-1: 1px solid var(--border-color);
     --shadow-sm: 0 1px 3px #0005;
     --shadow-md: 0 2px 8px #0007;
+
+    --entry: #45494a;
+    --panel: #3c3f41;
 }
 
 *, *::before, *::after {
@@ -41,6 +44,9 @@
 
 .menu,
 .container {
+    background: var(--bg-alt);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
     min-width: var(--layout-min-width);
     max-width: var(--layout-max-width);
     margin: var(--space-3) auto;
@@ -129,9 +135,6 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--bg-alt);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
 }
 
 .menu-right {
@@ -144,9 +147,6 @@ a:hover {
     display: flex;
     flex-direction: column;
     flex: 1;
-    background: var(--bg-alt);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
 
     min-height: 0;
     overflow: hidden;
@@ -193,7 +193,8 @@ a:hover {
 }
 
 .btn:hover {
-    background: var(--accent);
+    /*background: var(--accent);*/
+    background: #599fdb;
 }
 
 .btn:disabled {
@@ -238,9 +239,12 @@ a:hover {
 
 input, textarea {
     width: 100%;
-    background: var(--bg);
+    /*background: var(--bg);*/
+    background: var(--entry);
     color: var(--text);
-    border: var(--border-1);
+    /*border: var(--border-1);*/
+    border: 1px solid var(--border-color);
+    transition: border-color .2s, box-shadow .2s;
     border-radius: var(--radius-sm);
     padding: var(--space-2);
     font-family: inherit;
@@ -249,8 +253,8 @@ input, textarea {
 input:focus,
 textarea:focus {
     outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px #4e94ce55;
+    border-color: var(--accent-strong);
+    box-shadow: 0 0 0 1px var(--accent-strong);
 }
 
 input[type="checkbox"] {
