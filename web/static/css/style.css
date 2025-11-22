@@ -10,18 +10,27 @@
     --error: #d9534f;
     --danger: rgba(255, 0, 0, 0.87);
     --border: #3c3f41;
+
+    --layout-min-width: 570px;
+    --layout-max-width: 840px;
 }
 
-html, body {
+html {
     background-color: var(--bg);
     color: var(--text);
     font-family: "JetBrains Mono", monospace;
+    height: 100%;
+    min-height: 100vh;
+    overflow-x: auto;
+}
+
+body {
     margin: 0;
     padding: 0;
     height: 100%;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    overflow-x: hidden;
 }
 
 main {
@@ -61,8 +70,8 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 800px; /*Максимальная ширина*/
-    min-width: 800px; /*Максимальная ширина*/
+    min-width: var(--layout-min-width);
+    max-width: var(--layout-max-width);
     margin: 0 auto; /*20px это сверху и снизу, остальные автоматически рассчитываются*/
     padding: 20px; /*Внутренний отступ*/
     background: var(--bg-alt); /*Фон подложки*/
@@ -80,8 +89,8 @@ a:hover {
     display: flex;
     flex-direction: column;
     flex: 1;
-    min-width: 800px;
-    max-width: 800px;
+    min-width: var(--layout-min-width);
+    max-width: var(--layout-max-width);
     width: 100%;
     margin: 20px auto;
     padding: 20px;
