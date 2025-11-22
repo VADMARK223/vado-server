@@ -1,15 +1,19 @@
 @import url("/static/css/fontawesome-7_1_0.min.css");
 
 :root {
-    --bg: #2b2b2b;
-    --bg-alt: #313335;
+    --bg-main: #2b2b2b;
+    --bg-item: #313335;
+    --bg-item-hover: #3a3d41;
+    --bg-panel: #3c3f41;
+    --bg-entry: #45494a;
+    --bg-border: #4b4e50;
+
     --text: #a9b7c6;
     --accent: #6897bb;
     --accent-strong: #4e94ce;
     --orange: #cc7832;
     --error: #d9534f;
     --danger: rgba(255, 0, 0, 0.87);
-    --border-color: #3c3f41;
 
     --layout-min-width: 320px;
     /*--layout-min-width: 700px;*/
@@ -30,12 +34,9 @@
     --radius-md: 4px;
     --radius-lg: 8px;
 
-    --border-1: 1px solid var(--border-color);
+    --border-1: 1px solid var(--bg-border);
     --shadow-sm: 0 1px 3px #0005;
     --shadow-md: 0 2px 8px #0007;
-
-    --entry: #45494a;
-    --panel: #3c3f41;
 }
 
 *, *::before, *::after {
@@ -44,7 +45,7 @@
 
 .menu,
 .container {
-    background: var(--bg-alt);
+    background: var(--bg-panel);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
     min-width: var(--layout-min-width);
@@ -55,7 +56,7 @@
 }
 
 html {
-    background-color: var(--bg);
+    background-color: var(--bg-main);
     color: var(--text);
     font-family: "JetBrains Mono", monospace;
     height: 100%;
@@ -80,14 +81,14 @@ main {
 }
 
 header {
-    background: var(--bg-alt);
+    background: var(--bg-panel);
     padding: var(--space-3) var(--space-4) 0;
     text-align: center;
     box-shadow: var(--shadow-sm);
 }
 
 footer {
-    background: var(--bg-alt);
+    background: var(--bg-panel);
     padding-top: var(--space-2);
     padding-bottom: var(--space-2);
     text-align: center;
@@ -113,7 +114,7 @@ h1, h2, h3 {
 hr {
     border: none;
     height: 1px;
-    background: #3a3d3f;
+    background: var(--bg-border);
 }
 
 a, .link {
@@ -165,7 +166,7 @@ a:hover {
 }
 
 *::-webkit-scrollbar-track {
-    background: var(--bg-alt);
+    background: var(--bg-panel);
 }
 
 *::-webkit-scrollbar-thumb {
@@ -193,7 +194,6 @@ a:hover {
 }
 
 .btn:hover {
-    /*background: var(--accent);*/
     background: #599fdb;
 }
 
@@ -239,11 +239,9 @@ a:hover {
 
 input, textarea {
     width: 100%;
-    /*background: var(--bg);*/
-    background: var(--entry);
+    background: var(--bg-entry);
     color: var(--text);
-    /*border: var(--border-1);*/
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--bg-border);
     transition: border-color .2s, box-shadow .2s;
     border-radius: var(--radius-sm);
     padding: var(--space-2);
@@ -260,7 +258,7 @@ textarea:focus {
 input[type="checkbox"] {
     appearance: none; /* убираем стандартный стиль */
     -webkit-appearance: none;
-    background-color: var(--bg);
+    background-color: var(--bg-main);
     border: var(--border-1);
     width: 18px;
     height: 18px;
@@ -310,7 +308,7 @@ input[type="checkbox"]:checked::after {
     display: flex;
     flex-direction: row;
     align-items: center;
-    background: var(--bg);
+    background: var(--bg-item);
     border: var(--border-1);
     padding: var(--space-4);
     border-radius: var(--radius-md);
@@ -332,7 +330,7 @@ input[type="checkbox"]:checked::after {
 }
 
 .item:hover {
-    background: #353739;
+    background: var(--bg-item-hover);
 }
 
 .empty {
@@ -350,7 +348,7 @@ input[type="checkbox"]:checked::after {
 
 #status {
     padding: var(--space-2) var(--space-3);
-    background: var(--bg-alt);
+    background: var(--bg-panel);
     border-radius: var(--radius-sm);
     font-size: 12px;
     text-align: center;
@@ -367,7 +365,7 @@ input[type="checkbox"]:checked::after {
     padding: var(--space-4);
     border-radius: var(--radius-md);
     overflow-y: auto;
-    background: var(--bg);
+    background: var(--bg-main);
     gap: var(--space-3);
     min-height: var(--space-0);
 }
@@ -395,7 +393,7 @@ input[type="checkbox"]:checked::after {
 
 /* Сообщения других пользователей (слева) */
 .chat-messages > div:not(.chat-my-message) {
-    background: var(--bg-alt);
+    background: var(--bg-panel);
     border: var(--border-1);
     color: var(--text);
     align-self: flex-start;
