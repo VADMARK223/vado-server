@@ -5,7 +5,6 @@ import (
 	"vado_server/internal/config/code"
 	"vado_server/internal/infra/token"
 
-	//"vado_server/internal/domain/auth"
 	"vado_server/internal/trasport/ws"
 
 	"github.com/gin-gonic/gin"
@@ -15,8 +14,7 @@ import (
 
 func ShowChat() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		td, _ := c.Get(code.TemplateData)
-		data := td.(gin.H)
+		data := tplWithCapture(c, "WebSocket chat")
 
 		tokenStr, errTokenCookie := c.Cookie(code.VadoToken)
 		if errTokenCookie == nil && tokenStr != "" {

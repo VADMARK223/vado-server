@@ -12,8 +12,7 @@ import (
 
 func ShowIndex(provider *token.JWTProvider) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		td, _ := c.Get(code.TemplateData)
-		data := td.(gin.H)
+		data := tplWithCapture(c, fmt.Sprintf("Vado portal (%s)", gin.Mode()))
 
 		updateTokenInfo(c, data, provider)
 		updateRefreshTokenInfo(c, data, provider)

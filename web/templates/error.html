@@ -6,9 +6,7 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-<header>
-    <h1>{{.Message}}</h1>
-</header>
+{{ template "header" . }}
 
 <main>
     {{if .Error}}

@@ -3,7 +3,6 @@ package handler
 import (
 	"net/http"
 	"strconv"
-	"vado_server/internal/config/code"
 	"vado_server/internal/domain/user"
 
 	"github.com/gin-gonic/gin"
@@ -22,8 +21,7 @@ func renderUsersPage(c *gin.Context, service *user.Service, errorMsg string) {
 		return
 	}
 
-	td, _ := c.Get(code.TemplateData)
-	data := td.(gin.H)
+	data := tplWithCapture(c, "Users list")
 	data["Users"] = users
 
 	if errorMsg != "" {

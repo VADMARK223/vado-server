@@ -10,7 +10,6 @@ import (
 func TemplateContext(c *gin.Context) {
 	result := gin.H{
 		code.Username: "Guest",
-		code.Mode:     gin.Mode(),
 	}
 
 	if contextUser, ok := c.Get(code.CurrentUser); ok {

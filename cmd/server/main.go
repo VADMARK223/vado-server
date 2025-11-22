@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"log"
 	netHttp "net/http"
 	"os"
 	"os/signal"
@@ -83,7 +82,6 @@ func main() {
 	// Kafka consumer
 	//------------------------------------------------------------
 	kafkaEnable := appCtx.Cfg.KafkaEnable
-	log.Println("KafkaEnable", kafkaEnable)
 	var consumer *kafka.Consumer
 	if kafkaEnable {
 		consumer = kafka.NewConsumer(appCtx)

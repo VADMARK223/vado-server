@@ -7,7 +7,6 @@ const (
 	TokenStatus          = "token_status"
 	RefreshTokenStatus   = "refresh_token_status"
 	VadoRefreshToken     = "vado_refresh_token"
-	Mode                 = "mode"
 	TemplateData         = "template_data"
 	Local                = "local"
 	Port                 = "port"
@@ -22,4 +21,5 @@ const (
 	Login                = "login"
 	Username             = "username"
 	IsAdmin              = "is_admin"
+	Capture              = "capture"
 )

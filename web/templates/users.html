@@ -6,22 +6,7 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-<header>
-    <h1>Users</h1>
-    {{ template "menu" . }}
-    <script>
-        async function deleteUser(id) {
-            if (!confirm('Delete user?')) return;
-
-            const res = await fetch(`/users/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                document.getElementById(`user-${id}`).remove();
-            } else {
-                alert('Error deleting user');
-            }
-        }
-    </script>
-</header>
+{{ template "header" . }}
 
 <main>
     <div class="container">
@@ -48,5 +33,17 @@
 </main>
 
 {{ template "footer" . }}
+<script>
+    async function deleteUser(id) {
+        if (!confirm('Delete user?')) return;
+
+        const res = await fetch(`/users/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            document.getElementById(`user-${id}`).remove();
+        } else {
+            alert('Error deleting user');
+        }
+    }
+</script>
 </body>
 </html>
