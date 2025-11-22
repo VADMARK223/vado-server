@@ -54,6 +54,7 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 
 	// Публичные маршруты
 	r.GET(route.Index, handler.ShowIndex(tokenProvider))
+	r.GET(route.Book, handler.ShowBook)
 	r.GET(route.Login, handler.ShowLogin)
 	r.POST(route.Login, authH.Login)
 	r.GET(route.Register, handler.ShowSignup)
