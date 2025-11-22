@@ -1,5 +1,5 @@
 {{ define "menu" }}
-<div class="vado-menu">
+<div class="menu">
     <div>
         <a href="/" class="btn"><i class="fa-solid fa-house"></i></a>
         <a href="/book" class="btn"><i class="fa-solid fa-book"></i></a>
@@ -13,9 +13,8 @@
         {{end}}
     </div>
 
-    <div class="vado-menu-info">
-        <p>Hello, {{.username}}!</p>
-        <p id="email"></p>
+    <div class="menu-right">
+        <span>Hello, {{.username}}!</span>
         {{if .user_id}}
         <form action="/logout" method="POST" style="display:inline;">
             <button class="btn" id="logBtn">

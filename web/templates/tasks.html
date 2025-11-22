@@ -13,7 +13,7 @@
 
 <main>
     <div class="container">
-        <form class="vado-add-form" action="/tasks" method="POST">
+        <form class="form-add" action="/tasks" method="POST">
             <label>
                 <input type="text" name="name" placeholder="Task name" required>
             </label>
@@ -29,11 +29,15 @@
             </div>
         </form>
 
+        <div>
+            <hr/>
+        </div>
+
         <div class="scrollable-content">
-            <div class="vado-list">
+            <div class="list">
                 {{range .Tasks}}
-                <div class="vado-item {{if .Completed}}completed{{end}}" id="task-{{.ID}}">
-                    <div class="vado-item-info">
+                <div class="item {{if .Completed}}completed{{end}}" id="task-{{.ID}}">
+                    <div class="item-info">
                         <h3>{{.Name}}</h3>
                         <p>{{.Description}}</p>
                         <small>Created: {{.CreatedAt.Format "02.01.2006 15:04"}}</small>
