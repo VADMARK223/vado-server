@@ -20,11 +20,34 @@
             <label>
                 <input name="password" type="password" placeholder="Password" required>
             </label>
-            {{if .Error}}<p class="error">{{.Error}}</p>{{end}}
-            <button class="btn" type="submit">Log in</button>
-            <p><a href="/register">Sign up</a></p>
+            <div>
+                <button id="submitBtn" class="btn" type="submit">Log in</button>
+                {{if .error}}<span class="error-msg">{{.error}}</span>{{end}}
+            </div>
+
+            <span><a href="/register">Sign up</a></span>
         </form>
     </div>
+    <script>
+        const loginInput = document.querySelector('input[name="login"]');
+        const passwordInput = document.querySelector('input[name="password"]');
+        const submitBtn = document.getElementById("submitBtn")
+
+        loginInput.addEventListener("input", updateState);
+        passwordInput.addEventListener("input", updateState);
+
+        function updateState() {
+            const login = loginInput.value.trim();
+            const password = passwordInput.value.trim();
+            setDisabledSubmitBtn(login, password);
+        }
+
+        function setDisabledSubmitBtn(login, password) {
+            submitBtn.disabled = login === "" || password === "";
+        }
+
+        updateState();
+    </script>
 </main>
 
 {{ template "footer" . }}

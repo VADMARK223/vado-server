@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"vado_server/internal/config/code"
 	"vado_server/internal/config/route"
 	"vado_server/internal/domain/auth"
@@ -41,7 +42,9 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	_, tokens, err := h.service.Login(login, password)
 	if err != nil {
-		c.HTML(http.StatusUnauthorized, "login.html", gin.H{"Error": err.Error()})
+		errorStr := strings.ToUpper(err.Error()[:1]) + err.Error()[1:]
+		c.HTML(http.StatusUnauthorized, "login.html", gin.H{code.Error: errorStr})
+		return
 	}
 
 	auth.SetTokenCookies(c, tokens, h.refreshTokenTTLSecs)

@@ -2,11 +2,13 @@
 <div class="vado-menu">
     <div>
         <a href="/" class="btn"><i class="fa-solid fa-house"></i></a>
+        {{if .user_id}}
         <a href="/tasks" class="btn"><i class="fa-solid fa-list-check"></i></a>
         <a href="/chat" class="btn"><i class="fa-solid fa-comment"></i></a>
         {{if .is_admin}}
         <a href="/users" class="btn"><i class="fa-solid fa-users"></i></a>
         <a href="/grpc-test" class="btn"><i class="fa-solid fa-j"></i></a>
+        {{end}}
         {{end}}
     </div>
 
@@ -17,7 +19,6 @@
         <form action="/logout" method="POST" style="display:inline;">
             <button class="btn" id="logBtn">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
-<!--                <i class="fa-solid fa-person-walking-dashed-line-arrow-right"></i>-->
             </button>
         </form>
         {{else}}

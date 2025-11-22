@@ -38,19 +38,19 @@ func CheckJWT(provider *token.JWTProvider, refreshTokenTTL string) gin.HandlerFu
 func tryRefresh(c *gin.Context, refRefreshTokenTTL int, provider *token.JWTProvider) {
 	refreshStr, err := c.Cookie(code.VadoRefreshToken)
 	if err != nil || refreshStr == "" {
-		setNotAuth(c)
+		c.Next()
 		return
 	}
 
 	refreshClaims, err := provider.ParseToken(refreshStr)
 	if err != nil || (refreshClaims.ExpiresAt != nil && refreshClaims.ExpiresAt.Time.Before(time.Now())) {
-		setNotAuth(c)
+		c.Next()
 		return
 	}
 
 	newAccess, err := provider.CreateToken(refreshClaims.UserID(), refreshClaims.Role)
 	if err != nil {
-		setNotAuth(c)
+		c.Next()
 		return
 	}
 
@@ -62,9 +62,5 @@ func tryRefresh(c *gin.Context, refRefreshTokenTTL int, provider *token.JWTProvi
 func setAuth(c *gin.Context, id uint, role string) {
 	c.Set(code.UserId, id)
 	c.Set(code.Role, role)
-	c.Next()
-}
-
-func setNotAuth(c *gin.Context) {
 	c.Next()
 }

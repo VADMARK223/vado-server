@@ -18,7 +18,7 @@
             <label><input name="password" type="password" placeholder="Password" required></label>
             <label><input name="username" placeholder="Username" required></label>
             <label><input name="email" type="email" placeholder="E-mail" required></label>
-            <label><input name="role" placeholder="Role" value="user" required ></label>
+            <label><input name="role" placeholder="Role" value="user" required></label>
             <label><input name="color" placeholder="Color" value="#FF5733" required></label>
             {{if .Error}}<p class="error">{{.Error}}</p>{{end}}
             <button class="btn" type="submit">Create account</button>
@@ -30,13 +30,13 @@
 {{ template "footer" . }}
 
 <script>
-    document.addEventListener("DOMContentLoaded", ()=>{
+    document.addEventListener("DOMContentLoaded", () => {
         const login = document.querySelector('input[name="login"]')
         const password = document.querySelector('input[name="password"]')
         const email = document.querySelector('input[name="email"]')
         const username = document.querySelector('input[name="username"]')
 
-        login.addEventListener("input", ()=>{
+        login.addEventListener("input", () => {
             const v = login.value.trim();
 
             if (!v) return;
