@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 	"vado_server/internal/config/code"
@@ -36,8 +35,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	_, tokens, err := h.service.Login(login, password)
 	if err != nil {
-		errorStr := strings.ToUpper(err.Error()[:1]) + err.Error()[1:]
-		c.Set(code.Error, errorStr)
+		c.Set(code.Error, strings.ToUpper(err.Error()[:1])+err.Error()[1:])
 		ShowLogin(c)
 		return
 	}
@@ -70,9 +68,8 @@ func PerformRegister(service *user.Service) gin.HandlerFunc {
 		err := service.CreateUser(user.DTO{Login: login, Email: email, Password: password, Role: user.Role(role), Color: color, Username: username})
 
 		if err != nil {
-			c.HTML(http.StatusBadRequest, "register.html", gin.H{
-				"Error": fmt.Sprintf("Ошибка при регистрации: %s", err.Error()),
-			})
+			c.Set(code.Error, strings.ToUpper(err.Error()[:1])+err.Error()[1:])
+			ShowSignup(c)
 			return
 		}
 

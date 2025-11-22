@@ -1,12 +1,25 @@
 package gorm
 
 import (
+	"errors"
 	"fmt"
 	"vado_server/internal/app"
 	"vado_server/internal/domain/user"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+)
+
+const (
+	UniqueCode      = "23505"
+	ConstraintLogin = "users_login_key"
+	ConstraintEmail = "users_email_key"
+)
+
+var (
+	ErrLoginExists = errors.New("login already exists")
+	ErrEmailExists = errors.New("email already exists")
 )
 
 type UserRepository struct {
@@ -24,6 +37,16 @@ func NewUserRepo(ctx *app.Context) user.Repository {
 func (r *UserRepository) CreateUser(u user.User) error {
 	entity := toEntity(u)
 	if err := r.db.Create(&entity).Error; err != nil {
+		if pgErr := parsePgError(err); pgErr != nil {
+			if pgErr.Code == UniqueCode {
+				switch pgErr.ConstraintName {
+				case ConstraintLogin:
+					return ErrLoginExists
+				case ConstraintEmail:
+					return ErrEmailExists
+				}
+			}
+		}
 		return fmt.Errorf("failed to create user: %w", err)
 	}
 	return nil
@@ -91,4 +114,12 @@ func toEntity(u user.User) UserEntity {
 		Role:      string(u.Role), // доменный тип → строка
 		CreatedAt: u.CreatedAt,
 	}
+}
+
+func parsePgError(err error) *pgconn.PgError {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		return pgErr
+	}
+	return nil
 }

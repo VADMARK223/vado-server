@@ -15,12 +15,12 @@
             <label><input name="password" type="password" placeholder="Password" required></label>
             <label><input name="username" placeholder="Username" required></label>
             <label><input name="email" type="email" placeholder="E-mail" required></label>
-            <label><input name="role" placeholder="Role" value="user" required></label>
-            <label><input name="color" placeholder="Color" value="#FF5733" required></label>
+            <label><input name="role" placeholder="Role" value="user" disabled></label>
+            <label><input name="color" placeholder="Color" value="#FF5733" disabled></label>
 
             <div>
-                <button class="btn" type="submit">Create account</button>
-                {{if .Error}}<p class="error">{{.Error}}</p>{{end}}
+                <button id="submitBtn" class="btn" type="submit">Create account</button>
+                {{if .error}}<span class="error-msg">{{.error}}</span>{{end}}
             </div>
 
             <span>
@@ -34,20 +34,41 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        const login = document.querySelector('input[name="login"]')
-        const password = document.querySelector('input[name="password"]')
-        const email = document.querySelector('input[name="email"]')
-        const username = document.querySelector('input[name="username"]')
+        const loginInput = document.querySelector('input[name="login"]')
+        const passwordInput = document.querySelector('input[name="password"]')
+        const emailInput = document.querySelector('input[name="email"]')
+        const usernameInput = document.querySelector('input[name="username"]')
+        const submitBtn = document.getElementById("submitBtn")
 
-        login.addEventListener("input", () => {
-            const v = login.value.trim();
+        loginInput.addEventListener("input", () => {
+            const v = loginInput.value.trim();
 
-            if (!v) return;
+            if (v) {
+                passwordInput.value = v;
+                emailInput.value = `${v}@${v}.ru`;
+                usernameInput.value = `User${v}`;
+            }
 
-            password.value = v;
-            email.value = `${v}@${v}.ru`;
-            username.value = `User${v}`;
+            updateState()
         })
+
+        passwordInput.addEventListener("input", updateState);
+        emailInput.addEventListener("input", updateState);
+        usernameInput.addEventListener("input", updateState);
+
+        function updateState() {
+            const login = loginInput.value.trim();
+            const password = passwordInput.value.trim();
+            const email = emailInput.value.trim();
+            const username = usernameInput.value.trim();
+            setDisabledSubmitBtn(login, password, email, username);
+        }
+
+        function setDisabledSubmitBtn(login, password, email, username) {
+            submitBtn.disabled = login === "" || password === "" || email === "" || username === "";
+        }
+
+        updateState();
     })
 </script>
 </body>
