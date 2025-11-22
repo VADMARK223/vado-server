@@ -1,11 +1,11 @@
 @import url("/static/css/fontawesome-7_1_0.min.css");
 
 :root {
-    --bg-main: #2b2b2b;
+    --bg-main: #1e1f22;
     --bg-item: #313335;
     --bg-item-hover: #3a3d41;
-    --bg-panel: #3c3f41;
-    --bg-entry: #45494a;
+    --bg-panel: #2b2d30;
+    --bg-entry: #1e1f22;
     --bg-border: #4b4e50;
 
     --text: #a9b7c6;
@@ -13,7 +13,7 @@
     --accent-strong: #4e94ce;
     --orange: #cc7832;
     --error: #d9534f;
-    --danger: rgba(255, 0, 0, 0.87);
+    --danger: #c94f4f;
 
     --layout-min-width: 320px;
     /*--layout-min-width: 700px;*/
@@ -165,8 +165,8 @@ a:hover {
 }
 
 *::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: var(--space-2);
+    height: var(--space-2);
 }
 
 *::-webkit-scrollbar-track {
@@ -174,12 +174,12 @@ a:hover {
 }
 
 *::-webkit-scrollbar-thumb {
-    background: var(--accent-strong);
+    background: #4d4e51;
     border-radius: var(--radius-sm);
 }
 
 *::-webkit-scrollbar-thumb:hover {
-    background: var(--accent);
+    background: #5b5c5d;
 }
 
 .btn, .btn-small, .btn-danger {
@@ -227,7 +227,7 @@ a:hover {
 }
 
 .btn-danger:hover {
-    background: #ff9559;
+    background: #b54747;
 }
 
 .btn-outline {
@@ -442,4 +442,16 @@ input[type="checkbox"]:checked::after {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+@media (max-width: 600px) {
+    /*.menu .btn {
+        padding: 4px 8px;
+        font-size: 12px;
+    }*/
+
+    .greetings {
+        display: none;
+        /*color: red;*/
+    }
 }
