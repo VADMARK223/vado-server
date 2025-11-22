@@ -37,7 +37,8 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	_, tokens, err := h.service.Login(login, password)
 	if err != nil {
 		errorStr := strings.ToUpper(err.Error()[:1]) + err.Error()[1:]
-		c.HTML(http.StatusUnauthorized, "login.html", gin.H{code.Error: errorStr})
+		c.Set(code.Error, errorStr)
+		ShowLogin(c)
 		return
 	}
 

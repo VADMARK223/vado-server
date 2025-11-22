@@ -17,9 +17,15 @@
             <label><input name="email" type="email" placeholder="E-mail" required></label>
             <label><input name="role" placeholder="Role" value="user" required></label>
             <label><input name="color" placeholder="Color" value="#FF5733" required></label>
-            {{if .Error}}<p class="error">{{.Error}}</p>{{end}}
-            <button class="btn" type="submit">Create account</button>
-            <p><a href="/login">Sign in</a></p>
+
+            <div>
+                <button class="btn" type="submit">Create account</button>
+                {{if .Error}}<p class="error">{{.Error}}</p>{{end}}
+            </div>
+
+            <span>
+                <a href="/login">Sign in</a>
+            </span>
         </form>
     </div>
 </main>
