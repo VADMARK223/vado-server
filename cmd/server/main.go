@@ -15,6 +15,7 @@ import (
 	"vado_server/internal/infra/db"
 	"vado_server/internal/infra/kafka"
 	"vado_server/internal/infra/logger"
+	"vado_server/internal/infra/token"
 	"vado_server/internal/trasport/grpc"
 	"vado_server/internal/trasport/http"
 
@@ -59,12 +60,14 @@ func main() {
 	// HTTP сервер (Gin)
 	//------------------------------------------------------------
 	wg.Add(1)
-	srv := startHTTPServer(ctxWithCancel, appCtx, &wg, appCtx.Cfg.Port)
+	tokenProvider := token.NewJWTProvider(appCtx.Cfg)
+	srv := startHTTPServer(ctxWithCancel, appCtx, &wg, tokenProvider)
 
 	//------------------------------------------------------------
 	// gRPC сервер
 	//------------------------------------------------------------
-	grpcSrv, err := grpc.NewServer(appCtx, appCtx.Cfg.GrpcPort, appCtx.Cfg.GrpcWebPort, appCtx.Cfg.Port)
+
+	grpcSrv, err := grpc.NewServer(appCtx, appCtx.Cfg.GrpcPort, appCtx.Cfg.GrpcWebPort, tokenProvider)
 	if err != nil {
 		appCtx.Log.Fatalw("failed to start gRPC server", "error", err)
 	}
@@ -183,14 +186,14 @@ func initDB(appCtx *ctx.Context) *gorm.DB {
 }
 
 // startHTTPServer запускает Gin и корректно останавливает его при ctx.Done()
-func startHTTPServer(ctx context.Context, appCtx *ctx.Context, wg *sync.WaitGroup, port string) *netHttp.Server {
+func startHTTPServer(ctx context.Context, appCtx *ctx.Context, wg *sync.WaitGroup, tokenProvider *token.JWTProvider) *netHttp.Server {
 	defer wg.Done()
-	router := http.SetupRouter(appCtx)
+	router := http.SetupRouter(appCtx, tokenProvider)
 	srv := &netHttp.Server{
-		Addr:    ":" + port,
+		Addr:    ":" + appCtx.Cfg.Port,
 		Handler: router,
 	}
-	appCtx.Log.Infow("HTTP Server starting", code.Port, port)
+	appCtx.Log.Infow("HTTP Server starting", code.Port, appCtx.Cfg.Port)
 
 	// Запускаем сервер в отдельной горутине для graceful shutdown
 	go func() {

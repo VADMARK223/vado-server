@@ -2,8 +2,6 @@ package http
 
 import (
 	"html/template"
-	"strconv"
-	"time"
 	"vado_server/internal/app"
 	"vado_server/internal/config/route"
 	"vado_server/internal/domain/task"
@@ -17,19 +15,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter(ctx *app.Context) *gin.Engine {
+func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine {
 	// WS
 	hub := ws.NewHub(ctx.Log)
 	go hub.Run()
 	// Сервисы
 	taskSvc := task.NewService(gorm.NewTaskRepo(ctx.DB))
-	tokenTTL, _ := strconv.Atoi(ctx.Cfg.TokenTTL())
-	refreshTTL, _ := strconv.Atoi(ctx.Cfg.RefreshTTL)
-	tokenProvider := token.NewJWTProvider(ctx.Cfg.JwtSecret, time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
+
 	userSvc := user.NewService(gorm.NewUserRepo(ctx), tokenProvider)
 	localCache := app.NewLocalCache()
+
 	// Хендлеры
-	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.TokenTTL(), ctx.Cfg.RefreshTTL, ctx.Log)
+	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.RefreshTTLInt(), ctx.Log)
 
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()
@@ -47,7 +44,7 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 
 	// Middleware
 	r.Use(middleware.SessionMiddleware())
-	r.Use(middleware.CheckJWT(tokenProvider, ctx.Cfg.RefreshTTL))
+	r.Use(middleware.CheckJWT(tokenProvider, ctx.Cfg.RefreshTTLInt()))
 	r.Use(middleware.LoadUserContext(userSvc, localCache))
 	r.Use(middleware.NoCache)
 	r.Use(middleware.TemplateContext)

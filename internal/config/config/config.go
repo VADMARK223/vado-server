@@ -5,6 +5,9 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/k0kubun/pp/v3"
 )
 
 type Port string
@@ -15,13 +18,13 @@ type Config struct {
 	GrpcPort           string
 	GrpcWebPort        string
 	JwtSecret          string
-	RefreshTTL         string
 	GinMode            string
 	PostgresDsn        string
 	KafkaEnable        bool
 	KafkaBroker        string
 	corsAllowedOrigins string
-	tokenTTL           string // Время жизни токена в секунда
+	accessTTL          string // Время жизни токена в секунда
+	refreshTTL         string
 }
 
 func Load() *Config {
@@ -34,13 +37,13 @@ func Load() *Config {
 		KafkaEnable:        getEnvBool("KAFKA_ENABLE"),
 		KafkaBroker:        getEnv("KAFKA_BROKER"),
 		JwtSecret:          getEnv("JWT_SECRET"),
-		tokenTTL:           getEnv("TOKEN_TTL"),
-		RefreshTTL:         getEnv("REFRESH_TTL"),
+		accessTTL:          getEnv("TOKEN_TTL"),
+		refreshTTL:         getEnv("REFRESH_TTL"),
 		GinMode:            getEnv("GIN_MODE"),
 		PostgresDsn:        getEnv("POSTGRES_DSN"),
 	}
 
-	log.Printf("Loaded config: PORT=%s, GRPC_PORT=%s, GRPC_WEB_PORT=%s, TOKEN_TTL=%s", cfg.Port, cfg.GrpcPort, cfg.GrpcWebPort, cfg.tokenTTL)
+	log.Printf("Loaded config: PORT=%s, GRPC_PORT=%s, GRPC_WEB_PORT=%s, TOKEN_TTL=%s", cfg.Port, cfg.GrpcPort, cfg.GrpcWebPort, cfg.accessTTL)
 
 	return cfg
 }
@@ -59,17 +62,25 @@ func (cfg *Config) CorsAllowedOrigins() map[string]bool {
 	return result
 }
 
-func (cfg *Config) TokenTTL() string {
-	return cfg.tokenTTL
-}
-
-/*func (cfg *Config) Test() time.Duration {
-	ttl, err := strconv.Atoi(cfg.tokenTTL)
+func (cfg *Config) AccessTTLDuration() time.Duration {
+	ttl, err := strconv.Atoi(cfg.accessTTL)
 	if err != nil {
 		panic(pp.Sprintf("Failed to parse token TTL: %v", err))
 	}
 	return time.Duration(ttl) * time.Second
-}*/
+}
+
+func (cfg *Config) RefreshTTLInt() int {
+	ttl, err := strconv.Atoi(cfg.refreshTTL)
+	if err != nil {
+		panic(pp.Sprintf("Failed to parse refresh token TTL: %v", err))
+	}
+	return ttl
+}
+
+func (cfg *Config) RefreshTTLDuration() time.Duration {
+	return time.Duration(cfg.RefreshTTLInt()) * time.Second
+}
 
 func getEnv(key string) string {
 	if val := os.Getenv(key); val != "" {

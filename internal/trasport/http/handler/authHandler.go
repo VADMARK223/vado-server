@@ -3,7 +3,6 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 	"vado_server/internal/config/code"
 	"vado_server/internal/config/route"
@@ -16,23 +15,18 @@ import (
 )
 
 type AuthHandler struct {
-	service             *user.Service
-	secret              string
-	tokenTTLSecs        int
-	refreshTokenTTLSecs int
-	log                 *zap.SugaredLogger
+	service    *user.Service
+	secret     string
+	refreshTTL int
+	log        *zap.SugaredLogger
 }
 
-func NewAuthHandler(service *user.Service, secret string, tokenTTL string, refreshTokenTTL string, log *zap.SugaredLogger) *AuthHandler {
-	tokenTTLSecs, _ := strconv.Atoi(tokenTTL)
-	refreshTokenTTLSecs, _ := strconv.Atoi(refreshTokenTTL)
-
+func NewAuthHandler(service *user.Service, secret string, refreshTTL int, log *zap.SugaredLogger) *AuthHandler {
 	return &AuthHandler{
-		service:             service,
-		secret:              secret,
-		tokenTTLSecs:        tokenTTLSecs,
-		refreshTokenTTLSecs: refreshTokenTTLSecs,
-		log:                 log,
+		service:    service,
+		secret:     secret,
+		refreshTTL: refreshTTL,
+		log:        log,
 	}
 }
 
@@ -47,7 +41,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	auth.SetTokenCookies(c, tokens, h.refreshTokenTTLSecs)
+	auth.SetTokenCookies(c, tokens, h.refreshTTL)
 
 	session := sessions.Default(c)
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+	"vado_server/internal/config/config"
 	"vado_server/internal/domain/auth"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -16,8 +17,8 @@ type JWTProvider struct {
 	refreshTTL time.Duration
 }
 
-func NewJWTProvider(secret string, accessTTL, refreshTTL time.Duration) *JWTProvider {
-	return &JWTProvider{secret: secret, accessTTL: accessTTL, refreshTTL: refreshTTL}
+func NewJWTProvider(cfg *config.Config) *JWTProvider {
+	return &JWTProvider{secret: cfg.JwtSecret, accessTTL: cfg.AccessTTLDuration(), refreshTTL: cfg.RefreshTTLDuration()}
 }
 
 func (j *JWTProvider) CreateTokenPair(userID uint, role string) (*auth.TokenPair, error) {

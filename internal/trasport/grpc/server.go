@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"strconv"
-	"time"
 	pbAuth "vado_server/api/pb/auth"
 	pbChat "vado_server/api/pb/chat"
 	pbHello "vado_server/api/pb/hello"
@@ -29,24 +27,22 @@ type Server struct {
 	log        *zap.SugaredLogger
 }
 
-func NewServer(ctx *app.Context, grpcPort, grpcWebPort, port string) (*Server, error) {
+func NewServer(ctx *app.Context, grpcPort, grpcWebPort string, provider *token.JWTProvider) (*Server, error) {
 	lis, err := net.Listen("tcp", ":"+grpcPort)
 	if err != nil {
 		return nil, fmt.Errorf("failed to listen on port %s: %w", grpcPort, err)
 	}
 
-	tokenTTL, _ := strconv.Atoi(ctx.Cfg.TokenTTL())
-	refreshTTL, _ := strconv.Atoi(ctx.Cfg.RefreshTTL)
-	tokenProvider := token.NewJWTProvider(ctx.Cfg.JwtSecret, time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
+	//
 	s := &Server{
 		grpcServer: grpc.NewServer(
-			grpc.UnaryInterceptor(NewAuthInterceptor(ctx.Log, tokenProvider)),
+			grpc.UnaryInterceptor(NewAuthInterceptor(ctx.Log, provider)),
 		),
 		listener: lis,
 		log:      ctx.Log,
 	}
 
-	userSvc := user.NewService(gorm.NewUserRepo(ctx), tokenProvider)
+	userSvc := user.NewService(gorm.NewUserRepo(ctx), provider)
 
 	pbAuth.RegisterAuthServiceServer(s.grpcServer, NewAuthServer(userSvc, ctx.Cfg.JwtSecret))
 	pbHello.RegisterHelloServiceServer(s.grpcServer, NewHelloServer(ctx.Log))

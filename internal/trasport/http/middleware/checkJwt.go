@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"strconv"
 	"time"
 	"vado_server/internal/config/code"
 	"vado_server/internal/domain/auth"
@@ -10,24 +9,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CheckJWT(provider *token.JWTProvider, refreshTokenTTL string) gin.HandlerFunc {
+func CheckJWT(provider *token.JWTProvider, refreshTTL int) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		refreshTokenTTLSecs, _ := strconv.Atoi(refreshTokenTTL)
 		tokenStr, err := c.Cookie(code.VadoToken)
 		if err != nil || tokenStr == "" {
-			tryRefresh(c, refreshTokenTTLSecs, provider)
+			tryRefresh(c, refreshTTL, provider)
 			return
 		}
 
 		claims, err := provider.ParseToken(tokenStr)
 		if err != nil {
-			tryRefresh(c, refreshTokenTTLSecs, provider)
+			tryRefresh(c, refreshTTL, provider)
 			return
 		}
 
 		// Проверка срока действия токена
 		if claims.ExpiresAt != nil && claims.ExpiresAt.Time.Before(time.Now()) {
-			tryRefresh(c, refreshTokenTTLSecs, provider)
+			tryRefresh(c, refreshTTL, provider)
 			return
 		}
 
