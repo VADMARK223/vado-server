@@ -7,6 +7,6 @@ type TokenPair struct {
 
 type TokenProvider interface {
 	CreateTokenPair(userID uint, role string) (*TokenPair, error)
-	CreateToken(userID uint, role string) (string, error)
+	CreateToken(userID uint, role string, accessToken bool) (string, error)
 	ParseToken(token string) (*CustomClaims, error)
 }

@@ -35,7 +35,7 @@ func NewServer(ctx *app.Context, grpcPort, grpcWebPort, port string) (*Server, e
 		return nil, fmt.Errorf("failed to listen on port %s: %w", grpcPort, err)
 	}
 
-	tokenTTL, _ := strconv.Atoi(ctx.Cfg.TokenTTL)
+	tokenTTL, _ := strconv.Atoi(ctx.Cfg.TokenTTL())
 	refreshTTL, _ := strconv.Atoi(ctx.Cfg.RefreshTTL)
 	tokenProvider := token.NewJWTProvider(ctx.Cfg.JwtSecret, time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
 	s := &Server{

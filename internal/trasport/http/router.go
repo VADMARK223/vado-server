@@ -23,13 +23,13 @@ func SetupRouter(ctx *app.Context) *gin.Engine {
 	go hub.Run()
 	// Сервисы
 	taskSvc := task.NewService(gorm.NewTaskRepo(ctx.DB))
-	tokenTTL, _ := strconv.Atoi(ctx.Cfg.TokenTTL)
+	tokenTTL, _ := strconv.Atoi(ctx.Cfg.TokenTTL())
 	refreshTTL, _ := strconv.Atoi(ctx.Cfg.RefreshTTL)
 	tokenProvider := token.NewJWTProvider(ctx.Cfg.JwtSecret, time.Duration(tokenTTL)*time.Second, time.Duration(refreshTTL)*time.Second)
 	userSvc := user.NewService(gorm.NewUserRepo(ctx), tokenProvider)
 	localCache := app.NewLocalCache()
 	// Хендлеры
-	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.TokenTTL, ctx.Cfg.RefreshTTL, ctx.Log)
+	authH := handler.NewAuthHandler(userSvc, ctx.Cfg.JwtSecret, ctx.Cfg.TokenTTL(), ctx.Cfg.RefreshTTL, ctx.Log)
 
 	gin.SetMode(ctx.Cfg.GinMode)
 	r := gin.New()

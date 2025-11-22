@@ -65,7 +65,7 @@ func (s *Service) Refresh(token string) (User, string, error) {
 		return User{}, "", errors.New("user not found")
 	}
 
-	newToken, errToken := s.tokens.CreateToken(u.ID, string(u.Role))
+	newToken, errToken := s.tokens.CreateToken(u.ID, string(u.Role), true)
 	if errToken != nil {
 		return User{}, "", status.Error(codes.Unauthenticated, fmt.Sprintf("Error creating new token: %s", errToken.Error()))
 	}

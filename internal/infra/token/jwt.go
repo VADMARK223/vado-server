@@ -21,12 +21,12 @@ func NewJWTProvider(secret string, accessTTL, refreshTTL time.Duration) *JWTProv
 }
 
 func (j *JWTProvider) CreateTokenPair(userID uint, role string) (*auth.TokenPair, error) {
-	access, err := j.CreateToken(userID, role)
+	access, err := j.CreateToken(userID, role, true)
 	if err != nil {
 		return nil, err
 	}
 
-	refresh, err := j.CreateToken(userID, role)
+	refresh, err := j.CreateToken(userID, role, false)
 	if err != nil {
 		return nil, err
 	}
@@ -37,13 +37,21 @@ func (j *JWTProvider) CreateTokenPair(userID uint, role string) (*auth.TokenPair
 	}, nil
 }
 
-func (j *JWTProvider) CreateToken(userID uint, role string) (string, error) {
+func (j *JWTProvider) CreateToken(userID uint, role string, accessToken bool) (string, error) {
 	now := time.Now()
+
+	var duration time.Duration
+	if accessToken {
+		duration = j.accessTTL
+	} else {
+		duration = j.refreshTTL
+	}
+
 	claims := auth.CustomClaims{
 		Role: role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   strconv.Itoa(int(userID)),
-			ExpiresAt: jwt.NewNumericDate(now.Add(j.accessTTL)),
+			ExpiresAt: jwt.NewNumericDate(now.Add(duration)),
 			IssuedAt:  jwt.NewNumericDate(now),
 			NotBefore: jwt.NewNumericDate(now), // Делает токен “активным не раньше определённого момента”
 			Issuer:    "vado-server",

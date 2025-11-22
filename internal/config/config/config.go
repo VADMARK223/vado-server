@@ -15,13 +15,13 @@ type Config struct {
 	GrpcPort           string
 	GrpcWebPort        string
 	JwtSecret          string
-	TokenTTL           string // Время жизни токена в секунда
 	RefreshTTL         string
 	GinMode            string
 	PostgresDsn        string
 	KafkaEnable        bool
 	KafkaBroker        string
 	corsAllowedOrigins string
+	tokenTTL           string // Время жизни токена в секунда
 }
 
 func Load() *Config {
@@ -34,13 +34,13 @@ func Load() *Config {
 		KafkaEnable:        getEnvBool("KAFKA_ENABLE"),
 		KafkaBroker:        getEnv("KAFKA_BROKER"),
 		JwtSecret:          getEnv("JWT_SECRET"),
-		TokenTTL:           getEnv("TOKEN_TTL"),
+		tokenTTL:           getEnv("TOKEN_TTL"),
 		RefreshTTL:         getEnv("REFRESH_TTL"),
 		GinMode:            getEnv("GIN_MODE"),
 		PostgresDsn:        getEnv("POSTGRES_DSN"),
 	}
 
-	log.Printf("Loaded config: PORT=%s, GRPC_PORT=%s, GRPC_WEB_PORT=%s, TOKEN_TTL=%s", cfg.Port, cfg.GrpcPort, cfg.GrpcWebPort, cfg.TokenTTL)
+	log.Printf("Loaded config: PORT=%s, GRPC_PORT=%s, GRPC_WEB_PORT=%s, TOKEN_TTL=%s", cfg.Port, cfg.GrpcPort, cfg.GrpcWebPort, cfg.tokenTTL)
 
 	return cfg
 }
@@ -58,6 +58,18 @@ func (cfg *Config) CorsAllowedOrigins() map[string]bool {
 	}
 	return result
 }
+
+func (cfg *Config) TokenTTL() string {
+	return cfg.tokenTTL
+}
+
+/*func (cfg *Config) Test() time.Duration {
+	ttl, err := strconv.Atoi(cfg.tokenTTL)
+	if err != nil {
+		panic(pp.Sprintf("Failed to parse token TTL: %v", err))
+	}
+	return time.Duration(ttl) * time.Second
+}*/
 
 func getEnv(key string) string {
 	if val := os.Getenv(key); val != "" {
