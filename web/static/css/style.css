@@ -38,7 +38,7 @@ header, footer {
     box-shadow: 0 1px 4px #000a;
 }
 
-h1, h3 {
+h1, h2, h3 {
     color: var(--accent);
 }
 
@@ -99,6 +99,24 @@ a:hover {
     overflow-y: auto;
     min-height: 0;
     margin: 0;
+}
+
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--bg-alt);
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--accent-strong);
+    border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
 }
 
 .btn, .btn-small, .btn-danger {
@@ -234,8 +252,8 @@ input[type="checkbox"]:checked::after {
     border-radius: 8px;
     transition: background 0.2s;
 }
-
-.vado-item p, h3 {
+.vado-item h3,
+.vado-item p {
     margin: 0;
 }
 
@@ -280,7 +298,7 @@ input[type="checkbox"]:checked::after {
     border: 1px solid #6897bb;
     padding: 15px;
     border-radius: 8px;
-    overflow-y: scroll;
+    overflow-y: auto;
     background: var(--bg);
     display: flex;
     flex-direction: column;
