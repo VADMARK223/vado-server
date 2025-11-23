@@ -15,8 +15,9 @@
             <label><input name="password" type="password" placeholder="Password" required></label>
             <label><input name="username" placeholder="Username" required></label>
             <label><input name="email" type="email" placeholder="E-mail" required></label>
-            <label><input name="role" placeholder="Role" value="user" disabled></label>
-            <label><input name="color" placeholder="Color" value="#FF5733" disabled></label>
+            <label><input value="user" disabled></label>
+            <input type="hidden" name="role" value="user">
+            <label><input name="color" placeholder="Color" value="#FF5733" readonly></label>
 
             <div>
                 <button id="submitBtn" class="btn" type="submit">Create account</button>

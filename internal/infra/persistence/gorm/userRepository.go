@@ -80,7 +80,7 @@ func (r *UserRepository) GetByID(id uint) (user.User, error) {
 
 func (r *UserRepository) GetAll() ([]user.User, error) {
 	var entities []UserEntity
-	err := r.db.Find(&entities).Error
+	err := r.db.Order("id ASC").Find(&entities).Error
 	result := make([]user.User, 0, len(entities))
 
 	for _, entity := range entities {

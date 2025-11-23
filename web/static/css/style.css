@@ -268,6 +268,14 @@ textarea:disabled {
     opacity: 0.6;
 }
 
+input[readonly],
+textarea[readonly] {
+    background: #26272a;
+    color: #999;
+    border-color: #555;
+    cursor: default;
+}
+
 input[type="checkbox"] {
     appearance: none; /* убираем стандартный стиль */
     -webkit-appearance: none;

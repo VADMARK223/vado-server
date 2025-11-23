@@ -41,7 +41,8 @@
         if (res.ok) {
             document.getElementById(`user-${id}`).remove();
         } else {
-            alert('Error deleting user');
+            const data = await res.json();
+            alert(data.error || 'Error deleting user');
         }
     }
 </script>
