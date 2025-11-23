@@ -81,6 +81,23 @@ go list -m all
 go run ./cmd/ping/main.go
 ```
 
+# nGinx
+
+Активация
+```shell
+sudo ln -s /etc/nginx/sites-available/vado.local /etc/nginx/sites-enabled/
+sudo nginx -t   # проверка синтаксиса
+sudo systemctl reload nginx
+```
+Права
+```shell
+sudo chmod o+x /home/vadmark
+sudo chmod o+x /home/vadmark/GolandProjects
+sudo chmod o+x /home/vadmark/GolandProjects/vado-server
+sudo chmod o+x /home/vadmark/GolandProjects/vado-server/web
+sudo chmod -R o+x /home/vadmark/GolandProjects/vado-server/web/static
+```
+
 # Stack
 - gRPC
 - gRPC Web

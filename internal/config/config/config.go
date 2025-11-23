@@ -50,12 +50,10 @@ func Load() *Config {
 
 func (cfg *Config) CorsAllowedOrigins() map[string]bool {
 	result := make(map[string]bool)
-	port := cfg.Port
-
 	for _, value := range strings.Split(cfg.corsAllowedOrigins, ",") {
 		value = strings.TrimSpace(value)
 		if value != "" {
-			key := value + ":" + port
+			key := value
 			result[key] = true
 		}
 	}
