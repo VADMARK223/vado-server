@@ -1,0 +1,13 @@
+{{ define "component.inputWithClear" }}
+<div class="input-wrap">
+    <label>
+        <input
+                name="{{ .Name }}"
+                placeholder="{{ .Placeholder }}"
+                {{ if .Required }}data-required="true"{{ end }}
+        >
+    </label>
+
+    <button type="button" class="clear-btn" data-clear>×</button>
+</div>
+{{ end }}

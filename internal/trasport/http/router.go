@@ -1,7 +1,11 @@
 package http
 
 import (
+	"fmt"
 	"html/template"
+	"os"
+	"path/filepath"
+	"strings"
 	"vado_server/internal/app"
 	"vado_server/internal/config/route"
 	"vado_server/internal/domain/task"
@@ -32,8 +36,7 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
 	// Шаблоны
-	tmpl := template.Must(template.ParseGlob("web/templates/*.html"))
-	r.SetHTMLTemplate(tmpl)
+	r.SetHTMLTemplate(loadTemplates())
 	_ = r.SetTrustedProxies(nil)
 	// Статика и шаблоны
 	r.Static("/static", "./web/static")
@@ -74,4 +77,44 @@ func SetupRouter(ctx *app.Context, tokenProvider *token.JWTProvider) *gin.Engine
 	}
 
 	return r
+}
+
+func loadTemplates() *template.Template {
+	tmpl := template.New("").Funcs(template.FuncMap{
+		"dict": dict,
+	})
+
+	err := filepath.Walk("web/templates", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() && strings.HasSuffix(path, ".html") {
+			_, err = tmpl.ParseFiles(path)
+			if err != nil {
+				return fmt.Errorf("parse error in %s: %w", path, err)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	return tmpl
+}
+
+func dict(values ...interface{}) (map[string]interface{}, error) {
+	if len(values)%2 != 0 {
+		return nil, fmt.Errorf("invalid dict call: odd number of args")
+	}
+	m := make(map[string]interface{}, len(values)/2)
+	for i := 0; i < len(values); i += 2 {
+		key, ok := values[i].(string)
+		if !ok {
+			return nil, fmt.Errorf("dict keys must be strings")
+		}
+		m[key] = values[i+1]
+	}
+	return m, nil
 }

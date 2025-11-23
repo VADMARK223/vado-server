@@ -11,19 +11,25 @@
 <main>
     <div class="container">
         <form class="form-add" method="POST" action="/login">
-            <label>
-                <input name="login" placeholder="Login" required>
-            </label>
-            <label>
-                <input name="password" type="password" placeholder="Password" required>
-            </label>
+            {{ template "component.inputWithClear" dict
+                "ID" "loginInput"
+                "Name" "login"
+                "Placeholder" "Введите логин"
+                "Required" "true"
+            }}
+            {{ template "component.inputWithClear" dict
+                "ID" "passwordInput"
+                "Name" "password"
+                "Placeholder" "Введите пароль"
+                "Required" "true"
+            }}
             <div>
-                <button id="submitBtn" class="btn" type="submit">Log in</button>
+                <button id="submitBtn" class="btn" type="submit">Войти</button>
                 {{if .error}}<span class="error-msg">{{.error}}</span>{{end}}
 
             </div>
             <span>
-                <a href="/register">Sign up</a>
+                <a href="/register">Регистрация</a>
             </span>
         </form>
     </div>
@@ -50,6 +56,18 @@
 </main>
 
 {{ template "footer" . }}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".clear-btn[data-clear]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                btn.closest(".input-wrap").querySelector("input").value = "";
+            });
+        });
 
+        document.querySelectorAll("input[data-required='true']").forEach(input => {
+            input.required = true;
+        });
+    });
+</script>
 </body>
 </html>

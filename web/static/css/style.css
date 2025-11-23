@@ -462,13 +462,25 @@ input[type="checkbox"]:checked::after {
 }
 
 @media (max-width: 600px) {
-    /*.menu .btn {
-        padding: 4px 8px;
-        font-size: 12px;
-    }*/
-
     .greetings {
         display: none;
-        /*color: red;*/
     }
+}
+
+.input-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.clear-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    color: var(--text);
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
 }
