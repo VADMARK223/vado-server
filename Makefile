@@ -74,42 +74,41 @@ proto-go:
 	@echo "✅ Generation complete."
 
 PB_WEB_OUT_DIR = ./web/static/js/pb
-GRPC_WEB_PLUGIN = $(shell which protoc-gen-grpc-web)
-TS_PLUGIN := $(shell pwd)/node_modules/.bin/protoc-gen-ts
+GRPC_WEB_PLUGIN = /usr/local/bin/protoc-gen-grpc-web
 
-proto-ts-clean:
-	@echo "$(ORANGE)⚠️ Clear all *.ts$(PB_WEB_OUT_DIR)...$(RESET)"
+proto-js-clean:
+	@echo "$(ORANGE)⚠️ Clear all *.js$(PB_WEB_OUT_DIR)...$(RESET)"
 	@find $(PB_WEB_OUT_DIR) -type f \( -name "*.ts" -o -name "*.js" \) -delete
 	@echo "$(GREEN)✅️ Cleaning is complete$(RESET)"
 
-proto-ts:
-	@echo "🔧 Generating gRPC-Web TypeScript files..."
+proto-js:
+	@echo "🔧 Generating gRPC-Web JS files..."
 	@mkdir -p $(PB_WEB_OUT_DIR)
-	@for file in $(PROTO_DIR)/*.proto; do \
-		echo "  🔵 Compiling $$file"; \
-		protoc -I=$(PROTO_DIR) \
-			--plugin=protoc-gen-ts=$(TS_PLUGIN) \
-			--js_out=import_style=commonjs,binary:$(PB_WEB_OUT_DIR) \
-			--ts_out=service=grpc-web:$(PB_WEB_OUT_DIR) \
-			$$file; \
-	done
-	@echo "✅ TypeScript gRPC stubs generated → $(PB_WEB_OUT_DIR)"
+	@for file in $(PROTO_FILES); do \
+        echo "  🔵 Compilation $$file"; \
+        $(PROTOC) -I=$(PROTO_DIR) $$file \
+            --js_out=import_style=commonjs,binary:$(PB_WEB_OUT_DIR) \
+            --plugin=protoc-gen-grpc-web=$(GRPC_WEB_PLUGIN) \
+            --grpc-web_out=import_style=commonjs,mode=grpcwebtext:$(PB_WEB_OUT_DIR); \
+    done
+	@echo "$(GREEN)✅ Generation complete. Files in $(PB_WEB_OUT_DIR)$(RESET)"
 
 bundle:
-	@echo "$(BLUE)📦 Bundling TypeScript client with esbuild...$(RESET)"
-	npx esbuild web/static/js/main.ts \
+	@echo "$(BLUE)📦 Bundling JavaScript client...$(RESET)"
+	npx esbuild web/static/js/main.js \
 			--bundle \
-			--format=esm --outfile=web/static/js/bundle.js \
+			--format=esm \
+			--outfile=web/static/js/bundle.js \
 			--platform=browser \
 			--target=es2020 \
 			--define:process.env.GRPC_WEB_PORT="'$(GRPC_WEB_PORT)'" \
 			--define:process.env.PORT="'$(PORT)'"
 	@echo "$(GREEN)✅ Bundle created → web/static/js/bundle.js$(RESET)"
 
-proto-ts-all: ## 🚀 Full pipeline: clean → generate → bundle
-	@echo "$(BLUE)🚀 Starting full gRPC-Web TypeScript build pipeline...$(RESET)"
-	@$(MAKE) proto-ts-clean || { echo "$(ORANGE)❌ Stage failed: proto-ts-clean$(RESET)"; exit 1; }
-	@$(MAKE) proto-ts || { echo "$(ORANGE)❌ Stage failed: proto-ts$(RESET)"; exit 1; }
+proto-js-all: ## 🚀 Full pipeline: clean → generate → bundle
+	@echo "$(BLUE)🚀 Starting full gRPC-Web JavaScript build pipeline...$(RESET)"
+	@$(MAKE) proto-js-clean || { echo "$(ORANGE)❌ Stage failed: proto-ts-clean$(RESET)"; exit 1; }
+	@$(MAKE) proto-js || { echo "$(ORANGE)❌ Stage failed: proto-ts$(RESET)"; exit 1; }
 	@$(MAKE) bundle || { echo "$(ORANGE)❌ Stage failed: bundle$(RESET)"; exit 1; }
 	@echo "$(GREEN)✅ All stages completed successfully!$(RESET)"
 
@@ -135,11 +134,11 @@ help:
 	@echo "  $(GREEN)make clean-all$(RESET) - ⚠️ clean all Docker (containers, images, volumes, networks)"
 	@echo "  $(GREEN)make proto-go$(RESET)  - 🧠generating gRPC Go files"
 	@echo ""
-	@echo "$(CYAN)Type script proto:$(RESET)"
-	@echo "  $(GREEN)make proto-ts-clean$(RESET) - 🧹 Clean generated *.ts and *.js, files from $(PB_WEB_OUT_DIR)"
-	@echo "  $(GREEN)make proto-ts$(RESET)       - 🔧 Generate gRPC-Web client files (.js, .d.ts, .ts)"
-	@echo "  $(GREEN)make bundle$(RESET)         - 📦 Bundle TypeScript client into a single bundle.js using esbuild"
-	@echo "  $(GREEN)make proto-ts-all$(RESET)   - 🚀 Run the full pipeline: clean → generate → bundle"
+	@echo "$(CYAN)JavaScript proto:$(RESET)"
+	@echo "  $(GREEN)make proto-js-clean$(RESET) - 🧹 Clean generated *.js, files from $(PB_WEB_OUT_DIR)"
+	@echo "  $(GREEN)make proto-js$(RESET)       - 🔧 Generate gRPC-Web client files (.js,)"
+	@echo "  $(GREEN)make bundle$(RESET)         - 📦 Bundle JavaScript client into a single bundle.js"
+	@echo "  $(GREEN)make proto-js-all$(RESET)   - 🚀 Run the full pipeline: clean → generate → bundle"
 	@echo ""
 	@echo "$(CYAN)Others:$(RESET)"
 	@echo "  $(GREEN)make kafka-up$(RESET)   - start kafka and kafka UI containers"

@@ -27,13 +27,14 @@
     const resultBox = document.getElementById('result');
     const sayHelloBtn = document.getElementById('sayHelloBtn');
     const pingBtn = document.getElementById('pingHelloBtn');
+    const token ="{{.vado_token}}"
 
     function setStatus(message, isError = false) {
         resultBox.textContent = (isError ? '❌ ' : '✅ ') + message + '\n';
     }
 
     sayHelloBtn.addEventListener('click', async () => {
-        sayHello("Вадим")
+        sayHello("Вадим",token)
             .then((resp) => {
                 setStatus("Response: " + resp.getMessage());
             })
